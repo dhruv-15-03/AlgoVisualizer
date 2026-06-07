@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AlgoVisualizer — Wireframe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            ink: { 50:'#f6f7f9', 100:'#eceff3', 200:'#d4dae3', 300:'#a8b3c4', 400:'#7280a0', 500:'#4a587a', 600:'#34405e', 700:'#222b44', 800:'#161c2e', 900:'#0b0f1c' },
+            accent: { 400:'#7c93ff', 500:'#5b75ff', 600:'#4159e6' },
+            ok: '#4ade80', warn: '#facc15', danger: '#f87171'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #0b0f1c; color: #eceff3; font-family: 'Inter', sans-serif; }
+    .panel { background: #161c2e; border: 1px solid #222b44; border-radius: 12px; }
+    .panel-header { background: #1b2238; border-bottom: 1px solid #222b44; padding: 10px 14px; font-size: 12px; font-weight: 600; color: #a8b3c4; letter-spacing: 0.08em; text-transform: uppercase; display:flex; align-items:center; gap:8px; border-radius: 12px 12px 0 0; }
+    .panel-body { padding: 14px; }
+    .code-line { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; padding: 0 14px; color: #d4dae3; }
+    .code-line.highlight { background: rgba(124, 147, 255, 0.13); border-left: 3px solid #7c93ff; padding-left: 11px; }
+    .code-line .kw { color: #c692ff; }
+    .code-line .fn { color: #7cdcfe; }
+    .code-line .num { color: #ffb86c; }
+    .code-line .str { color: #4ade80; }
+    .code-line .com { color: #6272a4; font-style: italic; }
+    .code-line .var { color: #f8f8f2; }
+    .pill { display:inline-flex; align-items:center; gap:6px; padding: 4px 10px; border-radius: 999px; font-size:11px; font-weight:600; }
+    .btn { display:inline-flex; align-items:center; gap:6px; padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; transition: all .15s; cursor:pointer; user-select:none; }
+    .btn-primary { background: #5b75ff; color: white; }
+    .btn-primary:hover { background: #4159e6; }
+    .btn-secondary { background: #222b44; color: #d4dae3; border: 1px solid #34405e; }
+    .btn-secondary:hover { background: #2c365a; }
+    .btn-icon { padding: 7px 9px; }
+    select, input[type=range] { font-family: inherit; }
+    select { background: #222b44; color: #eceff3; border: 1px solid #34405e; border-radius: 8px; padding: 7px 28px 7px 12px; font-size: 13px; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;utf8,<svg fill='%23a8b3c4' height='20' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>"); background-repeat: no-repeat; background-position: right 4px center; cursor: pointer; }
+    input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; background: #34405e; border-radius: 999px; outline:none; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; background: #7c93ff; border-radius: 50%; cursor: pointer; box-shadow: 0 0 0 4px rgba(124,147,255,0.18);}
+    .scroll-x::-webkit-scrollbar, .scroll-y::-webkit-scrollbar { height: 6px; width: 6px; }
+    .scroll-y::-webkit-scrollbar-thumb { background: #34405e; border-radius: 999px; }
+    .math { background: #0d1224; border: 1px solid #1f2740; padding: 14px; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 16px; text-align: center; color: #d4dae3; }
+    .metric { background: #0d1224; border: 1px solid #1f2740; padding: 10px 12px; border-radius: 10px; }
+    .metric-label { font-size: 10px; color: #7280a0; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+    .metric-value { font-size: 18px; font-weight: 600; color: #eceff3; font-variant-numeric: tabular-nums; }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: #1b2238; border: 1px solid #34405e; padding: 10px 16px; border-radius: 8px; font-size: 13px; display:none; }
+    .step-dot { display:inline-block; width: 6px; height: 6px; border-radius: 50%; background: #7c93ff; margin-right: 6px; vertical-align: middle; animation: pulse 1.4s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .ok-dot { background: #4ade80; animation: none; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- TOP NAV -->
+  <header class="border-b border-ink-700 bg-ink-800 px-5 py-3 flex items-center gap-4 sticky top-0 z-10">
+    <div class="flex items-center gap-2">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center text-white font-bold">A</div>
+      <div>
+        <div class="text-base font-semibold leading-tight">AlgoVisualizer</div>
+        <div class="text-[10px] text-ink-400 leading-tight">ML algorithms, demystified</div>
+      </div>
+    </div>
+
+    <div class="h-8 w-px bg-ink-700 mx-2"></div>
+
+    <div class="flex items-center gap-2">
+      <span class="text-xs text-ink-400">Dataset</span>
+      <select id="datasetSelect">
+        <option value="iris">Iris (150 × 4)</option>
+        <option value="blobs">Synthetic blobs (300 × 2)</option>
+        <option value="moons">Two moons (200 × 2)</option>
+        <option value="upload">Upload CSV…</option>
+      </select>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <span class="text-xs text-ink-400">Algorithm</span>
+      <select id="algoSelect">
+        <option value="kmeans">K-Means</option>
+        <option value="linreg">Linear Regression (GD)</option>
+        <option value="logreg">Logistic Regression</option>
+        <option value="dtree">Decision Tree</option>
+      </select>
+    </div>
+
+    <div class="ml-auto flex items-center gap-2">
+      <button class="btn btn-secondary btn-icon" id="resetBtn" title="Reset">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+      </button>
+      <button class="btn btn-secondary btn-icon" id="stepBackBtn" title="Step back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zm12 0L8 12l10 7z"/></svg>
+      </button>
+      <button class="btn btn-primary" id="playBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" id="playIcon"><path d="M8 5v14l11-7z"/></svg>
+        <span id="playLabel">Play</span>
+      </button>
+      <button class="btn btn-secondary btn-icon" id="stepFwdBtn" title="Step forward">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM6 5l10 7L6 19z"/></svg>
+      </button>
+      <div class="flex items-center gap-2 ml-2">
+        <span class="text-[11px] text-ink-400">Speed</span>
+        <input type="range" id="speedSlider" min="1" max="10" value="5" style="width: 80px"/>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN GRID -->
+  <main class="grid gap-3 p-3" style="grid-template-columns: minmax(380px, 1fr) minmax(420px, 1.4fr) minmax(320px, 1fr); height: calc(100vh - 64px);">
+
+    <!-- LEFT: CODE PANEL -->
+    <section class="panel flex flex-col overflow-hidden">
+      <div class="panel-header justify-between">
+        <span class="flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span>Python · kmeans.py</span>
+        </span>
+        <span class="pill" style="background:#1b2a1f; color:#4ade80;">
+          <span class="step-dot ok-dot"></span>Running
+        </span>
+      </div>
+      <div class="flex-1 overflow-auto scroll-y pt-3 pb-3" id="codePanel">
+        <div class="code-line"><span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span></div>
+        <div class="code-line"></div>
+        <div class="code-line"><span class="kw">def</span> <span class="fn">k_means</span>(<span class="var">X</span>, <span class="var">k</span>=<span class="num" id="codeK">3</span>, <span class="var">max_iter</span>=<span class="num">20</span>, <span class="var">seed</span>=<span class="num">0</span>):</div>
+        <div class="code-line">    <span class="var">rng</span> = <span class="var">np</span>.<span class="fn">random</span>.<span class="fn">default_rng</span>(<span class="var">seed</span>)</div>
+        <div class="code-line">    <span class="var">centroids</span> = <span class="var">X</span>[<span class="var">rng</span>.<span class="fn">choice</span>(<span class="fn">len</span>(<span class="var">X</span>), <span class="var">k</span>, <span class="var">replace</span>=<span class="kw">False</span>)]</div>
+        <div class="code-line">    <span class="kw">yield</span> {<span class="str">"type"</span>: <span class="str">"init"</span>, <span class="str">"centroids"</span>: <span class="var">centroids</span>.<span class="fn">tolist</span>()}</div>
+        <div class="code-line"></div>
+        <div class="code-line">    <span class="kw">for</span> <span class="var">it</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="var">max_iter</span>):</div>
+        <div class="code-line">        <span class="com"># Assign each point to nearest centroid</span></div>
+        <div class="code-line" id="lineAssign">        <span class="var">dists</span> = <span class="var">np</span>.<span class="fn">linalg</span>.<span class="fn">norm</span>(<span class="var">X</span>[:, <span class="kw">None</span>] - <span class="var">centroids</span>, <span class="var">axis</span>=<span class="num">2</span>)</div>
+        <div class="code-line">        <span class="var">labels</span> = <span class="var">dists</span>.<span class="fn">argmin</span>(<span class="var">axis</span>=<span class="num">1</span>)</div>
+        <div class="code-line">        <span class="kw">yield</span> {<span class="str">"type"</span>: <span class="str">"assign"</span>, <span class="str">"iteration"</span>: <span class="var">it</span>, ...}</div>
+        <div class="code-line"></div>
+        <div class="code-line">        <span class="com"># Recompute centroids as cluster means</span></div>
+        <div class="code-line" id="lineUpdate">        <span class="var">centroids</span> = <span class="var">np</span>.<span class="fn">array</span>([<span class="var">X</span>[<span class="var">labels</span>==<span class="var">j</span>].<span class="fn">mean</span>(<span class="num">0</span>) <span class="kw">for</span> <span class="var">j</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="var">k</span>)])</div>
+        <div class="code-line">        <span class="kw">yield</span> {<span class="str">"type"</span>: <span class="str">"update"</span>, <span class="str">"iteration"</span>: <span class="var">it</span>, ...}</div>
+        <div class="code-line"></div>
+        <div class="code-line">        <span class="kw">if</span> <span class="var">converged</span>:</div>
+        <div class="code-line">            <span class="kw">yield</span> {<span class="str">"type"</span>: <span class="str">"converged"</span>}; <span class="kw">return</span></div>
+      </div>
+      <div class="border-t border-ink-700 px-4 py-2.5 flex items-center justify-between text-[11px] text-ink-400 bg-ink-800">
+        <span>📄 28 lines · Python 3.11 · Pyodide</span>
+        <span class="flex items-center gap-3">
+          <span>Equivalent: <code class="text-accent-400 font-mono">sklearn.cluster.KMeans</code></span>
+          <button class="text-accent-400 hover:text-accent-500 cursor-pointer">View →</button>
+        </span>
+      </div>
+    </section>
+
+    <!-- CENTER: VISUALIZATION + LOSS CURVE -->
+    <section class="flex flex-col gap-3 overflow-hidden">
+      <div class="panel flex-1 flex flex-col overflow-hidden">
+        <div class="panel-header justify-between">
+          <span class="flex items-center gap-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>
+            <span>Visualization</span>
+            <span class="pill" style="background:#1b2238; color:#a8b3c4; margin-left:8px;">scatter + centroids</span>
+          </span>
+          <span class="text-[11px] text-ink-400" id="stepInfo">Iteration 0 / —</span>
+        </div>
+        <div class="panel-body flex-1 flex items-center justify-center bg-ink-900 rounded-b-xl">
+          <svg id="vizSvg" viewBox="0 0 500 360" style="width:100%; height:100%; max-width:600px;">
+            <defs>
+              <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+                <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#1f2740" stroke-width="0.5"/>
+              </pattern>
+            </defs>
+            <rect width="500" height="360" fill="url(#grid)"/>
+            <g id="points"></g>
+            <g id="centroids"></g>
+            <g id="centroidPaths" opacity="0.4"></g>
+          </svg>
+        </div>
+      </div>
+      <div class="panel" style="height: 150px;">
+        <div class="panel-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 17 9 11 13 15 21 7"/></svg>
+          <span>Inertia (cost) over iterations</span>
+        </div>
+        <div class="panel-body" style="padding: 8px 14px 14px;">
+          <svg id="lossChart" viewBox="0 0 500 90" style="width:100%; height:90px;">
+            <line x1="0" y1="85" x2="500" y2="85" stroke="#34405e" stroke-width="1"/>
+            <polyline id="lossLine" points="" fill="none" stroke="#7c93ff" stroke-width="2"/>
+            <g id="lossDots"></g>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: HYPERPARAMS + MATH + METRICS -->
+    <section class="flex flex-col gap-3 overflow-y-auto scroll-y">
+      <div class="panel">
+        <div class="panel-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+          <span>Hyperparameters</span>
+        </div>
+        <div class="panel-body space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="text-xs text-ink-300 font-medium">K (clusters)</label>
+              <span class="font-mono text-sm text-accent-400" id="kValue">3</span>
+            </div>
+            <input type="range" id="kSlider" min="1" max="8" value="3"/>
+            <div class="text-[10px] text-ink-400 mt-1">↔ Bound to <code class="text-accent-400">k=</code> in code</div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="text-xs text-ink-300 font-medium">Max iterations</label>
+              <span class="font-mono text-sm text-accent-400" id="maxIterValue">20</span>
+            </div>
+            <input type="range" id="maxIterSlider" min="5" max="50" value="20"/>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="text-xs text-ink-300 font-medium">Random seed</label>
+              <span class="font-mono text-sm text-accent-400" id="seedValue">0</span>
+            </div>
+            <input type="range" id="seedSlider" min="0" max="20" value="0"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>What's happening</span>
+        </div>
+        <div class="panel-body space-y-3">
+          <div class="math" id="mathDisplay">
+            μⱼ = (1/|Cⱼ|) Σ x ∈ Cⱼ
+          </div>
+          <p class="text-xs text-ink-300 leading-relaxed" id="explanation">
+            Each centroid is moved to the mean of the points currently assigned to it.
+          </p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Metrics</span>
+        </div>
+        <div class="panel-body grid grid-cols-2 gap-2">
+          <div class="metric">
+            <div class="metric-label">Inertia</div>
+            <div class="metric-value" id="inertiaVal">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Δ Centroids</div>
+            <div class="metric-value" id="movedVal">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Iteration</div>
+            <div class="metric-value" id="iterVal">0</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Status</div>
+            <div class="metric-value text-sm" id="statusVal" style="color:#7c93ff;">Ready</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header justify-between">
+          <span class="flex items-center gap-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>About this algorithm</span>
+          </span>
+          <span class="pill" style="background:#1b2238; color:#7c93ff;">Unsupervised</span>
+        </div>
+        <div class="panel-body space-y-3">
+          <p class="text-xs text-ink-300 leading-relaxed">
+            <strong class="text-ink-100">K-Means</strong> partitions data into <em>k</em> clusters by iteratively assigning points to the nearest centroid and recomputing centroids as cluster means.
+          </p>
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <div class="metric">
+              <div class="metric-label">Time</div>
+              <div class="text-sm text-ink-100 font-mono">O(n·k·d·i)</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Space</div>
+              <div class="text-sm text-ink-100 font-mono">O(n·d + k·d)</div>
+            </div>
+          </div>
+          <div class="text-[11px] space-y-1.5">
+            <div class="flex gap-2">
+              <span class="text-ok">✓</span>
+              <span class="text-ink-300">Spherical, similarly-sized clusters</span>
+            </div>
+            <div class="flex gap-2">
+              <span class="text-ok">✓</span>
+              <span class="text-ink-300">Fast on medium datasets</span>
+            </div>
+            <div class="flex gap-2">
+              <span class="text-danger">✗</span>
+              <span class="text-ink-300">Non-convex shapes (try moons!)</span>
+            </div>
+            <div class="flex gap-2">
+              <span class="text-danger">✗</span>
+              <span class="text-ink-300">Sensitive to initialization & k</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
+          <span>Dataset</span>
+        </div>
+        <div class="panel-body grid grid-cols-3 gap-2 text-[11px]">
+          <div class="metric">
+            <div class="metric-label">Samples</div>
+            <div class="text-base text-ink-100 font-semibold" id="dsSamples">150</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Features</div>
+            <div class="text-base text-ink-100 font-semibold" id="dsFeatures">2</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Classes</div>
+            <div class="text-base text-ink-100 font-semibold" id="dsClasses">3</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span>Try this</span>
+        </div>
+        <div class="panel-body space-y-2 text-xs text-ink-300">
+          <button class="block w-full text-left p-2.5 rounded-lg bg-ink-700/40 hover:bg-ink-700 cursor-pointer">
+            <span class="text-accent-400 font-semibold">→</span> Change <code class="font-mono">k=3</code> to <code class="font-mono">k=5</code>
+          </button>
+          <button class="block w-full text-left p-2.5 rounded-lg bg-ink-700/40 hover:bg-ink-700 cursor-pointer">
+            <span class="text-accent-400 font-semibold">→</span> Switch to "Two moons" → notice K-Means struggles
+          </button>
+          <button class="block w-full text-left p-2.5 rounded-lg bg-ink-700/40 hover:bg-ink-700 cursor-pointer">
+            <span class="text-accent-400 font-semibold">→</span> Try seed = 17 → watch a different convergence path
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // === Mock data generators ===
+    function generateBlobs(n=300, centers=3, seed=0) {
+      const rng = mulberry32(seed);
+      const cs = [];
+      for (let i = 0; i < centers; i++) cs.push([60 + rng() * 380, 40 + rng() * 280]);
+      const pts = [];
+      for (let i = 0; i < n; i++) {
+        const c = cs[i % centers];
+        pts.push([c[0] + (rng() - 0.5) * 80, c[1] + (rng() - 0.5) * 60]);
+      }
+      return pts;
+    }
+    function generateMoons(n=200, seed=0) {
+      const rng = mulberry32(seed);
+      const pts = [];
+      for (let i = 0; i < n / 2; i++) {
+        const t = Math.PI * i / (n / 2);
+        pts.push([250 - 100 * Math.cos(t) + (rng() - 0.5) * 20, 180 - 80 * Math.sin(t) + (rng() - 0.5) * 20]);
+        pts.push([250 + 100 * Math.cos(t) + (rng() - 0.5) * 20, 180 + 80 * Math.sin(t) - 40 + (rng() - 0.5) * 20]);
+      }
+      return pts;
+    }
+    function generateIris(seed=0) {
+      // pseudo-iris in 2D (sepal proxy)
+      const rng = mulberry32(seed);
+      const pts = [];
+      const centers = [[120, 120], [260, 200], [380, 110]];
+      for (let i = 0; i < 150; i++) {
+        const c = centers[i % 3];
+        pts.push([c[0] + (rng() - 0.5) * 70, c[1] + (rng() - 0.5) * 70]);
+      }
+      return pts;
+    }
+    function mulberry32(a) {
+      return function() {
+        a |= 0; a = a + 0x6D2B79F5 | 0;
+        let t = a;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+
+    // === State ===
+    const state = {
+      dataset: 'iris',
+      algo: 'kmeans',
+      k: 3,
+      maxIter: 20,
+      seed: 0,
+      speed: 5,
+      points: [],
+      centroids: [],
+      labels: [],
+      centroidHistory: [],
+      iteration: 0,
+      inertiaHistory: [],
+      playing: false,
+      converged: false,
+      timer: null,
+    };
+
+    const palette = ['#7c93ff', '#4ade80', '#facc15', '#f87171', '#c084fc', '#22d3ee', '#f59e0b', '#ec4899'];
+
+    function loadDataset() {
+      let info = { samples: 150, features: 2, classes: 3 };
+      if (state.dataset === 'blobs') { state.points = generateBlobs(300, 3, state.seed); info = { samples: 300, features: 2, classes: 3 }; }
+      else if (state.dataset === 'moons') { state.points = generateMoons(200, state.seed); info = { samples: 200, features: 2, classes: 2 }; }
+      else { state.points = generateIris(state.seed); info = { samples: 150, features: 4, classes: 3 }; }
+      document.getElementById('dsSamples').textContent = info.samples;
+      document.getElementById('dsFeatures').textContent = info.features;
+      document.getElementById('dsClasses').textContent = info.classes;
+      reset();
+    }
+
+    function reset() {
+      stop();
+      state.iteration = 0;
+      state.converged = false;
+      state.inertiaHistory = [];
+      state.labels = new Array(state.points.length).fill(0);
+      state.centroidHistory = [];
+      // init centroids
+      const rng = mulberry32(state.seed + 1000);
+      const idxs = [];
+      while (idxs.length < state.k) {
+        const idx = Math.floor(rng() * state.points.length);
+        if (!idxs.includes(idx)) idxs.push(idx);
+      }
+      state.centroids = idxs.map(i => [...state.points[i]]);
+      state.centroidHistory = state.centroids.map(c => [[...c]]);
+      render();
+      updateMath('init', 'Centroids initialized by random sampling from the dataset.');
+      document.getElementById('stepInfo').textContent = `Iteration 0 / ${state.maxIter}`;
+      document.getElementById('statusVal').textContent = 'Ready';
+      document.getElementById('statusVal').style.color = '#7c93ff';
+      document.getElementById('inertiaVal').textContent = '—';
+      document.getElementById('movedVal').textContent = '—';
+      document.getElementById('iterVal').textContent = '0';
+    }
+
+    function step() {
+      if (state.converged || state.iteration >= state.maxIter) {
+        stop();
+        return;
+      }
+      // Assign
+      let inertia = 0;
+      state.labels = state.points.map((p) => {
+        let best = 0, bestD = Infinity;
+        state.centroids.forEach((c, j) => {
+          const d = (p[0]-c[0])**2 + (p[1]-c[1])**2;
+          if (d < bestD) { bestD = d; best = j; }
+        });
+        inertia += bestD;
+        return best;
+      });
+      state.inertiaHistory.push(inertia);
+      highlightLine('lineAssign');
+      updateMath('assign', `Iter ${state.iteration}: assigned each point to its nearest centroid using squared Euclidean distance.`);
+      render();
+
+      // Then update
+      setTimeout(() => {
+        const newCs = state.centroids.map((c, j) => {
+          const mine = state.points.filter((_, i) => state.labels[i] === j);
+          if (mine.length === 0) return [...c];
+          const mx = mine.reduce((s, p) => s + p[0], 0) / mine.length;
+          const my = mine.reduce((s, p) => s + p[1], 0) / mine.length;
+          return [mx, my];
+        });
+        const moved = Math.sqrt(state.centroids.reduce((s, c, j) =>
+          s + (c[0]-newCs[j][0])**2 + (c[1]-newCs[j][1])**2, 0));
+        state.centroids = newCs;
+        state.centroids.forEach((c, j) => state.centroidHistory[j].push([...c]));
+        state.iteration++;
+        document.getElementById('inertiaVal').textContent = inertia.toFixed(0);
+        document.getElementById('movedVal').textContent = moved.toFixed(2);
+        document.getElementById('iterVal').textContent = state.iteration;
+        document.getElementById('stepInfo').textContent = `Iteration ${state.iteration} / ${state.maxIter}`;
+        highlightLine('lineUpdate');
+        updateMath('update', `Iter ${state.iteration}: moved each centroid to the mean of its assigned points (Δ = ${moved.toFixed(2)}).`);
+        render();
+        if (moved < 0.5) {
+          state.converged = true;
+          document.getElementById('statusVal').textContent = '✓ Converged';
+          document.getElementById('statusVal').style.color = '#4ade80';
+          stop();
+          showToast('Converged in ' + state.iteration + ' iterations');
+        }
+      }, 250);
+    }
+
+    function highlightLine(id) {
+      document.querySelectorAll('.code-line').forEach(el => el.classList.remove('highlight'));
+      const el = document.getElementById(id);
+      if (el) el.classList.add('highlight');
+    }
+
+    function updateMath(kind, expl) {
+      const m = {
+        'init': 'μⱼ ← random sample from X',
+        'assign': 'cᵢ = argmin_j ‖xᵢ - μⱼ‖²',
+        'update': 'μⱼ = (1/|Cⱼ|) Σ x ∈ Cⱼ',
+      };
+      document.getElementById('mathDisplay').textContent = m[kind] || '';
+      document.getElementById('explanation').textContent = expl;
+    }
+
+    function play() {
+      state.playing = true;
+      document.getElementById('playIcon').innerHTML = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
+      document.getElementById('playLabel').textContent = 'Pause';
+      document.getElementById('statusVal').textContent = 'Training…';
+      document.getElementById('statusVal').style.color = '#facc15';
+      const tick = () => {
+        if (!state.playing) return;
+        step();
+        const delay = 1200 - state.speed * 100;
+        state.timer = setTimeout(tick, delay);
+      };
+      tick();
+    }
+
+    function stop() {
+      state.playing = false;
+      if (state.timer) clearTimeout(state.timer);
+      document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+      document.getElementById('playLabel').textContent = 'Play';
+      if (!state.converged) {
+        document.getElementById('statusVal').textContent = 'Paused';
+        document.getElementById('statusVal').style.color = '#7c93ff';
+      }
+    }
+
+    function render() {
+      // Points
+      const pg = document.getElementById('points');
+      pg.innerHTML = state.points.map((p, i) => {
+        const color = state.iteration === 0 ? '#7280a0' : palette[state.labels[i] % palette.length];
+        return `<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="${color}" opacity="0.78"/>`;
+      }).join('');
+      // Centroids
+      const cg = document.getElementById('centroids');
+      cg.innerHTML = state.centroids.map((c, j) =>
+        `<g><circle cx="${c[0]}" cy="${c[1]}" r="10" fill="${palette[j % palette.length]}" stroke="white" stroke-width="2"/><text x="${c[0]}" y="${c[1] + 4}" font-size="11" fill="white" text-anchor="middle" font-weight="700">${j+1}</text></g>`
+      ).join('');
+      // Centroid paths
+      const tg = document.getElementById('centroidPaths');
+      tg.innerHTML = state.centroidHistory.map((path, j) => {
+        if (path.length < 2) return '';
+        const d = path.map((p, i) => (i === 0 ? 'M' : 'L') + p[0] + ',' + p[1]).join(' ');
+        return `<path d="${d}" stroke="${palette[j % palette.length]}" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>`;
+      }).join('');
+      // Loss curve
+      const lg = document.getElementById('lossLine');
+      if (state.inertiaHistory.length > 0) {
+        const maxI = Math.max(...state.inertiaHistory);
+        const pts = state.inertiaHistory.map((v, i) => {
+          const x = (i / Math.max(state.maxIter - 1, 1)) * 480 + 10;
+          const y = 80 - (v / maxI) * 70;
+          return `${x},${y}`;
+        }).join(' ');
+        lg.setAttribute('points', pts);
+        const dots = state.inertiaHistory.map((v, i) => {
+          const x = (i / Math.max(state.maxIter - 1, 1)) * 480 + 10;
+          const y = 80 - (v / maxI) * 70;
+          return `<circle cx="${x}" cy="${y}" r="3" fill="#7c93ff"/>`;
+        }).join('');
+        document.getElementById('lossDots').innerHTML = dots;
+      } else {
+        lg.setAttribute('points', '');
+        document.getElementById('lossDots').innerHTML = '';
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2500);
+    }
+
+    // === Event wiring ===
+    document.getElementById('playBtn').addEventListener('click', () => {
+      if (state.playing) stop(); else play();
+    });
+    document.getElementById('stepFwdBtn').addEventListener('click', () => { stop(); step(); });
+    document.getElementById('stepBackBtn').addEventListener('click', () => { stop(); reset(); showToast('Step-back: full reset in wireframe'); });
+    document.getElementById('resetBtn').addEventListener('click', () => { reset(); });
+
+    document.getElementById('datasetSelect').addEventListener('change', (e) => {
+      state.dataset = e.target.value;
+      if (state.dataset === 'upload') { showToast('CSV upload (Phase 2 feature)'); state.dataset = 'iris'; e.target.value = 'iris'; }
+      loadDataset();
+    });
+    document.getElementById('algoSelect').addEventListener('change', (e) => {
+      state.algo = e.target.value;
+      showToast(`Switched to ${e.target.options[e.target.selectedIndex].text}. (Wireframe demos K-Means only.)`);
+      e.target.value = 'kmeans'; state.algo = 'kmeans';
+    });
+    document.getElementById('kSlider').addEventListener('input', (e) => {
+      state.k = +e.target.value;
+      document.getElementById('kValue').textContent = state.k;
+      document.getElementById('codeK').textContent = state.k;
+      document.getElementById('codeK').style.background = 'rgba(124,147,255,0.25)';
+      setTimeout(() => { document.getElementById('codeK').style.background = ''; }, 400);
+      reset();
+    });
+    document.getElementById('maxIterSlider').addEventListener('input', (e) => {
+      state.maxIter = +e.target.value;
+      document.getElementById('maxIterValue').textContent = state.maxIter;
+      document.getElementById('stepInfo').textContent = `Iteration ${state.iteration} / ${state.maxIter}`;
+    });
+    document.getElementById('seedSlider').addEventListener('input', (e) => {
+      state.seed = +e.target.value;
+      document.getElementById('seedValue').textContent = state.seed;
+      loadDataset();
+    });
+    document.getElementById('speedSlider').addEventListener('input', (e) => {
+      state.speed = +e.target.value;
+    });
+
+    // Boot
+    loadDataset();
+  </script>
+</body>
+</html>

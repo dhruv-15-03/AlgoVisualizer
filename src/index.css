@@ -1,0 +1,137 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Material Symbols (M3) — see <Icon /> component. Ligature-based; renders
+   the icon when the corresponding font-family is available, otherwise stays
+   invisible during the font's `font-display: block` period (≤3s). */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  flex-shrink: 0;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    @apply m-0 p-0;
+    height: 100%;
+    /* Use dynamic viewport units when available so mobile browser chrome
+       (address bar showing/hiding on iOS Safari, Android Chrome) doesn't
+       clip our app or leave dead space. */
+    height: 100dvh;
+  }
+
+  body {
+    @apply bg-ink-900 text-ink-100 font-sans antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    /* Prevent rubber-band/overscroll on mobile so panel internal scroll feels native. */
+    overscroll-behavior: none;
+    /* Honor iOS safe-area at the page edges as a fallback. */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  ::selection {
+    @apply bg-accent-500/30 text-ink-50;
+  }
+
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    @apply bg-ink-700 rounded-full;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    @apply bg-ink-600;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply bg-ink-800 border border-ink-700 rounded-xl flex flex-col overflow-hidden;
+  }
+  .panel-header {
+    @apply bg-ink-800 border-b border-ink-700 px-3.5 py-2.5 text-[11px] font-semibold text-ink-300 uppercase tracking-wider flex items-center gap-2;
+  }
+  .panel-body {
+    @apply p-3.5;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold;
+  }
+  .metric {
+    @apply bg-ink-900 border border-ink-700/60 rounded-lg p-2.5;
+  }
+  .metric-label {
+    @apply text-[10px] uppercase tracking-wide font-semibold text-ink-400;
+  }
+  .metric-value {
+    @apply text-lg font-semibold tabular-nums text-ink-100;
+  }
+}
+
+.katex-display {
+  margin: 0 !important;
+}
+.katex {
+  font-size: 1em !important;
+  color: theme('colors.ink.100');
+}
+
+/* Monaco line-highlight used when a slider patches a code line. */
+.monaco-line-highlight {
+  background: rgba(59, 130, 246, 0.18) !important;
+  border-left: 2px solid theme('colors.accent.400');
+}
+
+/* Touch-friendly slider thumbs and minimum tap targets on coarse pointers.
+   WCAG 2.5.5 recommends 44×44px; we bump native range thumbs and add a
+   utility class for icon buttons in mobile bars. */
+@media (pointer: coarse) {
+  input[type='range']::-webkit-slider-thumb {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+  }
+  input[type='range']::-moz-range-thumb {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    border: 0;
+  }
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Safe-area inset for sticky bottom toolbars on notched phones (iPhone). */
+.safe-bottom {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+

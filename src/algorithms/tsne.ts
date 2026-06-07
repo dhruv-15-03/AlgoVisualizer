@@ -1,0 +1,72 @@
+import tsneSource from '@/algorithms/python/tsne.py?raw';
+import type { AlgorithmMeta } from '@/types/algorithm';
+
+export const tsneMeta: AlgorithmMeta = {
+  id: 'tsne',
+  family: 'projection',
+  name: 't-SNE',
+  shortDescription: 'Non-linear 2D embedding that preserves local neighborhoods.',
+  longDescription:
+    "t-SNE iteratively places points in 2D so that pairs that are 'close in high-D' stay close and pairs that are 'far in high-D' stay far. Uses Gaussian similarities in the original space and a heavy-tailed Student-t in the embedding (to avoid crowding). Great for visual exploration; distances between far-apart clusters are NOT meaningful.",
+  category: 'unsupervised-dim-reduction',
+  task: 'dim-reduction',
+  pythonFilename: 'tsne.py',
+  defaultCode: tsneSource,
+  sklearnSnippet: `from sklearn.manifold import TSNE
+
+model = TSNE(n_components=2, perplexity=20, n_iter=300, random_state=0)
+X_emb = model.fit_transform(X)`,
+  hyperparams: [
+    {
+      id: 'perplexity',
+      label: 'Perplexity',
+      codeKey: 'perplexity=',
+      type: 'int',
+      min: 5,
+      max: 50,
+      step: 1,
+      default: 20,
+      description: 'Effective number of neighbors. Small = local detail, large = global structure.',
+    },
+    {
+      id: 'lr',
+      label: 'Learning rate',
+      codeKey: 'lr=',
+      type: 'float',
+      min: 10,
+      max: 500,
+      step: 5,
+      default: 80,
+    },
+    {
+      id: 'n_iter',
+      label: 'Iterations',
+      codeKey: 'n_iter=',
+      type: 'int',
+      min: 30,
+      max: 400,
+      step: 10,
+      default: 120,
+    },
+    {
+      id: 'seed',
+      label: 'Random seed',
+      codeKey: 'seed=',
+      type: 'int',
+      min: 0,
+      max: 99,
+      step: 1,
+      default: 0,
+    },
+  ],
+  timeComplexity: 'O(n² · iters)',
+  spaceComplexity: 'O(n²)',
+  pros: ["Reveals non-linear cluster structure", "Strong for visualization", "Works on any feature space"],
+  cons: ["Slow on large n", "Stochastic — different runs look different", "Hyperparameter-sensitive"],
+  compatibleTasks: ['classification', 'clustering'],
+  references: [
+    { kind: 'wiki', label: 'Wikipedia: t-distributed stochastic neighbor embedding', url: 'https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding' },
+    { kind: 'sklearn', label: 'scikit-learn user guide: t-SNE', url: 'https://scikit-learn.org/stable/modules/manifold.html#t-distributed-stochastic-neighbor-embedding-t-sne' },
+    { kind: 'article', label: 'Distill: How to Use t-SNE Effectively (must-read interactive)', url: 'https://distill.pub/2016/misread-tsne/' },
+  ],
+};

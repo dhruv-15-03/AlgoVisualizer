@@ -1,0 +1,219 @@
+import { useMemo, useState, useEffect } from 'react';
+import { BlockMath } from 'react-katex';
+import { Panel } from '@/components/ui/Panel';
+import { Icon } from '@/components/ui/Icon';
+import { VizRouter } from '@/visualizations/VizRouter';
+import { useSessionStore, useCurrentEvent } from '@/stores/session-store';
+import { getAlgorithm } from '@/algorithms/registry';
+import { getDataset } from '@/datasets/registry';
+import { familyOf } from '@/types/trace';
+import { runNow } from '@/controllers/training-controller';
+
+function LoadingState({ message }: { message: string }) {
+  return (
+    <div className="grid h-full place-items-center">
+      <div className="flex flex-col items-center gap-3 text-center">
+        <div className="relative h-10 w-10">
+          <div className="absolute inset-0 rounded-full border-2 border-ink-700" />
+          <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-accent-400" />
+        </div>
+        <div>
+          <div className="text-sm font-medium text-ink-200">{message}</div>
+          <div className="mt-1 text-[11px] text-ink-500">
+            First load downloads ~10MB Python runtime; subsequent runs are instant.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EmptyState({ message, showRun }: { message: string; showRun?: boolean }) {
+  return (
+    <div className="grid h-full place-items-center">
+      <div className="flex flex-col items-center gap-3 text-center">
+        <div className="text-sm text-ink-300">{message}</div>
+        {showRun && (
+          <button
+            onClick={() => runNow()}
+            className="inline-flex items-center gap-1.5 rounded-md bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-400"
+          >
+            <Icon name="play_arrow" size={14} fill />
+            Run now
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function VizPanel() {
+  const algorithmId = useSessionStore((s) => s.algorithmId);
+  const datasetId = useSessionStore((s) => s.datasetId);
+  const events = useSessionStore((s) => s.events);
+  const currentStep = useSessionStore((s) => s.currentStep);
+  const runStatus = useSessionStore((s) => s.runStatus);
+  const runError = useSessionStore((s) => s.runError);
+  const pyodideStatus = useSessionStore((s) => s.pyodideStatus);
+  const pyodideProgress = useSessionStore((s) => s.pyodideProgress);
+  const seekTo = useSessionStore((s) => s.seekTo);
+  const event = useCurrentEvent();
+
+  const algorithm = algorithmId ? getAlgorithm(algorithmId) : null;
+  const dataset = datasetId ? getDataset(datasetId) : null;
+
+  const headerSubtitle = useMemo(() => {
+    if (!algorithm || !dataset) return '';
+    return `${algorithm.name} on ${dataset.name}`;
+  }, [algorithm, dataset]);
+
+  let body: React.ReactNode;
+  if (pyodideStatus === 'loading' || pyodideStatus === 'idle') {
+    body = <LoadingState message={pyodideProgress || 'Loading Python runtime…'} />;
+  } else if (pyodideStatus === 'error') {
+    body = (
+      <div className="grid h-full place-items-center p-4">
+        <div className="max-w-md text-center">
+          <div className="inline-flex items-center gap-1.5 text-sm font-semibold text-rose-300">
+            <Icon name="error_outline" size={16} />
+            Python failed to load
+          </div>
+          <pre className="mt-2 max-h-40 overflow-auto rounded-md bg-rose-500/10 p-3 text-left text-[11px] text-rose-200">
+            {pyodideProgress}
+          </pre>
+        </div>
+      </div>
+    );
+  } else if (runStatus === 'error') {
+    body = (
+      <div className="grid h-full place-items-center p-4">
+        <div className="max-w-md text-center">
+          <div className="inline-flex items-center gap-1.5 text-sm font-semibold text-rose-300">
+            <Icon name="error_outline" size={16} />
+            Run failed
+          </div>
+          <pre className="mt-2 max-h-40 overflow-auto rounded-md bg-rose-500/10 p-3 text-left text-[11px] text-rose-200">
+            {runError || 'Unknown error'}
+          </pre>
+          <button
+            onClick={() => runNow()}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-400"
+          >
+            <Icon name="refresh" size={14} />
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+  } else if (events.length === 0) {
+    body = (
+      <EmptyState
+        message={runStatus === 'running' ? 'Running first iteration…' : 'Press Play or Re-run to start.'}
+        showRun={runStatus !== 'running'}
+      />
+    );
+  } else if (algorithm && dataset) {
+    body = (
+      <VizRouter
+        family={algorithm.family}
+        dataset={dataset}
+        events={events}
+        currentStep={currentStep}
+      />
+    );
+  } else {
+    body = null;
+  }
+
+  return (
+    <div className="flex h-full min-h-0 flex-col gap-3">
+      <Panel
+        title="Visualization"
+        subtitle={headerSubtitle}
+        right={
+          <span className="font-mono text-[11px] text-ink-400">
+            step {events.length === 0 ? 0 : currentStep + 1}/{events.length}
+          </span>
+        }
+        className="flex-1 min-h-0"
+        bodyClassName="p-2 flex flex-col gap-2"
+      >
+        <div className="min-h-0 flex-1 rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
+          {body}
+        </div>
+        {events.length > 0 && (
+          <div className="shrink-0 px-1">
+            <input
+              type="range"
+              min={0}
+              max={Math.max(0, events.length - 1)}
+              value={currentStep}
+              onChange={(e) => seekTo(Number(e.target.value))}
+              className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-ink-700 accent-accent-400"
+              aria-label="Timeline scrubber"
+            />
+            <div className="mt-1 flex justify-between text-[9px] font-mono text-ink-500">
+              <span>step 1</span>
+              <span>{event?.type ?? ''}</span>
+              <span>step {events.length}</span>
+            </div>
+          </div>
+        )}
+      </Panel>
+
+      <Panel
+        title="What's happening now"
+        subtitle={event ? `${event.type} · step ${event.step}` : '—'}
+        className="shrink-0"
+      >
+        <ExplanationPanel event={event} />
+      </Panel>
+    </div>
+  );
+}
+
+function ExplanationPanel({ event }: { event: ReturnType<typeof useCurrentEvent> }) {
+  const quizMode = useSessionStore((s) => s.quizMode);
+  const currentStep = useSessionStore((s) => s.currentStep);
+  const [revealed, setRevealed] = useState(false);
+
+  // Re-hide every time the step changes (in quiz mode you must reveal per-step).
+  useEffect(() => {
+    setRevealed(false);
+  }, [currentStep]);
+
+  const content = (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm leading-relaxed text-ink-200">
+        {event?.explanation ?? 'No events yet.'}
+      </p>
+      {event?.math && (
+        <div className="overflow-x-auto rounded-md bg-ink-900 px-3 py-2">
+          <BlockMath math={event.math} />
+        </div>
+      )}
+      {familyOf(event?.type ?? 'finished') === 'system' && event?.type === 'error' && (
+        <pre className="overflow-x-auto rounded-md bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+          {(event as { message?: string }).message}
+        </pre>
+      )}
+    </div>
+  );
+
+  if (!quizMode || revealed) return content;
+
+  return (
+    <div className="relative">
+      <div className="pointer-events-none select-none blur-md opacity-40">{content}</div>
+      <div className="absolute inset-0 grid place-items-center">
+        <button
+          onClick={() => setRevealed(true)}
+          className="inline-flex items-center gap-1.5 rounded-md border border-accent-400 bg-accent-500/15 px-3 py-1.5 text-xs font-semibold text-accent-200 hover:bg-accent-500/25"
+        >
+          <Icon name="visibility" size={14} />
+          Predict, then reveal
+        </button>
+      </div>
+    </div>
+  );
+}
