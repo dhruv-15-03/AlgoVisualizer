@@ -120,18 +120,14 @@ async function run(
     return { status: 'error', message, totalEvents: 0 };
   }
 
-  // Iterate the generator. Each next() runs Python until the next yield.
-  // Between yields we await onEvent (a Comlink proxy call) which lets the
-  // event loop check cancellation.
+  // Iterate the generator. Each next() runs Python until the next yield;
+  // between yields we await onEvent (a Comlink proxy call) which lets the
+  // event loop check `handle.cancelled` in the loop condition.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const gen = generator as any;
 
   try {
-    while (true) {
-      if (handle.cancelled) {
-        return { status: 'cancelled', totalEvents };
-      }
-
+    while (!handle.cancelled) {
       let next;
       try {
         next = gen.next();
@@ -169,6 +165,7 @@ async function run(
       totalEvents += 1;
       await onEvent(event);
     }
+    return { status: 'cancelled', totalEvents };
   } finally {
     try {
       gen.destroy?.();

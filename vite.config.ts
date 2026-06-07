@@ -37,7 +37,6 @@ export default defineConfig({
         manualChunks: (id) => {
           if (!id.includes('node_modules')) return;
           if (id.includes('monaco-editor') || id.includes('@monaco-editor')) return 'monaco';
-          if (id.includes('framer-motion')) return 'framer';
           if (id.includes('recharts') || id.includes('/d3-') || id.includes('node_modules/d3/')) return 'charts';
           if (id.includes('katex') || id.includes('react-katex')) return 'math';
           if (id.includes('react-router')) return 'router';

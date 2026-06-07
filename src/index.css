@@ -78,7 +78,7 @@
     @apply bg-ink-800 border border-ink-700 rounded-xl flex flex-col overflow-hidden;
   }
   .panel-header {
-    @apply bg-ink-800 border-b border-ink-700 px-3.5 py-2.5 text-[11px] font-semibold text-ink-300 uppercase tracking-wider flex items-center gap-2;
+    @apply bg-ink-800 border-b border-ink-700 px-3.5 py-2.5 flex items-center gap-2;
   }
   .panel-body {
     @apply p-3.5;
