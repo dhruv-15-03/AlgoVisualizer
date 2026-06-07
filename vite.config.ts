@@ -25,5 +25,26 @@ export default defineConfig({
   },
   build: {
     target: 'es2022',
+    // Monaco alone is ~600 KB; the warning is informational, not actionable
+    // unless we want to ship a different editor.
+    chunkSizeWarningLimit: 1200,
+    rollupOptions: {
+      output: {
+        // Split heavy vendor libs into their own chunks so a typical code
+        // change doesn't bust Monaco / D3 / framer's long-lived caches. The
+        // initial Home payload only needs react-vendor; everything else is
+        // pulled lazily by routes that need it.
+        manualChunks: (id) => {
+          if (!id.includes('node_modules')) return;
+          if (id.includes('monaco-editor') || id.includes('@monaco-editor')) return 'monaco';
+          if (id.includes('framer-motion')) return 'framer';
+          if (id.includes('recharts') || id.includes('/d3-') || id.includes('node_modules/d3/')) return 'charts';
+          if (id.includes('katex') || id.includes('react-katex')) return 'math';
+          if (id.includes('react-router')) return 'router';
+          if (id.includes('/react/') || id.includes('/react-dom/') || id.includes('scheduler')) return 'react-vendor';
+          return;
+        },
+      },
+    },
   },
 });

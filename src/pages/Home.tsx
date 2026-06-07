@@ -1,15 +1,42 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { listAlgorithms, listAlgorithmsByCategory } from '@/algorithms/registry';
 import { listDatasets } from '@/datasets/registry';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { CATEGORY_LABELS } from '@/types/algorithm';
+import { prewarmPyodide } from '@/controllers/training-controller';
 
 export function Home() {
   const firstAlgorithm = listAlgorithms()[0];
   const groups = listAlgorithmsByCategory().filter((g) => g.algorithms.length > 0);
   const datasets = listDatasets();
   const totalAlgorithms = groups.reduce((sum, g) => sum + g.algorithms.length, 0);
+
+  // Pre-warm two things while the visitor is reading the hero:
+  //   1) The lazy-loaded Workspace bundle (Monaco + viz code) — so the
+  //      route transition feels instant.
+  //   2) The Pyodide worker + CPython WASM (~10 MB) — so the algorithm
+  //      starts training the moment the user lands on the workspace.
+  // Both run during browser idle time to avoid jank on the Home paint.
+  useEffect(() => {
+    const ric: (cb: () => void) => number =
+      typeof window.requestIdleCallback === 'function'
+        ? (cb) => window.requestIdleCallback(cb, { timeout: 2000 })
+        : (cb) => window.setTimeout(cb, 600);
+    const cic: (id: number) => void =
+      typeof window.cancelIdleCallback === 'function'
+        ? (id) => window.cancelIdleCallback(id)
+        : (id) => window.clearTimeout(id);
+    const handle = ric(() => {
+      // Fire-and-forget; failures are intentionally swallowed by the
+      // prewarm helpers (errors surface on the real run instead).
+      void import('@/pages/WorkspacePage');
+      void import('@/pages/RacePage');
+      prewarmPyodide();
+    });
+    return () => cic(handle);
+  }, []);
 
   return (
     <div className="mx-auto flex h-full max-w-6xl flex-col overflow-y-auto px-4 py-8 sm:px-6 sm:py-12">
