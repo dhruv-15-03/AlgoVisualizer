@@ -68,7 +68,7 @@ function PolyChart({ X, y, weights }: { X: number[][]; y: number[] | null; weigh
   const innerH = Math.max(1, size.h - padding.top - padding.bottom);
 
   const xs = useMemo(() => X.map((r) => r[0]), [X]);
-  const ys = y ?? [];
+  const ys = useMemo(() => y ?? [], [y]);
 
   const xScale = useMemo(() => {
     const [a, b] = d3.extent(xs) as [number, number];

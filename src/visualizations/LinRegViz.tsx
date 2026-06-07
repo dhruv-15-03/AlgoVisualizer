@@ -50,7 +50,7 @@ function RegressionChart({ X, y, weights }: { X: number[][]; y: number[] | null;
   }, []);
 
   const xs = useMemo(() => X.map((r) => r[0]), [X]);
-  const ys = y ?? [];
+  const ys = useMemo(() => y ?? [], [y]);
 
   const padding = { top: 14, right: 14, bottom: 36, left: 44 };
   const innerW = Math.max(1, size.w - padding.left - padding.right);

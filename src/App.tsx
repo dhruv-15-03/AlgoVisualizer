@@ -5,7 +5,7 @@ import { attachController } from '@/controllers/training-controller';
 
 // Route-level code splitting. Home stays eager (it's the entry point);
 // WorkspacePage and RacePage are pulled lazily so the initial bundle
-// doesn't ship Monaco, the Pyodide worker, KaTeX or framer-motion.
+// doesn't ship Monaco, the Pyodide worker, KaTeX, or the heavy viz deps.
 const WorkspacePage = lazy(() =>
   import('@/pages/WorkspacePage').then((m) => ({ default: m.WorkspacePage })),
 );
