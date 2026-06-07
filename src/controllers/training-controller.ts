@@ -223,3 +223,18 @@ function hpChanged(
 export function runNow(): void {
   void runOnce();
 }
+
+/**
+ * Start downloading the Pyodide runtime in the background without running
+ * anything yet. Safe to call multiple times. Used by the Home page so that
+ * by the time the user navigates into a workspace, Python is already loading
+ * (or fully loaded) instead of cold-starting after the route transition.
+ */
+export function prewarmPyodide(): void {
+  if (initialized || initPromise) return;
+  void ensurePyodide().catch(() => {
+    // Swallow — the user hasn't asked to run anything yet, so a prewarm
+    // failure shouldn't surface an error toast. The next real run will
+    // re-attempt and report normally.
+  });
+}

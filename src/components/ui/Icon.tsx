@@ -10,6 +10,12 @@
  *
  * Default size is 20px which matches our 14px (text-sm) inline use; bump to
  * 18/24 for button-only icons or hero affordances.
+ *
+ * IMPORTANT: The font is SUBSETTED in `index.html` via the `icon_names=`
+ * query parameter for performance (~8KB vs ~600KB unsubset). When adding a
+ * new icon here, you MUST also add its name to the alphabetically-sorted
+ * `icon_names` list in `index.html`, otherwise it'll render as the literal
+ * text ligature name instead of a glyph.
  */
 
 import { cn } from '@/lib/cn';
