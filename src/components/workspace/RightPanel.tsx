@@ -72,6 +72,7 @@ function Hyperparams() {
   return (
     <Panel
       title="Hyperparameters"
+      className="shrink-0"
       subtitle={
         <span className="inline-flex flex-wrap items-center gap-1">
           Sliders edit the code.
@@ -166,7 +167,7 @@ function Metrics() {
   const event = useCurrentEvent();
   if (!algorithmId || events.length === 0) {
     return (
-      <Panel title="Metrics">
+      <Panel title="Metrics" className="shrink-0">
         <div className="text-xs text-ink-500">Run the algorithm to see metrics.</div>
       </Panel>
     );
@@ -202,7 +203,7 @@ function Metrics() {
   }
 
   return (
-    <Panel title="Metrics" subtitle="Reflect the current step">
+    <Panel title="Metrics" subtitle="Reflect the current step" className="shrink-0">
       <div className="grid grid-cols-2 gap-2">
         {metrics.map((m) => (
           <div key={m.label} className="metric">
@@ -225,6 +226,7 @@ function AlgorithmInfo() {
     <Panel
       title={algorithm.name}
       subtitle={algorithm.shortDescription}
+      className="shrink-0"
       right={
         <div className="flex overflow-hidden rounded-md border border-ink-600">
           {(['about', 'learn', 'sklearn'] as const).map((k) => (
@@ -290,7 +292,7 @@ function DatasetInfo() {
   const info = allDatasets.find((d) => d.id === datasetId) ?? null;
   if (!dataset || !info) return null;
   return (
-    <Panel title="Dataset" subtitle={dataset.description}>
+    <Panel title="Dataset" subtitle={dataset.description} className="shrink-0">
       <div className="grid grid-cols-3 gap-2">
         <div className="metric">
           <div className="metric-label">Samples</div>
