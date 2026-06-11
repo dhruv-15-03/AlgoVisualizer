@@ -126,16 +126,29 @@ const debouncedRun = debounce(() => {
   void runOnce();
 }, 350);
 
+/** Start the RAF playback loop if it isn't already running. Idempotent. */
+function startTicker() {
+  if (tickerId === null) {
+    tickerId = requestAnimationFrame(tick);
+  }
+}
+
+/** Stop the RAF playback loop and reset the frame-timing accumulators. */
+function stopTicker() {
+  if (tickerId !== null) {
+    cancelAnimationFrame(tickerId);
+    tickerId = null;
+  }
+  lastTickTimestamp = 0;
+  stepAccumulator = 0;
+}
+
 function tick(now: number) {
   const { playing, speed, events, currentStep } = useSessionStore.getState();
-  if (!playing) {
-    stepAccumulator = 0;
-    lastTickTimestamp = 0;
-    tickerId = requestAnimationFrame(tick);
-    return;
-  }
-  if (events.length === 0) {
-    tickerId = requestAnimationFrame(tick);
+  // Nothing to animate — stop the loop entirely instead of idling at ~60fps.
+  // The `playing` subscription in attachController restarts it on the next play.
+  if (!playing || events.length === 0) {
+    stopTicker();
     return;
   }
   if (lastTickTimestamp === 0) lastTickTimestamp = now;
@@ -148,10 +161,10 @@ function tick(now: number) {
     const next = currentStep + advance;
     if (next >= events.length - 1) {
       useSessionStore.setState({ currentStep: events.length - 1, playing: false });
-      stepAccumulator = 0;
-    } else {
-      useSessionStore.setState({ currentStep: next });
+      stopTicker();
+      return;
     }
+    useSessionStore.setState({ currentStep: next });
   }
   tickerId = requestAnimationFrame(tick);
 }
@@ -188,6 +201,17 @@ export function attachController(): () => void {
     },
   );
 
+  // Drive the playback ticker only while `playing` is true. Starting/stopping
+  // on the `playing` transition avoids an idle RAF loop burning a frame ~60x/s
+  // on an otherwise static workspace.
+  const unsubscribePlaying = useSessionStore.subscribe(
+    (s) => s.playing,
+    (playing) => {
+      if (playing) startTicker();
+      else stopTicker();
+    },
+  );
+
   // If algo+dataset+code are already set by the time we attach (common in
   // StrictMode dev where child effects fire before this parent effect),
   // kick off a run now — the subscriber will miss those initial mutations.
@@ -195,14 +219,14 @@ export function attachController(): () => void {
   if (s.algorithmId && s.datasetId && s.code) {
     debouncedRun();
   }
-
-  tickerId = requestAnimationFrame(tick);
+  // Cover the edge case where playback is somehow already active at attach.
+  if (s.playing) startTicker();
 
   return () => {
     if (unsubscribeStore) unsubscribeStore();
     unsubscribeStore = null;
-    if (tickerId !== null) cancelAnimationFrame(tickerId);
-    tickerId = null;
+    unsubscribePlaying();
+    stopTicker();
   };
 }
 
