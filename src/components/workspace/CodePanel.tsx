@@ -32,12 +32,10 @@ export function CodePanel() {
       const extracted = extractValue(newCode, p.codeKey);
       if (extracted === null) continue;
       if (extracted === hyperparams[p.id]) continue;
-      // Clamp numeric values to the slider's declared range so the slider stays valid.
-      let next: number | string | boolean = extracted;
-      if (typeof extracted === 'number' && p.min !== undefined && p.max !== undefined) {
-        next = Math.max(p.min, Math.min(p.max, extracted));
-      }
-      setHyperparam(p.id, next);
+      // Pass the raw typed value through unchanged. Clamping here would
+      // silently rewrite what the user typed (and what gets sent to the
+      // worker); the range input simply pins its thumb at the boundary.
+      setHyperparam(p.id, extracted);
     }
   };
 

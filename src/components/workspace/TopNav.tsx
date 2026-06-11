@@ -217,7 +217,7 @@ export function TopNav() {
       {/* Speed slider — desktop only. */}
       <div className="hidden items-center gap-2 border-l border-ink-700 pl-3 xl:flex">
         <span className="text-[10px] font-medium uppercase tracking-wide text-ink-400">Speed</span>
-        <Slider value={speed} min={0.5} max={8} step={0.25} onValueChange={setSpeed} className="w-24" />
+        <Slider value={speed} min={0.5} max={8} step={0.25} aria-label="Playback speed" onValueChange={setSpeed} className="w-24" />
         <span className="w-10 text-right font-mono text-[11px] tabular-nums text-ink-300">{speed.toFixed(2)}×</span>
       </div>
     </header>

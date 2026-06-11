@@ -146,6 +146,7 @@ function Hyperparams() {
                 min={p.min ?? 0}
                 max={p.max ?? 1}
                 step={p.step ?? 0.01}
+                aria-label={p.label}
                 onValueChange={(v) => {
                   setHyperparam(p.id, v);
                   setCode(patchCode(code, p.codeKey, p.type === 'int' ? Math.round(v) : v));
