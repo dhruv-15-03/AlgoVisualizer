@@ -75,6 +75,19 @@ export function WorkspacePage() {
     }
   }, [algoId, currentDatasetId, setDataset]);
 
+  // Give each algorithm tab a distinct document title so multiple open
+  // workspaces are distinguishable; restore the default on unmount.
+  useEffect(() => {
+    const defaultTitle = 'AlgoVisualizer · ML algorithms, demystified';
+    if (!algoId) return;
+    const meta = getAlgorithm(algoId);
+    if (!meta) return;
+    document.title = `${meta.name} · AlgoVisualizer`;
+    return () => {
+      document.title = defaultTitle;
+    };
+  }, [algoId]);
+
   return (
     <div className="flex h-full min-h-0 flex-col bg-ink-900">
       <TopNav />

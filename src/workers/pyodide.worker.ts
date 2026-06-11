@@ -21,6 +21,11 @@ let loadPromise: Promise<void> | null = null;
 // Cancellation handle for the in-flight run; tested between yields.
 let currentRun: { cancelled: boolean } | null = null;
 
+// Safety limits to stop a runaway user generator (e.g. `while True: yield`)
+// from locking the worker forever.
+const MAX_EVENTS = 10000;
+const MAX_WALL_MS = 30000;
+
 const RUNNER_PY = `
 import numpy as np
 
@@ -127,7 +132,22 @@ async function run(
   const gen = generator as any;
 
   try {
+    const startedAt = Date.now();
     while (!handle.cancelled) {
+      // Guard against infinite / pathologically long runs.
+      if (totalEvents >= MAX_EVENTS || Date.now() - startedAt > MAX_WALL_MS) {
+        const limit =
+          totalEvents >= MAX_EVENTS ? `${MAX_EVENTS} events` : `${MAX_WALL_MS / 1000}s`;
+        const message = `Run exceeded ${limit} limit`;
+        await onEvent({
+          type: 'error',
+          step: totalEvents,
+          explanation: 'Run stopped: exceeded safety limit (possible infinite loop).',
+          math: '',
+          message,
+        });
+        return { status: 'error', message, totalEvents };
+      }
       let next;
       try {
         next = gen.next();

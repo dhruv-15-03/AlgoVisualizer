@@ -109,42 +109,49 @@ export function Home() {
               {algorithms.map((a) => {
                 const wiki = a.references?.find((r) => r.kind === 'wiki');
                 return (
-                  <Link
+                  <div
                     key={a.id}
-                    to={`/workspace/${a.id}`}
-                    className="group rounded-xl border border-ink-700 bg-ink-800 p-4 transition-colors hover:border-accent-500/50 hover:bg-ink-800/80"
+                    className="group relative rounded-xl border border-ink-700 bg-ink-800 p-4 transition-colors hover:border-accent-500/50 hover:bg-ink-800/80"
                   >
-                    <div className="flex items-start justify-between gap-2">
-                      <h3 className="text-sm font-semibold text-ink-100 group-hover:text-accent-300">
-                        {a.name}
-                      </h3>
-                      {wiki && (
-                        <a
-                          href={wiki.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="shrink-0 text-ink-500 hover:text-accent-300"
-                          title="Read on Wikipedia"
-                          aria-label="Read on Wikipedia"
-                        >
-                          <Icon name="open_in_new" size={14} />
-                        </a>
-                      )}
+                    <Link
+                      to={`/workspace/${a.id}`}
+                      aria-label={a.name}
+                      className="absolute inset-0 z-0 rounded-xl"
+                    >
+                      <span className="sr-only">{a.name}</span>
+                    </Link>
+                    {wiki && (
+                      <a
+                        href={wiki.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute right-4 top-4 z-10 shrink-0 text-ink-500 hover:text-accent-300"
+                        title="Read on Wikipedia"
+                        aria-label="Read on Wikipedia"
+                      >
+                        <Icon name="open_in_new" size={14} />
+                      </a>
+                    )}
+                    <div className="pointer-events-none relative z-10">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="text-sm font-semibold text-ink-100 group-hover:text-accent-300">
+                          {a.name}
+                        </h3>
+                      </div>
+                      <p className="mt-1 text-xs leading-relaxed text-ink-400">{a.shortDescription}</p>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {a.hyperparams.slice(0, 4).map((h) => (
+                          <span
+                            key={h.id}
+                            className="rounded-md bg-ink-900 px-1.5 py-0.5 font-mono text-[10px] text-ink-300"
+                          >
+                            {h.codeKey}
+                            {h.default}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                    <p className="mt-1 text-xs leading-relaxed text-ink-400">{a.shortDescription}</p>
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {a.hyperparams.slice(0, 4).map((h) => (
-                        <span
-                          key={h.id}
-                          className="rounded-md bg-ink-900 px-1.5 py-0.5 font-mono text-[10px] text-ink-300"
-                        >
-                          {h.codeKey}
-                          {h.default}
-                        </span>
-                      ))}
-                    </div>
-                  </Link>
+                  </div>
                 );
               })}
             </div>
