@@ -56,6 +56,7 @@ export function CodePanel() {
 
   return (
     <Panel
+      className="h-full"
       title={titleNode}
       subtitle="Editable Python — runs in your browser via Pyodide"
       right={
