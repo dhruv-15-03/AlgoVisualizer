@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 // Vite `?raw` import: read VizRouter's source so we can assert each algorithm
-// family has a `case` without importing the heavy D3/recharts viz components.
+// family has a `case` without importing the heavy D3 viz components.
 import vizRouterSource from '@/visualizations/VizRouter.tsx?raw';
 import { listAlgorithms } from '@/algorithms/registry';
 import { getDataset } from '@/datasets/registry';

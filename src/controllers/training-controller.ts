@@ -29,15 +29,15 @@ async function ensurePyodide(): Promise<void> {
   if (initialized) return;
   if (initPromise) return initPromise;
   const setStatus = useSessionStore.getState().setPyodideStatus;
-  setStatus('loading', 'Starting Pyodide…');
+  setStatus('loading', 'Starting Python…', 'loading-runtime');
 
   initPromise = (async () => {
     const worker = ensureWorker();
     await worker.init(
       Comlink.proxy((p) => {
-        if (p.stage === 'error') setStatus('error', p.message);
-        else if (p.stage === 'ready') setStatus('ready', p.message);
-        else setStatus('loading', p.message);
+        if (p.stage === 'error') setStatus('error', p.message, 'error');
+        else if (p.stage === 'ready') setStatus('ready', p.message, 'ready');
+        else setStatus('loading', p.message, p.stage);
       }),
     );
     initialized = true;
