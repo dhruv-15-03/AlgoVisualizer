@@ -10,6 +10,7 @@ import type { WorkspacePane } from '@/components/workspace/workspace-pane';
 import { useIsXlUp } from '@/lib/use-media-query';
 import { usePlaybackKeyboard } from '@/hooks/usePlaybackKeyboard';
 import { useSessionStore } from '@/stores/session-store';
+import { useFamilyTheme } from '@/hooks/useFamilyTheme';
 import { getAlgorithm, listAlgorithms } from '@/algorithms/registry';
 import { getDataset } from '@/datasets/registry';
 import { DEFAULT_DATASET_BY_ALGO } from '@/algorithms/default-datasets';
@@ -109,8 +110,10 @@ export function WorkspacePage() {
   // and dispatches the same session-store playback actions as the buttons.
   usePlaybackKeyboard();
 
+  const familyTheme = useFamilyTheme();
+
   return (
-    <div className="flex h-full min-h-0 flex-col bg-ink-900">
+    <div className="flex h-full min-h-0 flex-col bg-ink-900" style={familyTheme.style}>
       <a
         href="#main-content"
         className="sr-only z-50 rounded-md bg-accent-500 px-3 py-2 text-sm font-medium text-white focus:not-sr-only focus:absolute focus:left-3 focus:top-3"
