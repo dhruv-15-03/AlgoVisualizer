@@ -11,28 +11,8 @@ import { useIsXlUp } from '@/lib/use-media-query';
 import { useSessionStore } from '@/stores/session-store';
 import { getAlgorithm, listAlgorithms } from '@/algorithms/registry';
 import { getDataset } from '@/datasets/registry';
+import { DEFAULT_DATASET_BY_ALGO } from '@/algorithms/default-datasets';
 import type { AlgorithmId } from '@/types/algorithm';
-
-const DEFAULT_DATASET_BY_ALGO: Record<AlgorithmId, string> = {
-  kmeans: 'blobs',
-  linreg: 'linear',
-  logreg: 'moons',
-  dtree: 'iris',
-  knn: 'moons',
-  naivebayes: 'iris',
-  svm: 'moons',
-  randomforest: 'spirals',
-  mlp: 'spirals',
-  cnn: 'shapes',
-  polyreg: 'polywave',
-  ridge: 'noisy-linear',
-  lasso: 'noisy-linear',
-  dbscan: 'moons',
-  hierarchical: 'blobs',
-  gmm: 'gmm-mix',
-  pca: 'wine',
-  tsne: 'iris',
-};
 
 export function WorkspacePage() {
   const navigate = useNavigate();

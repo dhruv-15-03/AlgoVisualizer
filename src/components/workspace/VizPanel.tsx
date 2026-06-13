@@ -3,6 +3,7 @@ import { BlockMath } from 'react-katex';
 import { Panel } from '@/components/ui/Panel';
 import { Icon } from '@/components/ui/Icon';
 import { VizRouter } from '@/visualizations/VizRouter';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useSessionStore, useCurrentEvent } from '@/stores/session-store';
 import { getAlgorithm } from '@/algorithms/registry';
 import { getDataset } from '@/datasets/registry';
@@ -114,12 +115,19 @@ export function VizPanel() {
     );
   } else if (algorithm && dataset) {
     body = (
-      <VizRouter
-        family={algorithm.family}
-        dataset={dataset}
-        events={events}
-        currentStep={currentStep}
-      />
+      <ErrorBoundary
+        key={`${algorithm.family}:${dataset.id}`}
+        compact
+        title="Visualization error"
+        description="This view hit an unexpected error while rendering. Try again or tweak the code."
+      >
+        <VizRouter
+          family={algorithm.family}
+          dataset={dataset}
+          events={events}
+          currentStep={currentStep}
+        />
+      </ErrorBoundary>
     );
   } else {
     body = null;
