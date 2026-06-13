@@ -1,5 +1,6 @@
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useSessionStore } from '@/stores/session-store';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { listAlgorithmsByCategory } from '@/algorithms/registry';
 import { listDatasets } from '@/datasets/registry';
 import { Select } from '@/components/ui/Select';
@@ -52,6 +53,7 @@ export function TopNav() {
   const currentStep = useSessionStore((s) => s.currentStep);
   const quizMode = useSessionStore((s) => s.quizMode);
   const toggleQuizMode = useSessionStore((s) => s.toggleQuizMode);
+  const reduceMotion = usePrefersReducedMotion();
 
   const algoGroups = listAlgorithmsByCategory()
     .filter((g) => g.algorithms.length > 0)
@@ -117,10 +119,31 @@ export function TopNav() {
           Wraps freely; nothing here is overflow-critical. */}
       <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
         {/* Brand — allowed to shrink/truncate so it never forces overflow at
-            narrow widths; the logo stays fixed. */}
-        <Link to="/" className="flex min-w-0 shrink items-center gap-2 text-ink-100 hover:text-ink-50" title="Home">
-          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-accent-500/15 text-accent-300">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+            narrow widths; the logo stays fixed. The brand mark is tinted by the
+            active algorithm family and gently animated (orbit dot + glow), all
+            gated by reduced-motion. */}
+        <Link to="/" className="group flex min-w-0 shrink items-center gap-2.5 text-ink-100 hover:text-ink-50" title="Home">
+          <div className="relative grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-family-accent/15 text-family-text shadow-sm ring-1 ring-family-accent/30">
+            {!reduceMotion && (
+              <>
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 rounded-lg bg-family-accent/25 blur-md animate-brand-glow"
+                />
+                <span aria-hidden className="pointer-events-none absolute inset-[-3px] animate-brand-orbit">
+                  <span className="absolute left-1/2 top-0 h-1 w-1 -translate-x-1/2 rounded-full bg-family-text shadow-[0_0_6px_rgb(var(--family-accent-rgb)/0.7)]" />
+                </span>
+              </>
+            )}
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="relative"
+            >
               <path d="M4 17l6-6 4 4 6-9" strokeLinecap="round" strokeLinejoin="round" />
               <circle cx="4" cy="17" r="1.5" fill="currentColor" />
               <circle cx="10" cy="11" r="1.5" fill="currentColor" />
@@ -129,7 +152,7 @@ export function TopNav() {
             </svg>
           </div>
           <div className="min-w-0">
-            <div className="truncate text-sm font-semibold tracking-tight text-ink-50">AlgoVisualizer</div>
+            <div className="truncate font-display text-sm font-semibold tracking-tight text-ink-50">AlgoVisualizer</div>
             <div className="hidden text-[10px] uppercase tracking-wider text-ink-500 sm:block">Visual ML workspace</div>
           </div>
         </Link>
@@ -183,7 +206,7 @@ export function TopNav() {
             groups={algoGroups}
             onChange={(e) => navigate(`/workspace/${e.target.value}`)}
             aria-label="Algorithm"
-            className="min-w-0 flex-1 sm:w-[200px] sm:flex-none"
+            className="min-w-0 flex-1 border-l-2 border-l-family-accent/70 font-medium text-family-text focus:ring-family-accent sm:w-[200px] sm:flex-none"
           />
           <label className="hidden shrink-0 text-[10px] uppercase tracking-wide text-ink-400 xl:inline">Data</label>
           <Select

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css');
 
 @tailwind base;
@@ -31,6 +31,12 @@
 @layer base {
   :root {
     color-scheme: dark;
+    /* Family-coded identity defaults — degrade to the indigo accent so any
+       `family-*` token renders sensibly before a workspace sets a category
+       theme (see src/lib/family-palette.ts + useFamilyTheme). */
+    --family-text-rgb: 124 147 255; /* accent-400 */
+    --family-accent-rgb: 91 117 255; /* accent-500 */
+    --family-solid-rgb: 65 89 230; /* accent-600 */
   }
 
   html,
@@ -87,6 +93,9 @@
 @layer components {
   .panel {
     @apply bg-ink-800 border border-ink-700 rounded-xl flex flex-col overflow-hidden;
+    /* Family-coded top edge — subtly tints every panel by the active algorithm
+       family (defaults to indigo via the :root custom properties). */
+    border-top: 2px solid rgb(var(--family-accent-rgb) / 0.5);
   }
   .panel-header {
     @apply bg-ink-800 border-b border-ink-700 px-3.5 py-2.5 flex items-center gap-2;
