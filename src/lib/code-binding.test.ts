@@ -62,12 +62,25 @@ describe('code-binding · extractValue', () => {
     expect(extractValue('k=3  # was k=9 before', 'k=')).toBe(3);
   });
 
-  it('KNOWN LIMITATION: first match wins, so a commented key above the real one shadows it', () => {
-    // This documents current behavior, not necessarily desired behavior: a
-    // hyperparameter mentioned in a comment *before* the real assignment is
-    // picked up first. See report — flagged as a latent binding bug.
+  it('ignores a hyperparameter mentioned in a comment above the real assignment', () => {
+    // Previously a latent binding bug: the commented `k=9` shadowed the real
+    // `k=3` because the first regex match anywhere won. Comments are now
+    // stripped before matching, so the real assignment wins.
     const code = '# good starting point: k=9\ndef run(X, k=3):';
-    expect(extractValue(code, 'k=')).toBe(9);
+    expect(extractValue(code, 'k=')).toBe(3);
+  });
+
+  it('ignores a fully commented-out assignment', () => {
+    expect(extractValue('# k = 99\nk = 3', 'k=')).toBe(3);
+    // ...and returns null when the only occurrence is commented out.
+    expect(extractValue('# k = 99', 'k=')).toBeNull();
+  });
+
+  it('does not treat a "#" inside a string literal as a comment', () => {
+    // The "#" lives inside the quoted value; stripping must leave the string
+    // intact so the value still resolves (rather than being blanked out).
+    expect(extractValue('mode="#fff"', 'mode=')).toBe('#fff');
+    expect(extractValue("color='#abc' # real comment\nk=3", 'color=')).toBe('#abc');
   });
 });
 
@@ -99,6 +112,11 @@ describe('code-binding · patchCode', () => {
 
   it('only patches the first occurrence', () => {
     expect(patchCode('k=3\nk=3', 'k=', 9)).toBe('k=9\nk=3');
+  });
+
+  it('patches the real assignment, not a value mentioned in a comment above it', () => {
+    const code = '# try k=9\nk=3';
+    expect(patchCode(code, 'k=', 5)).toBe('# try k=9\nk=5');
   });
 
   it('patches a value inside a function call without touching siblings', () => {

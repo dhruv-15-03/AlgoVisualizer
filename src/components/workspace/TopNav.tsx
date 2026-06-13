@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { StatusPill } from '@/components/ui/StatusPill';
 import { Slider } from '@/components/ui/Slider';
+import { ShareButton } from '@/components/workspace/ShareButton';
+import { ByoDataButton } from '@/components/workspace/ByoDataButton';
 import { runNow } from '@/controllers/training-controller';
 import type { AlgorithmId } from '@/types/algorithm';
 import { CATEGORY_LABELS } from '@/types/algorithm';
@@ -120,8 +122,9 @@ export function TopNav() {
         </div>
       </Link>
 
-      {/* Right cluster: quiz / race / status — sits before selectors so it stays on row 1 when wrapped. */}
+      {/* Right cluster: share / quiz / race / status — sits before selectors so it stays on row 1 when wrapped. */}
       <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+        <ShareButton />
         <button
           onClick={toggleQuizMode}
           title={`Quiz mode ${quizMode ? 'on' : 'off'} — hide explanations until you reveal them`}
@@ -178,18 +181,30 @@ export function TopNav() {
           aria-label="Dataset"
           className="min-w-0 flex-1 sm:min-w-[200px] sm:flex-none"
         />
+        <ByoDataButton />
       </div>
 
-      {/* Playback — desktop only. On smaller screens the MobilePlaybackBar shows these. */}
-      <div className="hidden items-center gap-1 border-l border-ink-700 pl-3 xl:flex">
-        <Button size="icon" variant="ghost" title="Step back" aria-label="Step back" onClick={stepBack} disabled={currentStep <= 0}>
+      {/* Playback — desktop only. On smaller screens the MobilePlaybackBar shows these.
+          `aria-keyshortcuts` + the key hints in each title document the keyboard
+          transport wired up by usePlaybackKeyboard (Space/←/→/Home/End/R). */}
+      <div className="hidden items-center gap-1 border-l border-ink-700 pl-3 xl:flex" aria-label="Playback controls">
+        <Button
+          size="icon"
+          variant="ghost"
+          title="Step back (Left arrow)"
+          aria-label="Step back"
+          aria-keyshortcuts="ArrowLeft Home"
+          onClick={stepBack}
+          disabled={currentStep <= 0}
+        >
           <Icon name="skip_previous" size={20} />
         </Button>
         <Button
           size="icon"
           variant="primary"
-          title={playing ? 'Pause' : 'Play'}
+          title={`${playing ? 'Pause' : 'Play'} (Space)`}
           aria-label={playing ? 'Pause' : 'Play'}
+          aria-keyshortcuts="Space"
           onClick={togglePlay}
           disabled={events.length === 0}
         >
@@ -198,14 +213,23 @@ export function TopNav() {
         <Button
           size="icon"
           variant="ghost"
-          title="Step forward"
+          title="Step forward (Right arrow)"
           aria-label="Step forward"
+          aria-keyshortcuts="ArrowRight End"
           onClick={stepForward}
           disabled={currentStep >= events.length - 1}
         >
           <Icon name="skip_next" size={20} />
         </Button>
-        <Button size="icon" variant="ghost" title="Reset" aria-label="Reset" onClick={resetPlayback} disabled={events.length === 0}>
+        <Button
+          size="icon"
+          variant="ghost"
+          title="Reset (R)"
+          aria-label="Reset"
+          aria-keyshortcuts="R"
+          onClick={resetPlayback}
+          disabled={events.length === 0}
+        >
           <Icon name="replay" size={18} />
         </Button>
         <Button size="sm" variant="secondary" onClick={() => runNow()}>

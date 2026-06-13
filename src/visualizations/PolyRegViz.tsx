@@ -10,7 +10,7 @@ import * as d3 from 'd3';
 import type { TraceEvent } from '@/types/trace';
 import type { Dataset } from '@/types/dataset';
 import { LossChart } from './LossChart';
-
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 interface PolyRegVizProps {
   dataset: Dataset;
   events: TraceEvent[];
@@ -53,6 +53,7 @@ function snapshot(events: TraceEvent[], upTo: number): PolyRegSnapshot {
 function PolyChart({ X, y, weights }: { X: number[][]; y: number[] | null; weights: number[] | null }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
+  const reduceMotion = usePrefersReducedMotion();
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -131,7 +132,7 @@ function PolyChart({ X, y, weights }: { X: number[][]; y: number[] | null; weigh
                 <circle key={i} cx={xScale(row[0])} cy={yScale(ys[i])} r={3.2} fill="#60a5fa" fillOpacity={0.75} stroke="#0f172a" strokeWidth={0.5} />
               ))}
               {pathD && (
-                <path d={pathD} fill="none" stroke="#fbbf24" strokeWidth={2.5} style={{ transition: 'd 200ms ease' }} />
+                <path d={pathD} fill="none" stroke="#fbbf24" strokeWidth={2.5} style={{ transition: reduceMotion ? undefined : 'd 200ms ease' }} />
               )}
             </g>
 

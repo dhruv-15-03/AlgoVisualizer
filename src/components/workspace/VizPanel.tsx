@@ -1,9 +1,11 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { BlockMath } from 'react-katex';
 import { Panel } from '@/components/ui/Panel';
 import { Icon } from '@/components/ui/Icon';
 import { VizRouter } from '@/visualizations/VizRouter';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { ExplainErrorPanel } from '@/components/workspace/ExplainErrorPanel';
+import { ExportPngButton } from '@/components/workspace/ExportPngButton';
 import { useSessionStore, useCurrentEvent } from '@/stores/session-store';
 import { getAlgorithm } from '@/algorithms/registry';
 import { getDataset } from '@/datasets/registry';
@@ -118,6 +120,7 @@ export function VizPanel() {
   const pyodideStage = useSessionStore((s) => s.pyodideStage);
   const seekTo = useSessionStore((s) => s.seekTo);
   const event = useCurrentEvent();
+  const vizContainerRef = useRef<HTMLDivElement | null>(null);
 
   const algorithm = algorithmId ? getAlgorithm(algorithmId) : null;
   const dataset = datasetId ? getDataset(datasetId) : null;
@@ -147,14 +150,12 @@ export function VizPanel() {
   } else if (runStatus === 'error') {
     body = (
       <div className="grid h-full place-items-center p-4">
-        <div className="max-w-md text-center">
+        <div className="w-full max-w-lg text-center">
           <div className="inline-flex items-center gap-1.5 text-sm font-semibold text-rose-300">
             <Icon name="error_outline" size={16} />
             Run failed
           </div>
-          <pre className="mt-2 max-h-40 overflow-auto rounded-md bg-rose-500/10 p-3 text-left text-[11px] text-rose-200">
-            {runError || 'Unknown error'}
-          </pre>
+          <ExplainErrorPanel traceback={runError || 'Unknown error'} />
           <button
             onClick={() => runNow()}
             className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-400"
@@ -198,14 +199,19 @@ export function VizPanel() {
         title="Visualization"
         subtitle={headerSubtitle}
         right={
-          <span className="font-mono text-[11px] text-ink-400">
-            step {events.length === 0 ? 0 : currentStep + 1}/{events.length}
-          </span>
+          <div className="flex items-center gap-2">
+            {events.length > 0 && (
+              <ExportPngButton targetRef={vizContainerRef} fileName={headerSubtitle || 'visualization'} />
+            )}
+            <span className="font-mono text-[11px] text-ink-400">
+              step {events.length === 0 ? 0 : currentStep + 1}/{events.length}
+            </span>
+          </div>
         }
         className="flex-1 min-h-0"
         bodyClassName="p-2 flex flex-col gap-2"
       >
-        <div className="min-h-0 flex-1 rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
+        <div ref={vizContainerRef} className="min-h-0 flex-1 rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
           {body}
         </div>
         {events.length > 0 && (
