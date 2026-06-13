@@ -12,7 +12,7 @@ Everything runs in the browser. The Python executes on **[Pyodide](https://pyodi
 (CPython compiled to WebAssembly), so there is no backend, no install, and your code never
 leaves the page.
 
-- **Live demo:** deploy your own in one click — see [Deployment](#deployment).
+- **Live demo:** **[algo-visualizer-beige.vercel.app](https://algo-visualizer-beige.vercel.app)** — runs entirely in your browser. You can also deploy your own in one click; see [Deployment](#deployment).
 - **Tech:** React 18 · TypeScript · Vite · Pyodide · D3 · Zustand · Tailwind CSS · Monaco.
 
 ---
