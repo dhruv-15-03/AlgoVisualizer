@@ -56,15 +56,26 @@ export function WorkspacePage() {
   }, [algoId, currentDatasetId, setDataset]);
 
   // Give each algorithm tab a distinct document title so multiple open
-  // workspaces are distinguishable; restore the default on unmount.
+  // workspaces are distinguishable; restore the default on unmount. Also keep
+  // the meta description + canonical in sync for crawlers that execute JS.
   useEffect(() => {
     const defaultTitle = 'AlgoVisualizer · ML algorithms, demystified';
+    const defaultDesc =
+      'AlgoVisualizer — edit real Python ML code and watch 18 algorithms train step by step on real datasets, right in your browser. No install, no setup.';
+    const origin = 'https://algo-visualizer-beige.vercel.app';
     if (!algoId) return;
     const meta = getAlgorithm(algoId);
     if (!meta) return;
+
     document.title = `${meta.name} · AlgoVisualizer`;
+    const desc = `${meta.name}: ${meta.shortDescription} Edit the Python and watch it train step by step in your browser.`;
+    setMetaDescription(desc);
+    setCanonical(`${origin}/workspace/${algoId}`);
+
     return () => {
       document.title = defaultTitle;
+      setMetaDescription(defaultDesc);
+      setCanonical(`${origin}/`);
     };
   }, [algoId]);
 
@@ -74,6 +85,28 @@ export function WorkspacePage() {
       <WorkspaceBody />
     </div>
   );
+}
+
+/** Upsert the <meta name="description"> content. */
+function setMetaDescription(content: string) {
+  let el = document.head.querySelector<HTMLMetaElement>('meta[name="description"]');
+  if (!el) {
+    el = document.createElement('meta');
+    el.setAttribute('name', 'description');
+    document.head.appendChild(el);
+  }
+  el.setAttribute('content', content);
+}
+
+/** Upsert the <link rel="canonical"> href. */
+function setCanonical(href: string) {
+  let el = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if (!el) {
+    el = document.createElement('link');
+    el.setAttribute('rel', 'canonical');
+    document.head.appendChild(el);
+  }
+  el.setAttribute('href', href);
 }
 
 /**

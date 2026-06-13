@@ -2,6 +2,8 @@ import { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Home } from '@/pages/Home';
 import { attachController } from '@/controllers/training-controller';
+import { ConsentBanner } from '@/components/ConsentBanner';
+import { maybeLoadClarity } from '@/lib/consent';
 
 // Route-level code splitting. Home stays eager (it's the entry point);
 // WorkspacePage and RacePage are pulled lazily so the initial bundle
@@ -33,15 +35,24 @@ export default function App() {
     return detach;
   }, []);
 
+  // Re-load Clarity on return visits where the user previously accepted.
+  // (First-time/declined visitors load nothing.)
+  useEffect(() => {
+    maybeLoadClarity();
+  }, []);
+
   return (
-    <Suspense fallback={<RouteSplash />}>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/workspace" element={<WorkspacePage />} />
-        <Route path="/workspace/:algoId" element={<WorkspacePage />} />
-        <Route path="/race" element={<RacePage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Suspense>
+    <>
+      <Suspense fallback={<RouteSplash />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/workspace" element={<WorkspacePage />} />
+          <Route path="/workspace/:algoId" element={<WorkspacePage />} />
+          <Route path="/race" element={<RacePage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
+      <ConsentBanner />
+    </>
   );
 }

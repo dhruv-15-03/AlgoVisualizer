@@ -10,6 +10,7 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import type { AlgorithmId, AlgorithmHyperparam } from '@/types/algorithm';
 import type { TraceEvent } from '@/types/trace';
+import type { PyodideStage } from '@/lib/pyodide-progress';
 
 export type PyodideStatus = 'idle' | 'loading' | 'ready' | 'error';
 export type RunStatus = 'idle' | 'running' | 'success' | 'cancelled' | 'error';
@@ -21,6 +22,7 @@ export interface HyperparamValue {
 interface SessionState {
   pyodideStatus: PyodideStatus;
   pyodideProgress: string;
+  pyodideStage: PyodideStage;
 
   algorithmId: AlgorithmId | null;
   datasetId: string | null;
@@ -39,7 +41,7 @@ interface SessionState {
   /** When true, the "what's happening" panel is blurred until the user reveals it per step. */
   quizMode: boolean;
 
-  setPyodideStatus: (s: PyodideStatus, msg?: string) => void;
+  setPyodideStatus: (s: PyodideStatus, msg?: string, stage?: PyodideStage) => void;
 
   setAlgorithm: (id: AlgorithmId, defaults: { code: string; hyperparams: AlgorithmHyperparam[] }) => void;
   setDataset: (id: string) => void;
@@ -66,6 +68,7 @@ export const useSessionStore = create<SessionState>()(
   subscribeWithSelector((set, get) => ({
     pyodideStatus: 'idle',
     pyodideProgress: '',
+    pyodideStage: 'idle',
 
     algorithmId: null,
     datasetId: null,
@@ -83,8 +86,20 @@ export const useSessionStore = create<SessionState>()(
     speed: 2,
     quizMode: false,
 
-    setPyodideStatus: (s, msg) =>
-      set({ pyodideStatus: s, pyodideProgress: msg ?? get().pyodideProgress }),
+    setPyodideStatus: (s, msg, stage) =>
+      set({
+        pyodideStatus: s,
+        pyodideProgress: msg ?? get().pyodideProgress,
+        pyodideStage:
+          stage ??
+          (s === 'ready'
+            ? 'ready'
+            : s === 'error'
+              ? 'error'
+              : s === 'idle'
+                ? 'idle'
+                : get().pyodideStage),
+      }),
 
     setAlgorithm: (id, defaults) => {
       const hp: Record<string, number | string | boolean> = {};

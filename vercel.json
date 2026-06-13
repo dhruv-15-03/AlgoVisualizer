@@ -4,7 +4,10 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
-    { "source": "/((?!assets/|favicon\\.svg).*)", "destination": "/index.html" }
+    {
+      "source": "/((?!assets/|icons/|favicon\\.svg|og-image\\.png|manifest\\.webmanifest|sw\\.js|registerSW\\.js|workbox-[^/]+\\.js|sitemap\\.xml|robots\\.txt).*)",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {
