@@ -1,11 +1,16 @@
 /**
  * Dataset registry — single source of truth for the dataset picker.
+ *
+ * Built-in datasets are static. User-supplied (BYO) datasets live in the
+ * session store; this registry consults the store so custom datasets resolve
+ * through the exact same `getDataset` / `listDatasets` pathway the built-ins use.
  */
 
 import type { Dataset, DatasetInfo } from '@/types/dataset';
 import { iris } from '@/datasets/builtin/iris';
 import { wine } from '@/datasets/builtin/wine';
 import { makeShapes } from '@/datasets/builtin/shapes';
+import { useSessionStore } from '@/stores/session-store';
 import {
   makeAnisoBlobs,
   makeBlobs,
@@ -35,8 +40,8 @@ const datasets: Dataset[] = [
 
 const map = new Map<string, Dataset>(datasets.map((d) => [d.id, d]));
 
-export function listDatasets(): DatasetInfo[] {
-  return datasets.map((d) => ({
+function toInfo(d: Dataset): DatasetInfo {
+  return {
     id: d.id,
     name: d.name,
     description: d.description,
@@ -46,9 +51,18 @@ export function listDatasets(): DatasetInfo[] {
     task: d.task,
     source: d.source,
     imageShape: d.imageShape,
-  }));
+  };
+}
+
+function customDatasets(): Dataset[] {
+  return useSessionStore.getState().customDatasets;
+}
+
+export function listDatasets(): DatasetInfo[] {
+  return [...datasets, ...customDatasets()].map(toInfo);
 }
 
 export function getDataset(id: string): Dataset | null {
-  return map.get(id) ?? null;
+  return map.get(id) ?? customDatasets().find((d) => d.id === id) ?? null;
 }
+

@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { StatusPill } from '@/components/ui/StatusPill';
 import { Slider } from '@/components/ui/Slider';
+import { ShareButton } from '@/components/workspace/ShareButton';
+import { ByoDataButton } from '@/components/workspace/ByoDataButton';
 import { runNow } from '@/controllers/training-controller';
 import type { AlgorithmId } from '@/types/algorithm';
 import { CATEGORY_LABELS } from '@/types/algorithm';
@@ -120,8 +122,9 @@ export function TopNav() {
         </div>
       </Link>
 
-      {/* Right cluster: quiz / race / status — sits before selectors so it stays on row 1 when wrapped. */}
+      {/* Right cluster: share / quiz / race / status — sits before selectors so it stays on row 1 when wrapped. */}
       <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+        <ShareButton />
         <button
           onClick={toggleQuizMode}
           title={`Quiz mode ${quizMode ? 'on' : 'off'} — hide explanations until you reveal them`}
@@ -178,6 +181,7 @@ export function TopNav() {
           aria-label="Dataset"
           className="min-w-0 flex-1 sm:min-w-[200px] sm:flex-none"
         />
+        <ByoDataButton />
       </div>
 
       {/* Playback — desktop only. On smaller screens the MobilePlaybackBar shows these. */}

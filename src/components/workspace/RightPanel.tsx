@@ -8,6 +8,7 @@ import { patchCode } from '@/lib/code-binding';
 import { formatNumber } from '@/lib/utils';
 import { useState } from 'react';
 import { SweepDialog } from './SweepDialog';
+import { ConvergencePanel } from './ConvergencePanel';
 import type { AlgorithmReference, ReferenceKind } from '@/types/algorithm';
 
 const KIND_ICON: Record<ReferenceKind, string> = {
@@ -318,6 +319,7 @@ export function RightPanel() {
     <div className="flex h-full min-h-0 flex-col gap-3 overflow-y-auto pr-1">
       <Hyperparams />
       <Metrics />
+      <ConvergencePanel />
       <AlgorithmInfo />
       <DatasetInfo />
     </div>
