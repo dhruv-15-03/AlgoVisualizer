@@ -23,3 +23,9 @@ lerna-debug.log*
 
 # Build
 *.tsbuildinfo
+
+# Test / e2e artifacts
+coverage
+test-results
+playwright-report
+playwright/.cache
