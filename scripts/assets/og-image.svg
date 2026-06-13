@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="1" y="1" width="1198" height="628" rx="0" fill="none" stroke="#1e293b" stroke-width="2"/>
+
+  <!-- logo mark -->
+  <g transform="translate(96 96)">
+    <rect width="96" height="96" rx="22" fill="#60a5fa" fill-opacity="0.14"/>
+    <path d="M22 70 L42 50 L56 64 L78 30" stroke="#60a5fa" stroke-width="7"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="22" cy="70" r="6" fill="#60a5fa"/>
+    <circle cx="42" cy="50" r="6" fill="#60a5fa"/>
+    <circle cx="56" cy="64" r="6" fill="#60a5fa"/>
+    <circle cx="78" cy="30" r="6" fill="#60a5fa"/>
+  </g>
+  <text x="212" y="158" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="40"
+        font-weight="700" fill="#f8fafc">AlgoVisualizer</text>
+
+  <!-- headline -->
+  <text x="96" y="320" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="76"
+        font-weight="800" fill="#f8fafc">See ML algorithms</text>
+  <text x="96" y="406" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="76"
+        font-weight="800" fill="#60a5fa">train, live.</text>
+
+  <!-- tagline -->
+  <text x="98" y="470" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="30"
+        font-weight="400" fill="#94a3b8">Edit real Python in your browser. No backend, no setup.</text>
+
+  <!-- stat chips -->
+  <g font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="24" font-weight="600" fill="#cbd5e1">
+    <text x="98" y="545">18 algorithms</text>
+    <text x="320" y="545" fill="#334155">•</text>
+    <text x="346" y="545">11 visual families</text>
+    <text x="616" y="545" fill="#334155">•</text>
+    <text x="642" y="545">Powered by Pyodide</text>
+  </g>
+</svg>

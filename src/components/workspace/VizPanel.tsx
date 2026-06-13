@@ -9,20 +9,78 @@ import { getAlgorithm } from '@/algorithms/registry';
 import { getDataset } from '@/datasets/registry';
 import { familyOf } from '@/types/trace';
 import { runNow } from '@/controllers/training-controller';
+import { pyodideLoadProgress, type PyodideStage } from '@/lib/pyodide-progress';
 
-function LoadingState({ message }: { message: string }) {
+const LOADING_STEPS: { stage: PyodideStage; label: string }[] = [
+  { stage: 'loading-runtime', label: 'Download Python' },
+  { stage: 'loading-numpy', label: 'Load NumPy' },
+  { stage: 'ready', label: 'Ready' },
+];
+
+function LoadingState({ stage, message }: { stage: PyodideStage; message: string }) {
+  const progress = pyodideLoadProgress(stage);
+  const reachedIndex = LOADING_STEPS.findIndex((s) => s.stage === stage);
+
   return (
-    <div className="grid h-full place-items-center">
-      <div className="flex flex-col items-center gap-3 text-center">
+    <div className="grid h-full place-items-center p-4">
+      <div className="flex w-full max-w-xs flex-col items-center gap-4 text-center">
         <div className="relative h-10 w-10">
           <div className="absolute inset-0 rounded-full border-2 border-ink-700" />
           <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-accent-400" />
         </div>
-        <div>
-          <div className="text-sm font-medium text-ink-200">{message}</div>
-          <div className="mt-1 text-[11px] text-ink-500">
-            First load downloads ~10MB Python runtime; subsequent runs are instant.
+
+        <div className="w-full">
+          <div className="mb-1 flex items-baseline justify-between">
+            <span className="text-sm font-medium text-ink-200">
+              {message || progress.label}
+            </span>
+            <span className="font-mono text-[11px] text-ink-400">{progress.percent}%</span>
           </div>
+          <div
+            className="h-1.5 w-full overflow-hidden rounded-full bg-ink-700"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progress.percent}
+            aria-label="Python runtime loading progress"
+          >
+            <div
+              className="h-full rounded-full bg-accent-400 transition-[width] duration-500 ease-out"
+              style={{ width: `${progress.percent}%` }}
+            />
+          </div>
+
+          <ol className="mt-3 flex items-center justify-between gap-1">
+            {LOADING_STEPS.map((s, i) => {
+              const done = reachedIndex > i || stage === 'ready';
+              const active = reachedIndex === i && stage !== 'ready';
+              return (
+                <li
+                  key={s.stage}
+                  className={
+                    'flex items-center gap-1 text-[10px] ' +
+                    (done
+                      ? 'text-accent-300'
+                      : active
+                        ? 'text-ink-200'
+                        : 'text-ink-500')
+                  }
+                >
+                  <Icon
+                    name={done ? 'check_circle' : active ? 'sync' : 'radio_button_unchecked'}
+                    size={12}
+                    fill={done}
+                  />
+                  {s.label}
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+
+        <div className="text-[11px] text-ink-500">
+          First load downloads the ~10MB Python runtime; it&apos;s cached so repeat
+          visits are near-instant.
         </div>
       </div>
     </div>
@@ -57,6 +115,7 @@ export function VizPanel() {
   const runError = useSessionStore((s) => s.runError);
   const pyodideStatus = useSessionStore((s) => s.pyodideStatus);
   const pyodideProgress = useSessionStore((s) => s.pyodideProgress);
+  const pyodideStage = useSessionStore((s) => s.pyodideStage);
   const seekTo = useSessionStore((s) => s.seekTo);
   const event = useCurrentEvent();
 
@@ -70,7 +129,7 @@ export function VizPanel() {
 
   let body: React.ReactNode;
   if (pyodideStatus === 'loading' || pyodideStatus === 'idle') {
-    body = <LoadingState message={pyodideProgress || 'Loading Python runtime…'} />;
+    body = <LoadingState stage={pyodideStage} message={pyodideProgress} />;
   } else if (pyodideStatus === 'error') {
     body = (
       <div className="grid h-full place-items-center p-4">
