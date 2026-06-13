@@ -47,6 +47,7 @@ export default {
         'confetti-fall': 'confetti-fall 1700ms cubic-bezier(0.2, 0.6, 0.3, 1) forwards',
         'converge-pop': 'converge-pop 520ms cubic-bezier(0.18, 0.9, 0.28, 1.2) forwards',
         'celebrate-glow': 'celebrate-glow 1600ms ease-out forwards',
+        'fade-in': 'fade-in 420ms ease-out both',
       },
       keyframes: {
         'pulse-soft': {
@@ -77,6 +78,10 @@ export default {
           '0%': { opacity: '0' },
           '25%': { opacity: '1' },
           '100%': { opacity: '0' },
+        },
+        'fade-in': {
+          '0%': { opacity: '0', transform: 'translateY(4px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },
     },
