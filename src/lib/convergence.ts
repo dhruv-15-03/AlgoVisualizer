@@ -49,6 +49,8 @@ function metricOf(ev: TraceEvent): { value: number; label: string } | null {
       return typeof ev.metric === 'number'
         ? { value: ev.metric, label: ev.metricLabel ?? 'Metric' }
         : null;
+    case 'rl:episode':
+      return { value: ev.reward, label: 'Reward' };
     default:
       return null;
   }

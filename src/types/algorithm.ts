@@ -11,25 +11,34 @@ export type AlgorithmId =
   | 'naivebayes'
   | 'svm'
   | 'randomforest'
+  | 'gbm'
   | 'mlp'
   | 'cnn'
   // Supervised — regression
   | 'polyreg'
   | 'ridge'
   | 'lasso'
+  | 'elasticnet'
   // Unsupervised — clustering
   | 'dbscan'
   | 'hierarchical'
   | 'gmm'
   // Unsupervised — dim reduction
   | 'pca'
-  | 'tsne';
+  | 'tsne'
+  | 'autoencoder'
+  // Reinforcement learning
+  | 'qlearning'
+  | 'dqn'
+  | 'reinforce'
+  | 'actorcritic';
 
 export type AlgorithmCategory =
   | 'supervised-classification'
   | 'supervised-regression'
   | 'unsupervised-clustering'
-  | 'unsupervised-dim-reduction';
+  | 'unsupervised-dim-reduction'
+  | 'reinforcement';
 
 export interface AlgorithmHyperparam {
   id: string;
@@ -63,7 +72,7 @@ export interface AlgorithmMeta {
   longDescription: string;
   /** High-level grouping for the home page and dropdown. */
   category: AlgorithmCategory;
-  task: 'classification' | 'regression' | 'clustering' | 'dim-reduction';
+  task: 'classification' | 'regression' | 'clustering' | 'dim-reduction' | 'reinforcement';
   pythonFilename: string;
   /** The default Python source shown in the Monaco editor. */
   defaultCode: string;
@@ -76,7 +85,7 @@ export interface AlgorithmMeta {
   pros: string[];
   cons: string[];
   /** Compatible dataset task types. */
-  compatibleTasks: Array<'classification' | 'regression' | 'clustering'>;
+  compatibleTasks: Array<'classification' | 'regression' | 'clustering' | 'reinforcement'>;
   /** External reading material (Wikipedia, sklearn docs, papers, etc). */
   references?: AlgorithmReference[];
 }
@@ -87,6 +96,7 @@ export const CATEGORY_LABELS: Record<AlgorithmCategory, string> = {
   'supervised-regression': 'Supervised · Regression',
   'unsupervised-clustering': 'Unsupervised · Clustering',
   'unsupervised-dim-reduction': 'Unsupervised · Dimensionality reduction',
+  reinforcement: 'Reinforcement learning',
 };
 
 export const CATEGORY_ORDER: AlgorithmCategory[] = [
@@ -94,4 +104,5 @@ export const CATEGORY_ORDER: AlgorithmCategory[] = [
   'supervised-regression',
   'unsupervised-clustering',
   'unsupervised-dim-reduction',
+  'reinforcement',
 ];

@@ -41,6 +41,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://algo-visualizer-beige.vercel.app/workspace/gbm</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://algo-visualizer-beige.vercel.app/workspace/mlp</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -71,6 +76,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://algo-visualizer-beige.vercel.app/workspace/elasticnet</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://algo-visualizer-beige.vercel.app/workspace/kmeans</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -97,6 +107,31 @@
   </url>
   <url>
     <loc>https://algo-visualizer-beige.vercel.app/workspace/tsne</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://algo-visualizer-beige.vercel.app/workspace/autoencoder</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://algo-visualizer-beige.vercel.app/workspace/qlearning</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://algo-visualizer-beige.vercel.app/workspace/dqn</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://algo-visualizer-beige.vercel.app/workspace/reinforce</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://algo-visualizer-beige.vercel.app/workspace/actorcritic</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

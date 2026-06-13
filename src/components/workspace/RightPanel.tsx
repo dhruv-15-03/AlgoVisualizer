@@ -190,6 +190,15 @@ function Metrics() {
     if ('iteration' in event && typeof event.iteration === 'number') {
       metrics.push({ label: 'Iteration', value: event.iteration.toString() });
     }
+    if ('reward' in event && typeof event.reward === 'number') {
+      metrics.push({ label: 'Reward', value: formatNumber(event.reward, 3) });
+    }
+    if ('steps' in event && typeof event.steps === 'number') {
+      metrics.push({ label: 'Steps', value: event.steps.toString() });
+    }
+    if ('epsilon' in event && typeof event.epsilon === 'number') {
+      metrics.push({ label: 'Epsilon', value: formatNumber(event.epsilon, 3) });
+    }
     if ('moved' in event && typeof event.moved === 'number') {
       metrics.push({ label: 'Centroid Δ', value: formatNumber(event.moved, 4) });
     }
@@ -297,16 +306,20 @@ function DatasetInfo() {
     <Panel title="Dataset" subtitle={dataset.description} className="shrink-0">
       <div className="grid grid-cols-3 gap-2">
         <div className="metric">
-          <div className="metric-label">Samples</div>
+          <div className="metric-label">{info.task === 'reinforcement' ? 'Rows' : 'Samples'}</div>
           <div className="metric-value">{info.samples}</div>
         </div>
         <div className="metric">
-          <div className="metric-label">Features</div>
+          <div className="metric-label">{info.task === 'reinforcement' ? 'Cols' : 'Features'}</div>
           <div className="metric-value">{info.features}</div>
         </div>
         <div className="metric">
-          <div className="metric-label">{info.task === 'regression' ? 'Task' : 'Classes'}</div>
-          <div className="metric-value">{info.task === 'regression' ? 'reg.' : info.classes ?? '—'}</div>
+          <div className="metric-label">
+            {info.task === 'reinforcement' ? 'Env' : info.task === 'regression' ? 'Task' : 'Classes'}
+          </div>
+          <div className="metric-value">
+            {info.task === 'reinforcement' ? 'grid' : info.task === 'regression' ? 'reg.' : info.classes ?? '—'}
+          </div>
         </div>
       </div>
       <div className="mt-2 text-[10px] text-ink-500">{info.source}</div>

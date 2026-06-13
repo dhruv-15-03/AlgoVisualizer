@@ -9,6 +9,7 @@
  *   supervised · regression       → amber
  *   unsupervised · clustering     → violet
  *   unsupervised · dim-reduction  → teal
+ *   reinforcement                 → rose
  *
  * This module is intentionally PURE (no React, no registry import) so it can be
  * unit-tested in isolation and reused anywhere. Components resolve the palette
@@ -23,7 +24,7 @@
  */
 import type { AlgorithmCategory } from '@/types/algorithm';
 
-export type FamilyName = 'azure' | 'amber' | 'violet' | 'teal';
+export type FamilyName = 'azure' | 'amber' | 'violet' | 'teal' | 'rose';
 
 export interface FamilyShade {
   /** Hex string, e.g. "#7cc4ff". */
@@ -78,6 +79,13 @@ export const FAMILY_PALETTES: Record<FamilyName, FamilyPalette> = {
     accent: shade('#2dd4bf'),
     solid: shade('#14b8a6'),
   },
+  rose: {
+    name: 'rose',
+    label: 'Rose',
+    text: shade('#ff8fb3'),
+    accent: shade('#f56a9b'),
+    solid: shade('#e84d86'),
+  },
 };
 
 const FAMILY_BY_CATEGORY: Record<AlgorithmCategory, FamilyName> = {
@@ -85,6 +93,7 @@ const FAMILY_BY_CATEGORY: Record<AlgorithmCategory, FamilyName> = {
   'supervised-regression': 'amber',
   'unsupervised-clustering': 'violet',
   'unsupervised-dim-reduction': 'teal',
+  reinforcement: 'rose',
 };
 
 /** The family name for a category. */

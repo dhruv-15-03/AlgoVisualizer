@@ -1,7 +1,7 @@
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useSessionStore } from '@/stores/session-store';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { listAlgorithmsByCategory } from '@/algorithms/registry';
+import { listAlgorithmsByCategory, getAlgorithm } from '@/algorithms/registry';
 import { listDatasets } from '@/datasets/registry';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
@@ -62,6 +62,12 @@ export function TopNav() {
       options: g.algorithms.map((a) => ({ value: a.id, label: a.name })),
     }));
   const datasets = listDatasets();
+  // Only offer datasets whose task the active algorithm can consume — keeps the
+  // gridworld env out of the picker for non-RL algos (and vice versa).
+  const activeAlgo = algoId ? getAlgorithm(algoId) : null;
+  const compatibleDatasets = activeAlgo
+    ? datasets.filter((d) => activeAlgo.compatibleTasks.includes(d.task))
+    : datasets;
 
   const pyTone =
     pyodideStatus === 'ready'
@@ -211,7 +217,7 @@ export function TopNav() {
           <label className="hidden shrink-0 text-[10px] uppercase tracking-wide text-ink-400 xl:inline">Data</label>
           <Select
             value={datasetId ?? ''}
-            options={datasets.map((d) => ({ value: d.id, label: `${d.name} (${d.samples}×${d.features})` }))}
+            options={compatibleDatasets.map((d) => ({ value: d.id, label: `${d.name} (${d.samples}×${d.features})` }))}
             onChange={(e) => setDataset(e.target.value)}
             aria-label="Dataset"
             className="min-w-0 flex-1 sm:w-[200px] sm:flex-none"

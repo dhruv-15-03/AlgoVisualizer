@@ -19,6 +19,7 @@ describe('familyForCategory', () => {
     expect(familyForCategory('supervised-regression')).toBe('amber');
     expect(familyForCategory('unsupervised-clustering')).toBe('violet');
     expect(familyForCategory('unsupervised-dim-reduction')).toBe('teal');
+    expect(familyForCategory('reinforcement')).toBe('rose');
   });
 
   it('covers every category in CATEGORY_ORDER with a palette', () => {
