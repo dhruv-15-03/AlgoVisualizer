@@ -5,7 +5,6 @@ import { CodePanel } from '@/components/workspace/CodePanel';
 import { VizPanel } from '@/components/workspace/VizPanel';
 import { RightPanel } from '@/components/workspace/RightPanel';
 import { WorkspaceTabBar } from '@/components/workspace/WorkspaceTabBar';
-import { MobilePlaybackBar } from '@/components/workspace/MobilePlaybackBar';
 import { LiveAnnouncer } from '@/components/workspace/LiveAnnouncer';
 import type { WorkspacePane } from '@/components/workspace/workspace-pane';
 import { useIsXlUp } from '@/lib/use-media-query';
@@ -191,7 +190,6 @@ function WorkspaceBody() {
         )}
         {pane === 'tune' && <RightPanel />}
       </div>
-      <MobilePlaybackBar />
     </>
   );
 }
