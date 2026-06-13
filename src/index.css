@@ -58,6 +58,17 @@
     @apply bg-accent-500/30 text-ink-50;
   }
 
+  /* Keyboard focus safety net. `:where()` keeps specificity at 0 so components
+     that define their own `focus-visible:ring-*` styles still win; this only
+     adds a visible outline to interactive elements that would otherwise have
+     none (hand-rolled buttons/links). `:focus-visible` means mouse users are
+     unaffected — zero visual change for pointer interaction. */
+  :where(a, button, input, select, textarea, summary, [tabindex], [role='button'], [role='link']):focus-visible {
+    outline: 2px solid theme('colors.accent.400');
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
   *::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -133,5 +144,21 @@
 /* Safe-area inset for sticky bottom toolbars on notched phones (iPhone). */
 .safe-bottom {
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+/* Respect the OS "reduce motion" setting. Non-essential CSS animations and
+   transitions (viz easing, loader shimmer/pulse, progress-bar tweens) collapse
+   to ~0 so nothing slides, spins, or pulses — while the visualization keeps
+   advancing through steps (step progression is driven in JS, not by these
+   durations, so no information is lost). Opt-in via the user's OS setting. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 

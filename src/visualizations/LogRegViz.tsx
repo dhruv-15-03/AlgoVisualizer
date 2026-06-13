@@ -4,6 +4,7 @@ import type { TraceEvent } from '@/types/trace';
 import type { Dataset } from '@/types/dataset';
 import { LossChart } from './LossChart';
 import { colorFor } from '@/lib/utils';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface LogRegVizProps {
   dataset: Dataset;
@@ -54,6 +55,7 @@ function BoundaryChart({
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
+  const reduceMotion = usePrefersReducedMotion();
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -127,7 +129,7 @@ function BoundaryChart({
                   stroke="#fbbf24"
                   strokeWidth={2}
                   strokeDasharray="6 4"
-                  style={{ transition: 'all 200ms ease' }}
+                  style={{ transition: reduceMotion ? undefined : 'all 200ms ease' }}
                 />
               )}
               {X.map((row, i) => (
