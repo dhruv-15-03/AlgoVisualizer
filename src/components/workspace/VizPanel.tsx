@@ -6,12 +6,16 @@ import { VizRouter } from '@/visualizations/VizRouter';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ExplainErrorPanel } from '@/components/workspace/ExplainErrorPanel';
 import { ExportPngButton } from '@/components/workspace/ExportPngButton';
+import { ConvergenceCelebration } from '@/components/workspace/ConvergenceCelebration';
+import { ChallengeChip } from '@/components/workspace/ChallengeChip';
 import { useSessionStore, useCurrentEvent } from '@/stores/session-store';
 import { getAlgorithm } from '@/algorithms/registry';
 import { getDataset } from '@/datasets/registry';
 import { familyOf } from '@/types/trace';
 import { runNow } from '@/controllers/training-controller';
 import { pyodideLoadProgress, type PyodideStage } from '@/lib/pyodide-progress';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { factAt, factCount } from '@/lib/ml-facts';
 
 const LOADING_STEPS: { stage: PyodideStage; label: string }[] = [
   { stage: 'loading-runtime', label: 'Download Python' },
@@ -22,6 +26,16 @@ const LOADING_STEPS: { stage: PyodideStage; label: string }[] = [
 function LoadingState({ stage, message }: { stage: PyodideStage; message: string }) {
   const progress = pyodideLoadProgress(stage);
   const reachedIndex = LOADING_STEPS.findIndex((s) => s.stage === stage);
+  const reduceMotion = usePrefersReducedMotion();
+  const [factIdx, setFactIdx] = useState(() => Math.floor(Math.random() * factCount()));
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    const id = window.setInterval(() => setFactIdx((i) => i + 1), 5200);
+    return () => window.clearInterval(id);
+  }, [reduceMotion]);
+
+  const fact = factAt(factIdx);
 
   return (
     <div className="grid h-full place-items-center p-4">
@@ -78,6 +92,19 @@ function LoadingState({ stage, message }: { stage: PyodideStage; message: string
               );
             })}
           </ol>
+        </div>
+
+        <div
+          key={reduceMotion ? 'static' : factIdx}
+          className={
+            'flex w-full items-start gap-2 rounded-lg border border-ink-700/60 bg-ink-800/40 px-3 py-2 text-left ' +
+            (reduceMotion ? '' : 'animate-fade-in')
+          }
+        >
+          <Icon name="lightbulb" size={14} className="mt-0.5 shrink-0 text-family-text" fill />
+          <p className="text-[11px] leading-snug text-ink-300" aria-live="off">
+            {fact}
+          </p>
         </div>
 
         <div className="text-[11px] text-ink-500">
@@ -211,9 +238,15 @@ export function VizPanel() {
         className="flex-1 min-h-0"
         bodyClassName="p-2 flex flex-col gap-2"
       >
-        <div ref={vizContainerRef} className="min-h-0 flex-1 rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
+        <div ref={vizContainerRef} className="relative min-h-0 flex-1 overflow-hidden rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
           {body}
+          <ConvergenceCelebration />
         </div>
+        {events.length > 0 && (
+          <div className="shrink-0 px-1">
+            <ChallengeChip />
+          </div>
+        )}
         {events.length > 0 && (
           <div className="shrink-0 px-1">
             <input

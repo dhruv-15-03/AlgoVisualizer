@@ -50,7 +50,7 @@ export function Home() {
             <circle cx="20" cy="6" r="2" fill="currentColor" />
           </svg>
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-ink-50 sm:text-4xl md:text-5xl">
+        <h1 className="font-display text-3xl font-bold tracking-tight text-ink-50 sm:text-4xl md:text-5xl">
           See ML algorithms <span className="text-accent-300">train, live</span>.
         </h1>
         <p className="max-w-2xl text-sm leading-relaxed text-ink-300 sm:text-base">
