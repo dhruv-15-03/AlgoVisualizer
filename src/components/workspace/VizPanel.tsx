@@ -6,6 +6,7 @@ import { VizRouter } from '@/visualizations/VizRouter';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ExplainErrorPanel } from '@/components/workspace/ExplainErrorPanel';
 import { ExportPngButton } from '@/components/workspace/ExportPngButton';
+import { ConvergenceCelebration } from '@/components/workspace/ConvergenceCelebration';
 import { useSessionStore, useCurrentEvent } from '@/stores/session-store';
 import { getAlgorithm } from '@/algorithms/registry';
 import { getDataset } from '@/datasets/registry';
@@ -211,8 +212,9 @@ export function VizPanel() {
         className="flex-1 min-h-0"
         bodyClassName="p-2 flex flex-col gap-2"
       >
-        <div ref={vizContainerRef} className="min-h-0 flex-1 rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
+        <div ref={vizContainerRef} className="relative min-h-0 flex-1 overflow-hidden rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
           {body}
+          <ConvergenceCelebration />
         </div>
         {events.length > 0 && (
           <div className="shrink-0 px-1">
