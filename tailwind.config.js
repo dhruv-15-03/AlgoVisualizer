@@ -46,6 +46,7 @@ export default {
         'brand-glow': 'brand-glow 3.2s ease-in-out infinite',
         'confetti-fall': 'confetti-fall 1700ms cubic-bezier(0.2, 0.6, 0.3, 1) forwards',
         'converge-pop': 'converge-pop 520ms cubic-bezier(0.18, 0.9, 0.28, 1.2) forwards',
+        'celebrate-glow': 'celebrate-glow 1600ms ease-out forwards',
       },
       keyframes: {
         'pulse-soft': {
@@ -71,6 +72,11 @@ export default {
           '0%': { transform: 'scale(0.8)', opacity: '0' },
           '60%': { transform: 'scale(1.06)', opacity: '1' },
           '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        'celebrate-glow': {
+          '0%': { opacity: '0' },
+          '25%': { opacity: '1' },
+          '100%': { opacity: '0' },
         },
       },
     },
