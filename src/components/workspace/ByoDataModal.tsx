@@ -3,6 +3,7 @@ import { useSessionStore } from '@/stores/session-store';
 import { Icon } from '@/components/ui/Icon';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { csvToDataset, type CsvTask } from '@/lib/csv-dataset';
 import { drawnPointsToDataset, type DrawnPoint } from '@/lib/draw-points';
 import type { ByoSupport } from '@/lib/byo-support';
@@ -33,6 +34,11 @@ const CLASS_COLORS = ['#60a5fa', '#f472b6', '#34d399', '#fbbf24', '#a78bfa', '#f
 export function ByoDataModal({ support, onClose }: ByoDataModalProps) {
   const initialTab: Tab = support.csv ? 'csv' : 'draw';
   const [tab, setTab] = useState<Tab>(initialTab);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Trap focus inside the dialog while it's open: focus moves in on mount,
+  // Tab/Shift+Tab wrap, Escape closes, and focus returns to the invoker on close.
+  useFocusTrap(dialogRef, { active: true, onClose });
 
   const addCustomDataset = useSessionStore((s) => s.addCustomDataset);
   const setDataset = useSessionStore((s) => s.setDataset);
@@ -49,13 +55,15 @@ export function ByoDataModal({ support, onClose }: ByoDataModalProps) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="byo-title"
       onClick={onClose}
     >
       <div
-        className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-ink-700 bg-ink-800 shadow-2xl"
+        ref={dialogRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="byo-title"
+        className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-ink-700 bg-ink-800 shadow-2xl focus:outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-ink-700 px-4 py-3">

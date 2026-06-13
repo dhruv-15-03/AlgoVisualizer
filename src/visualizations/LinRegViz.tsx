@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import type { TraceEvent } from '@/types/trace';
 import type { Dataset } from '@/types/dataset';
 import { LossChart } from './LossChart';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface LinRegVizProps {
   dataset: Dataset;
@@ -39,6 +40,7 @@ function snapshot(events: TraceEvent[], upTo: number): LinRegSnapshot {
 function RegressionChart({ X, y, weights }: { X: number[][]; y: number[] | null; weights: number[] | null }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
+  const reduceMotion = usePrefersReducedMotion();
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -128,7 +130,7 @@ function RegressionChart({ X, y, weights }: { X: number[][]; y: number[] | null;
                 y2={yScale(linePts[1].y)}
                 stroke="#fbbf24"
                 strokeWidth={2.5}
-                style={{ transition: 'all 200ms ease' }}
+                style={{ transition: reduceMotion ? undefined : 'all 200ms ease' }}
               />
             )}
           </g>

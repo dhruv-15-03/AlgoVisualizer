@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState, useLayoutEffect } from 'react';
 import * as d3 from 'd3';
 import { colorFor } from '@/lib/utils';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface ScatterPlotProps {
   X: number[][];
@@ -24,6 +25,8 @@ export function ScatterPlot({
 }: ScatterPlotProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
+  const reduceMotion = usePrefersReducedMotion();
+  const centroidTransition = reduceMotion ? undefined : 'transform 200ms ease';
 
   useLayoutEffect(() => {
     const el = containerRef.current;
@@ -156,7 +159,7 @@ export function ScatterPlot({
               <g
                 key={`c${i}`}
                 transform={`translate(${xScale(c[fx])},${yScale(c[fy])})`}
-                style={{ transition: 'transform 200ms ease' }}
+                style={{ transition: centroidTransition }}
               >
                 <circle r={11} fill={colorFor(i)} fillOpacity={0.18} />
                 <circle r={7} fill={colorFor(i)} stroke="#0f172a" strokeWidth={2} />

@@ -56,7 +56,6 @@ export function ShareButton() {
     if (!ok) {
       flash({ tone: 'error', message: 'Copy failed — link in console' });
       // Last-resort fallback so the link is never lost.
-      // eslint-disable-next-line no-console
       console.info('Share link:', url);
       return;
     }

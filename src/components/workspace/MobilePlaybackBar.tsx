@@ -26,12 +26,13 @@ export function MobilePlaybackBar() {
   const runStatus = useSessionStore((s) => s.runStatus);
 
   return (
-    <div className="safe-bottom flex shrink-0 items-center gap-1 border-t border-ink-700 bg-ink-800/95 px-2 pt-2 backdrop-blur sm:gap-2 sm:px-3">
+    <div className="safe-bottom flex shrink-0 items-center gap-1 border-t border-ink-700 bg-ink-800/95 px-2 pt-2 backdrop-blur sm:gap-2 sm:px-3" aria-label="Playback controls">
       <Button
         size="icon"
         variant="ghost"
-        title="Step back"
+        title="Step back (Left arrow)"
         aria-label="Step back"
+        aria-keyshortcuts="ArrowLeft Home"
         className="touch-target"
         onClick={stepBack}
         disabled={currentStep <= 0}
@@ -41,8 +42,9 @@ export function MobilePlaybackBar() {
       <Button
         size="icon"
         variant="primary"
-        title={playing ? 'Pause' : 'Play'}
+        title={`${playing ? 'Pause' : 'Play'} (Space)`}
         aria-label={playing ? 'Pause' : 'Play'}
+        aria-keyshortcuts="Space"
         className="touch-target"
         onClick={togglePlay}
         disabled={events.length === 0}
@@ -52,8 +54,9 @@ export function MobilePlaybackBar() {
       <Button
         size="icon"
         variant="ghost"
-        title="Step forward"
+        title="Step forward (Right arrow)"
         aria-label="Step forward"
+        aria-keyshortcuts="ArrowRight End"
         className="touch-target"
         onClick={stepForward}
         disabled={currentStep >= events.length - 1}
@@ -63,8 +66,9 @@ export function MobilePlaybackBar() {
       <Button
         size="icon"
         variant="ghost"
-        title="Reset playback"
+        title="Reset playback (R)"
         aria-label="Reset playback"
+        aria-keyshortcuts="R"
         className="touch-target"
         onClick={resetPlayback}
         disabled={events.length === 0}
