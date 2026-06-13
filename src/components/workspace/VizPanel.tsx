@@ -7,6 +7,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ExplainErrorPanel } from '@/components/workspace/ExplainErrorPanel';
 import { ExportPngButton } from '@/components/workspace/ExportPngButton';
 import { ConvergenceCelebration } from '@/components/workspace/ConvergenceCelebration';
+import { ChallengeChip } from '@/components/workspace/ChallengeChip';
 import { useSessionStore, useCurrentEvent } from '@/stores/session-store';
 import { getAlgorithm } from '@/algorithms/registry';
 import { getDataset } from '@/datasets/registry';
@@ -241,6 +242,11 @@ export function VizPanel() {
           {body}
           <ConvergenceCelebration />
         </div>
+        {events.length > 0 && (
+          <div className="shrink-0 px-1">
+            <ChallengeChip />
+          </div>
+        )}
         {events.length > 0 && (
           <div className="shrink-0 px-1">
             <input
