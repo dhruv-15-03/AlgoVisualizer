@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { TopNav } from '@/components/workspace/TopNav';
 import { CodePanel } from '@/components/workspace/CodePanel';
@@ -12,6 +12,7 @@ import { useSessionStore } from '@/stores/session-store';
 import { getAlgorithm, listAlgorithms } from '@/algorithms/registry';
 import { getDataset } from '@/datasets/registry';
 import { DEFAULT_DATASET_BY_ALGO } from '@/algorithms/default-datasets';
+import { decodeShareState, readTokenFromHash } from '@/lib/share-link';
 import type { AlgorithmId } from '@/types/algorithm';
 
 export function WorkspacePage() {
@@ -19,8 +20,10 @@ export function WorkspacePage() {
   const { algoId } = useParams<{ algoId?: AlgorithmId }>();
   const setAlgorithm = useSessionStore((s) => s.setAlgorithm);
   const setDataset = useSessionStore((s) => s.setDataset);
+  const applyShareState = useSessionStore((s) => s.applyShareState);
   const currentAlgoId = useSessionStore((s) => s.algorithmId);
   const currentDatasetId = useSessionStore((s) => s.datasetId);
+  const hydratedRef = useRef(false);
 
   // If no algoId in route, redirect to the first algorithm.
   useEffect(() => {
@@ -30,6 +33,23 @@ export function WorkspacePage() {
     }
   }, [algoId, navigate]);
 
+  // One-time hydration from a share link (`#s=…`). Runs before the default
+  // algorithm/dataset effects below so it wins the initial mount.
+  useEffect(() => {
+    if (hydratedRef.current) return;
+    hydratedRef.current = true;
+    const token = readTokenFromHash(window.location.hash);
+    if (!token) return;
+    const shared = decodeShareState(token);
+    if (!shared) return;
+    applyShareState(shared);
+    // Strip the token so a refresh won't re-hydrate and the URL stays short.
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    if (shared.algorithmId !== algoId) {
+      navigate(`/workspace/${shared.algorithmId}`, { replace: true });
+    }
+  }, [algoId, applyShareState, navigate]);
+
   // When the route's algoId changes, load that algorithm into the store.
   useEffect(() => {
     if (!algoId) return;
@@ -38,7 +58,11 @@ export function WorkspacePage() {
       navigate('/workspace', { replace: true });
       return;
     }
-    if (currentAlgoId !== algoId) {
+    // Read live state too: during the same mount commit as hydration the
+    // closed-over `currentAlgoId` is stale (still null), which would otherwise
+    // clobber a just-hydrated session back to defaults.
+    const liveAlgoId = currentAlgoId ?? useSessionStore.getState().algorithmId;
+    if (liveAlgoId !== algoId) {
       setAlgorithm(algoId, { code: meta.defaultCode, hyperparams: meta.hyperparams });
     }
   }, [algoId, currentAlgoId, setAlgorithm, navigate]);
@@ -48,7 +72,8 @@ export function WorkspacePage() {
     if (!algoId) return;
     const meta = getAlgorithm(algoId);
     if (!meta) return;
-    const ds = currentDatasetId ? getDataset(currentDatasetId) : null;
+    const dsId = currentDatasetId ?? useSessionStore.getState().datasetId;
+    const ds = dsId ? getDataset(dsId) : null;
     const compatible = ds && meta.compatibleTasks.includes(ds.task);
     if (!compatible) {
       setDataset(DEFAULT_DATASET_BY_ALGO[algoId] ?? 'iris');

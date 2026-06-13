@@ -10,7 +10,9 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import type { AlgorithmId, AlgorithmHyperparam } from '@/types/algorithm';
 import type { TraceEvent } from '@/types/trace';
+import type { Dataset } from '@/types/dataset';
 import type { PyodideStage } from '@/lib/pyodide-progress';
+import type { WorkspaceShareState } from '@/lib/share-link';
 
 export type PyodideStatus = 'idle' | 'loading' | 'ready' | 'error';
 export type RunStatus = 'idle' | 'running' | 'success' | 'cancelled' | 'error';
@@ -26,6 +28,8 @@ interface SessionState {
 
   algorithmId: AlgorithmId | null;
   datasetId: string | null;
+  /** User-supplied datasets (CSV upload / drawn points). Resolved by the dataset registry. */
+  customDatasets: Dataset[];
 
   code: string;
   hyperparams: Record<string, number | string | boolean>;
@@ -45,6 +49,10 @@ interface SessionState {
 
   setAlgorithm: (id: AlgorithmId, defaults: { code: string; hyperparams: AlgorithmHyperparam[] }) => void;
   setDataset: (id: string) => void;
+  /** Register (or replace by id) a user-supplied dataset. */
+  addCustomDataset: (ds: Dataset) => void;
+  /** Atomically restore a workspace from a decoded share link. */
+  applyShareState: (state: WorkspaceShareState) => void;
 
   setCode: (code: string) => void;
   setHyperparam: (key: string, value: number | string | boolean) => void;
@@ -72,6 +80,7 @@ export const useSessionStore = create<SessionState>()(
 
     algorithmId: null,
     datasetId: null,
+    customDatasets: [],
 
     code: '',
     hyperparams: {},
@@ -119,6 +128,30 @@ export const useSessionStore = create<SessionState>()(
     },
 
     setDataset: (id) => set({ datasetId: id }),
+
+    addCustomDataset: (ds) =>
+      set((state) => ({
+        customDatasets: [...state.customDatasets.filter((d) => d.id !== ds.id), ds],
+      })),
+
+    applyShareState: (shared) =>
+      set((state) => ({
+        algorithmId: shared.algorithmId as AlgorithmId,
+        code: shared.code,
+        hyperparams: { ...shared.hyperparams },
+        datasetId: shared.datasetId,
+        customDatasets: shared.customDataset
+          ? [
+              ...state.customDatasets.filter((d) => d.id !== shared.customDataset!.id),
+              shared.customDataset,
+            ]
+          : state.customDatasets,
+        events: [],
+        currentStep: 0,
+        playing: false,
+        runStatus: 'idle',
+        runError: null,
+      })),
 
     setCode: (code) => set({ code }),
 
