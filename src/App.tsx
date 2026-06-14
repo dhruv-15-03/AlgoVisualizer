@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { Home } from '@/pages/Home';
 import { attachController } from '@/controllers/training-controller';
 import { ConsentBanner } from '@/components/ConsentBanner';
+import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { maybeLoadClarity } from '@/lib/consent';
 
 // Route-level code splitting. Home stays eager (it's the entry point);
@@ -53,6 +54,7 @@ export default function App() {
         </Routes>
       </Suspense>
       <ConsentBanner />
+      <UpdatePrompt />
     </>
   );
 }

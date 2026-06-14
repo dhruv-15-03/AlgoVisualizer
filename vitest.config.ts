@@ -10,6 +10,13 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // The PWA plugin isn't in the Vitest pipeline, so the build-time virtual
+      // module has no implementation here. Point it at a safe stub so imports
+      // resolve; tests that exercise the prompt override it with `vi.mock`.
+      'virtual:pwa-register/react': path.resolve(
+        __dirname,
+        './src/test/pwa-register-react-stub.ts',
+      ),
     },
   },
   test: {
