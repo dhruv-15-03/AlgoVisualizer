@@ -7,7 +7,14 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt' (not 'autoUpdate'): a new deploy installs in the background but
+      // never silently takes over the open tab. The app holds expensive,
+      // destroyable state (a ~10 MB warm Pyodide runtime, in-progress training
+      // runs, edited Monaco code), so we surface the waiting update as a
+      // dismissible toast (src/components/UpdatePrompt.tsx) and only reload on an
+      // explicit user click. skipWaiting/clientsClaim below still let that
+      // user-triggered reload activate the new SW immediately.
+      registerType: 'prompt',
       injectRegister: 'auto',
       // Disable in dev so the SW never interferes with Vite HMR / module
       // graph. `npm run dev` behaves exactly as before.
@@ -43,8 +50,15 @@ export default defineConfig({
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/icons\//, /^\/assets\//, /\.(?:png|xml|txt|webmanifest)$/],
         cleanupOutdatedCaches: true,
+        // clientsClaim (take control of open pages) is fine and helps first-load
+        // offline. skipWaiting MUST be false for the 'prompt' flow: a new SW has
+        // to stay in the waiting state so workbox-window fires `onNeedRefresh`
+        // (→ our UpdatePrompt toast). Clicking Reload posts SKIP_WAITING via
+        // updateServiceWorker(true), which activates the waiting SW and reloads.
+        // With skipWaiting:true the new SW would self-activate on install and the
+        // prompt would never appear.
         clientsClaim: true,
-        skipWaiting: true,
+        skipWaiting: false,
         runtimeCaching: [
           {
             // Pyodide CPython WASM + numpy/package files (~10 MB on first
