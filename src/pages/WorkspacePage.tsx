@@ -88,7 +88,7 @@ export function WorkspacePage() {
   useEffect(() => {
     const defaultTitle = 'AlgoVisualizer · ML algorithms, demystified';
     const defaultDesc =
-      'AlgoVisualizer — edit real Python ML code and watch 18 algorithms train step by step on real datasets, right in your browser. No install, no setup.';
+      'AlgoVisualizer — edit real Python ML code and watch 25 algorithms train step by step on real datasets, right in your browser. No install, no setup.';
     const origin = 'https://algo-visualizer-beige.vercel.app';
     if (!algoId) return;
     const meta = getAlgorithm(algoId);

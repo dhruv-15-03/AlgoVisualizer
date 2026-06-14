@@ -17,8 +17,8 @@ const supportedFamilies = new Set(
 const algorithms = listAlgorithms();
 
 describe('algorithm registry · integrity', () => {
-  it('registers at least the expected 18 algorithms', () => {
-    expect(algorithms.length).toBeGreaterThanOrEqual(18);
+  it('registers at least the expected 25 algorithms', () => {
+    expect(algorithms.length).toBeGreaterThanOrEqual(25);
   });
 
   it('has unique algorithm ids', () => {
