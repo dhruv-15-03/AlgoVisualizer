@@ -8,6 +8,8 @@ import { ExplainErrorPanel } from '@/components/workspace/ExplainErrorPanel';
 import { ExportPngButton } from '@/components/workspace/ExportPngButton';
 import { ConvergenceCelebration } from '@/components/workspace/ConvergenceCelebration';
 import { ChallengeChip } from '@/components/workspace/ChallengeChip';
+import { PredictThenReveal } from '@/components/workspace/PredictThenReveal';
+import { predictionFor } from '@/lib/predictions';
 import { useSessionStore, useCurrentEvent } from '@/stores/session-store';
 import { getAlgorithm } from '@/algorithms/registry';
 import { getDataset } from '@/datasets/registry';
@@ -151,6 +153,7 @@ export function VizPanel() {
 
   const algorithm = algorithmId ? getAlgorithm(algorithmId) : null;
   const dataset = datasetId ? getDataset(datasetId) : null;
+  const hasPrediction = algorithm ? predictionFor(algorithm) !== null : false;
 
   const headerSubtitle = useMemo(() => {
     if (!algorithm || !dataset) return '';
@@ -242,6 +245,11 @@ export function VizPanel() {
           {body}
           <ConvergenceCelebration />
         </div>
+        {hasPrediction && (
+          <div className="shrink-0 px-1">
+            <PredictThenReveal />
+          </div>
+        )}
         {events.length > 0 && (
           <div className="shrink-0 px-1">
             <ChallengeChip />
