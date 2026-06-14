@@ -31,6 +31,8 @@ interface BoundarySnapshot {
   currentIteration: number | null;
   supportVectors: number[] | null;
   hasLossHistory: boolean;
+  points: number[][] | null;
+  pointAxisLabels: [string, string] | null;
 }
 
 function snapshot(events: TraceEvent[], upTo: number): BoundarySnapshot {
@@ -43,11 +45,15 @@ function snapshot(events: TraceEvent[], upTo: number): BoundarySnapshot {
   const accuracyHistory: Array<{ iteration: number; loss: number }> = [];
   let currentIteration: number | null = null;
   let hasLossHistory = false;
+  let points: number[][] | null = null;
+  let pointAxisLabels: [string, string] | null = null;
 
   for (let i = 0; i <= upTo && i < events.length; i += 1) {
     const e = events[i];
     if (e.type === 'boundary:init') {
       label = e.label;
+      points = e.points ?? points;
+      pointAxisLabels = e.pointAxisLabels ?? pointAxisLabels;
     } else if (e.type === 'boundary:step') {
       label = e.label;
       grid = e.grid;
@@ -78,6 +84,8 @@ function snapshot(events: TraceEvent[], upTo: number): BoundarySnapshot {
     currentIteration,
     supportVectors,
     hasLossHistory,
+    points,
+    pointAxisLabels,
   };
 }
 
@@ -256,13 +264,13 @@ export function BoundaryViz({ dataset, events, currentStep }: BoundaryVizProps) 
     <div className="grid h-full grid-rows-[3fr,1fr] gap-3">
       <div className="min-h-0 rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
         <GridBoundaryChart
-          X={dataset.X}
+          X={snap.points ?? dataset.X}
           y={dataset.y}
           grid={snap.grid}
           gridSize={snap.gridSize}
           bbox={snap.bbox}
           supportVectors={snap.supportVectors}
-          featureNames={dataset.featureNames}
+          featureNames={snap.pointAxisLabels ?? dataset.featureNames}
           numClasses={numClasses}
         />
       </div>

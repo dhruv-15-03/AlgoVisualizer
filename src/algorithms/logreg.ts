@@ -57,6 +57,7 @@ probabilities = model.predict_proba(X)`,
   pros: ['Outputs calibrated probabilities', 'Convex loss', 'Fast inference'],
   cons: ['Linear decision boundary only', 'Sensitive to outliers', 'Needs feature scaling'],
   compatibleTasks: ['classification'],
+  maxClasses: 2,
   references: [
     { kind: 'wiki', label: 'Wikipedia: Logistic regression', url: 'https://en.wikipedia.org/wiki/Logistic_regression' },
     { kind: 'sklearn', label: 'scikit-learn user guide: Logistic regression', url: 'https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression' },

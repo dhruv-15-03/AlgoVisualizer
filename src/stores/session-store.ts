@@ -127,7 +127,15 @@ export const useSessionStore = create<SessionState>()(
       });
     },
 
-    setDataset: (id) => set({ datasetId: id }),
+    setDataset: (id) =>
+      set({
+        datasetId: id,
+        events: [],
+        currentStep: 0,
+        playing: false,
+        runStatus: 'idle',
+        runError: null,
+      }),
 
     addCustomDataset: (ds) =>
       set((state) => ({

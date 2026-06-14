@@ -27,6 +27,8 @@ interface MLPSnapshot {
   accuracy: number | null;
   iteration: number | null;
   lossHistory: Array<{ iteration: number; loss: number }>;
+  points: number[][] | null;
+  pointAxisLabels: [string, string] | null;
 }
 
 function snapshot(events: TraceEvent[], upTo: number): MLPSnapshot {
@@ -39,6 +41,8 @@ function snapshot(events: TraceEvent[], upTo: number): MLPSnapshot {
   let accuracy: number | null = null;
   let iteration: number | null = null;
   const lossHistory: Array<{ iteration: number; loss: number }> = [];
+  let points: number[][] | null = null;
+  let pointAxisLabels: [string, string] | null = null;
   for (let i = 0; i <= upTo && i < events.length; i += 1) {
     const e = events[i];
     if (e.type === 'mlp:init') {
@@ -46,6 +50,8 @@ function snapshot(events: TraceEvent[], upTo: number): MLPSnapshot {
       weights = e.weights;
       loss = e.loss;
       accuracy = e.accuracy;
+      points = e.points ?? points;
+      pointAxisLabels = e.pointAxisLabels ?? pointAxisLabels;
       lossHistory.push({ iteration: -1, loss: e.loss });
     } else if (e.type === 'mlp:step') {
       layers = e.layers;
@@ -64,7 +70,7 @@ function snapshot(events: TraceEvent[], upTo: number): MLPSnapshot {
       accuracy = e.finalAccuracy;
     }
   }
-  return { layers, weights, grid, gridSize, bbox, loss, accuracy, iteration, lossHistory };
+  return { layers, weights, grid, gridSize, bbox, loss, accuracy, iteration, lossHistory, points, pointAxisLabels };
 }
 
 function BoundaryTop({
@@ -297,12 +303,12 @@ export function MLPViz({ dataset, events, currentStep }: MLPVizProps) {
     <div className="grid h-full grid-rows-[3fr,2fr] gap-3">
       <div className="min-h-0 rounded-lg border border-ink-700/50 bg-ink-900/50 p-2 relative">
         <BoundaryTop
-          X={dataset.X}
+          X={snap.points ?? dataset.X}
           y={dataset.y}
           grid={snap.grid}
           gridSize={snap.gridSize}
           bbox={snap.bbox}
-          featureNames={dataset.featureNames}
+          featureNames={snap.pointAxisLabels ?? dataset.featureNames}
         />
         <div className="absolute right-3 top-2 flex gap-2 text-[10px] font-mono">
           {snap.loss !== null && (

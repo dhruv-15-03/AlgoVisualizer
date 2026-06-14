@@ -7,6 +7,20 @@
 import numpy as np
 
 
+def _project_2d(X):
+    # Deterministic PCA onto the top 2 principal components so >2-D inputs
+    # (e.g. Iris, Wine) fit and draw a coherent boundary in one shared plane.
+    Xc = X - X.mean(axis=0)
+    _, S, Vt = np.linalg.svd(Xc, full_matrices=False)
+    comps = Vt[:2].copy()
+    for i in range(comps.shape[0]):
+        if comps[i][np.argmax(np.abs(comps[i]))] < 0:
+            comps[i] = -comps[i]
+    total = float((S ** 2).sum())
+    var = float((S[:2] ** 2).sum() / total) if total > 0 else 0.0
+    return Xc @ comps.T, var
+
+
 def _log_gaussian(x, mu, var):
     # Diagonal-cov log-pdf per feature; sum across features.
     eps = 1e-6
@@ -32,30 +46,48 @@ def run(X, y, smoothing=1e-9, seed=0):
     rng = np.random.default_rng(seed)
     _ = rng
     classes = np.unique(y)
+
+    note = ""
+    points = None
+    if X.shape[1] > 2:
+        n_orig = X.shape[1]
+        X, var = _project_2d(X)
+        note = f"Projected {n_orig} features onto 2 principal components ({var * 100:.0f}% variance) for a 2-D view. "
+        points = X.tolist()
+
     n_total = len(X)
     means = np.zeros((len(classes), X.shape[1]))
     variances = np.zeros((len(classes), X.shape[1]))
     priors = np.zeros(len(classes))
 
     step = 0
-    yield {
+    init_event = {
         "type": "boundary:init",
         "step": step,
         "label": "Gaussian NB",
-        "explanation": f"Naive Bayes assumes p(x|y) is Gaussian for each feature. "
+        "explanation": note + f"Naive Bayes assumes p(x|y) is Gaussian for each feature. "
                        f"We'll fit {len(classes)} Gaussians, one per class.",
         "math": r"p(y|x) \propto p(y) \prod_d p(x_d \mid y)",
     }
+    if points is not None:
+        init_event["points"] = points
+        init_event["pointAxisLabels"] = ["PC 1", "PC 2"]
+    yield init_event
 
     for ci, c in enumerate(classes):
         Xc = X[y == c]
         means[ci] = Xc.mean(axis=0)
         variances[ci] = Xc.var(axis=0) + smoothing
         priors[ci] = len(Xc) / n_total
-        grid, gsize, bbox = _grid_predict(X, classes, means[: ci + 1] if ci + 1 < len(classes) else means,
-                                          variances[: ci + 1] if ci + 1 < len(classes) else variances,
-                                          priors[: ci + 1] if ci + 1 < len(classes) else priors,
-                                          grid_size=30 if ci + 1 < len(classes) else 44)
+        partial = ci + 1 < len(classes)
+        grid, gsize, bbox = _grid_predict(
+            X,
+            classes[: ci + 1] if partial else classes,
+            means[: ci + 1] if partial else means,
+            variances[: ci + 1] if partial else variances,
+            priors[: ci + 1] if partial else priors,
+            grid_size=30 if partial else 44,
+        )
         step += 1
         yield {
             "type": "boundary:step",

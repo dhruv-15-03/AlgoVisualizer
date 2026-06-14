@@ -9,6 +9,20 @@
 import numpy as np
 
 
+def _project_2d(X):
+    # Insurance: a future 2-class but >2-D dataset still draws a coherent
+    # boundary by projecting onto the top 2 principal components (deterministic).
+    Xc = X - X.mean(axis=0)
+    _, S, Vt = np.linalg.svd(Xc, full_matrices=False)
+    comps = Vt[:2].copy()
+    for i in range(comps.shape[0]):
+        if comps[i][np.argmax(np.abs(comps[i]))] < 0:
+            comps[i] = -comps[i]
+    total = float((S ** 2).sum())
+    var = float((S[:2] ** 2).sum() / total) if total > 0 else 0.0
+    return Xc @ comps.T, var
+
+
 def _grid_predict(X, w, b, grid_size=44):
     x_min, x_max = float(X[:, 0].min()) - 0.5, float(X[:, 0].max()) + 0.5
     y_min, y_max = float(X[:, 1].min()) - 0.5, float(X[:, 1].max()) + 0.5
@@ -25,6 +39,15 @@ def run(X, y, lr=0.05, C=1.0, epochs=80, seed=0):
     rng = np.random.default_rng(seed)
     # SVM uses {-1, +1} labels.
     y_signed = np.where(y > 0, 1.0, -1.0)
+
+    note = ""
+    points = None
+    if X.shape[1] > 2:
+        n_orig = X.shape[1]
+        X, var = _project_2d(X)
+        note = f"Projected {n_orig} features onto 2 principal components ({var * 100:.0f}% variance) for a 2-D view. "
+        points = X.tolist()
+
     n, d = X.shape
     w = rng.standard_normal(d) * 0.01
     b = 0.0
@@ -39,16 +62,20 @@ def run(X, y, lr=0.05, C=1.0, epochs=80, seed=0):
 
     step = 0
     l0, a0 = loss_acc(w, b)
-    yield {
+    init_event = {
         "type": "boundary:init",
         "step": step,
         "label": f"SVM(C={C})",
-        "explanation": (
+        "explanation": note + (
             f"Initialized w randomly. The SVM minimizes the hinge loss with L2 regularization. "
             f"Initial loss = {l0:.4f}, accuracy = {a0:.3f}."
         ),
         "math": r"\min_w \tfrac{1}{N}\sum_i \max(0, 1 - y_i (w^\top x_i + b)) + \tfrac{\lambda}{2}\|w\|^2",
     }
+    if points is not None:
+        init_event["points"] = points
+        init_event["pointAxisLabels"] = ["PC 1", "PC 2"]
+    yield init_event
 
     for it in range(epochs):
         margins = y_signed * (X @ w + b)

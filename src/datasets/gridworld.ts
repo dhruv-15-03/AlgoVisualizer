@@ -67,3 +67,39 @@ export const gridworldOpen = fromLayout(
     '. . . G',
   ],
 );
+
+/**
+ * Cliff-walk: the bottom row between S and G is a line of traps (the "cliff").
+ * Stepping onto any cliff cell ends the episode with −1, so the optimal policy
+ * hugs the safe row above the cliff before dropping down onto the goal.
+ */
+export const cliffWalk = fromLayout(
+  'cliff-walk',
+  'Cliff walk 4×6',
+  'A cliff-walking gridworld: a row of traps (T) separates the start from the goal along the bottom edge. Stepping onto the cliff ends the episode with −1, so the agent learns to detour over the safe row before reaching G (+1).',
+  [
+    '. . . . . .',
+    '. . . . . .',
+    '. . . . . .',
+    'S T T T T G',
+  ],
+);
+
+/**
+ * A larger 6×6 maze with winding walls and a single trap — more states and a
+ * longer corridor to the goal, so value/policy take more episodes to propagate
+ * back from G to S.
+ */
+export const maze = fromLayout(
+  'maze',
+  'Maze 6×6',
+  'A 6×6 maze of winding corridors with one trap (T). More states and a longer route to the goal mean value information takes more episodes to propagate back from G (+1) to the start.',
+  [
+    'S . . # . T',
+    '# # . # . .',
+    '. . . . . #',
+    '. # # # . .',
+    '. . . # # .',
+    '# . . . . G',
+  ],
+);

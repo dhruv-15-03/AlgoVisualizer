@@ -6,6 +6,20 @@
 import numpy as np
 
 
+def _project_2d(X):
+    # Deterministic PCA onto the top 2 principal components so >2-D inputs
+    # (e.g. Iris, Wine) train and draw a coherent boundary in one shared plane.
+    Xc = X - X.mean(axis=0)
+    _, S, Vt = np.linalg.svd(Xc, full_matrices=False)
+    comps = Vt[:2].copy()
+    for i in range(comps.shape[0]):
+        if comps[i][np.argmax(np.abs(comps[i]))] < 0:
+            comps[i] = -comps[i]
+    total = float((S ** 2).sum())
+    var = float((S[:2] ** 2).sum() / total) if total > 0 else 0.0
+    return Xc @ comps.T, var
+
+
 def _softmax(z):
     z = z - z.max(axis=1, keepdims=True)
     e = np.exp(z)
@@ -87,6 +101,15 @@ def run(X, y, hidden=8, lr=0.1, epochs=80, activation="tanh", seed=0):
     rng = np.random.default_rng(seed)
     classes = np.unique(y)
     k = len(classes)
+
+    note = ""
+    points = None
+    if X.shape[1] > 2:
+        n_orig = X.shape[1]
+        X, var = _project_2d(X)
+        note = f"Projected {n_orig} features onto 2 principal components ({var * 100:.0f}% variance) for a 2-D view. "
+        points = X.tolist()
+
     layers = [X.shape[1], hidden, hidden, k]
     # He init for relu, Xavier-ish for tanh/sigmoid.
     if activation == "relu":
@@ -99,19 +122,23 @@ def run(X, y, hidden=8, lr=0.1, epochs=80, activation="tanh", seed=0):
 
     step = 0
     loss, acc, acts = _loss_acc(X, y, weights, biases, activation)
-    yield {
+    init_event = {
         "type": "mlp:init",
         "step": step,
         "layers": layers,
         "weights": [W.tolist() for W in weights],
         "loss": loss,
         "accuracy": acc,
-        "explanation": (
+        "explanation": note + (
             f"Initialized MLP layers {layers}, activation={activation}, softmax output, "
             f"cross-entropy loss. Initial loss={loss:.4f}, acc={acc:.3f}."
         ),
         "math": r"h^{(l)} = \sigma(W^{(l)} h^{(l-1)} + b^{(l)}), \quad p = \mathrm{softmax}(W^{(L)} h^{(L-1)} + b^{(L)})",
     }
+    if points is not None:
+        init_event["points"] = points
+        init_event["pointAxisLabels"] = ["PC 1", "PC 2"]
+    yield init_event
 
     for it in range(epochs):
         loss, acc, acts = _loss_acc(X, y, weights, biases, activation)

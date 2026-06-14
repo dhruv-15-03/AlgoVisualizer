@@ -23,7 +23,7 @@ export const DEFAULT_DATASET_BY_ALGO: Record<AlgorithmId, string> = {
   polyreg: 'polywave',
   ridge: 'noisy-linear',
   lasso: 'noisy-linear',
-  elasticnet: 'noisy-linear',
+  elasticnet: 'collinear',
   dbscan: 'moons',
   hierarchical: 'blobs',
   gmm: 'gmm-mix',

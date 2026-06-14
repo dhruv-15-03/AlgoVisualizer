@@ -55,6 +55,7 @@ y_pred = model.predict(X_new)`,
   pros: ['Maximum margin = good generalization', 'Sparse model (only support vectors matter)', 'Works in high dimensions'],
   cons: ['Linear only (without kernel)', 'Sensitive to scale', 'Slower than logistic regression'],
   compatibleTasks: ['classification'],
+  maxClasses: 2,
   references: [
     { kind: 'wiki', label: 'Wikipedia: Support vector machine', url: 'https://en.wikipedia.org/wiki/Support_vector_machine' },
     { kind: 'sklearn', label: 'scikit-learn user guide: SVM', url: 'https://scikit-learn.org/stable/modules/svm.html' },

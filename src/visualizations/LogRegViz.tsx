@@ -17,6 +17,8 @@ interface LogRegSnapshot {
   history: Array<{ iteration: number; loss: number }>;
   accuracyHistory: Array<{ iteration: number; loss: number }>;
   currentIteration: number | null;
+  points: number[][] | null;
+  pointAxisLabels: [string, string] | null;
 }
 
 function snapshot(events: TraceEvent[], upTo: number): LogRegSnapshot {
@@ -24,10 +26,14 @@ function snapshot(events: TraceEvent[], upTo: number): LogRegSnapshot {
   const history: Array<{ iteration: number; loss: number }> = [];
   const accuracyHistory: Array<{ iteration: number; loss: number }> = [];
   let currentIteration: number | null = null;
+  let points: number[][] | null = null;
+  let pointAxisLabels: [string, string] | null = null;
   for (let i = 0; i <= upTo && i < events.length; i += 1) {
     const e = events[i];
     if (e.type === 'logreg:init') {
       weights = e.weights;
+      points = e.points ?? points;
+      pointAxisLabels = e.pointAxisLabels ?? pointAxisLabels;
       history.push({ iteration: -1, loss: e.loss });
       accuracyHistory.push({ iteration: -1, loss: e.accuracy });
     } else if (e.type === 'logreg:step') {
@@ -39,7 +45,7 @@ function snapshot(events: TraceEvent[], upTo: number): LogRegSnapshot {
       currentIteration = e.iteration ?? currentIteration;
     }
   }
-  return { weights, history, accuracyHistory, currentIteration };
+  return { weights, history, accuracyHistory, currentIteration, points, pointAxisLabels };
 }
 
 function BoundaryChart({
@@ -178,7 +184,7 @@ export function LogRegViz({ dataset, events, currentStep }: LogRegVizProps) {
   return (
     <div className="grid h-full grid-rows-[3fr,1fr] gap-3">
       <div className="min-h-0 rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
-        <BoundaryChart X={dataset.X} y={dataset.y} weights={snap.weights} featureNames={dataset.featureNames} />
+        <BoundaryChart X={snap.points ?? dataset.X} y={dataset.y} weights={snap.weights} featureNames={snap.pointAxisLabels ?? dataset.featureNames} />
       </div>
       <div className="min-h-0 rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
         <LossChart

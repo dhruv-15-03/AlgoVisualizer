@@ -10,6 +10,20 @@
 import numpy as np
 
 
+def _project_2d(X):
+    # Deterministic PCA onto the top 2 principal components so >2-D inputs draw
+    # a coherent boundary; training, grid and scatter all share the same plane.
+    Xc = X - X.mean(axis=0)
+    _, S, Vt = np.linalg.svd(Xc, full_matrices=False)
+    comps = Vt[:2].copy()
+    for i in range(comps.shape[0]):
+        if comps[i][np.argmax(np.abs(comps[i]))] < 0:
+            comps[i] = -comps[i]
+    total = float((S ** 2).sum())
+    var = float((S[:2] ** 2).sum() / total) if total > 0 else 0.0
+    return Xc @ comps.T, var
+
+
 def _sigmoid(z):
     return 1.0 / (1.0 + np.exp(-np.clip(z, -30, 30)))
 
@@ -61,6 +75,15 @@ def _grid_predict(stumps, F0, lr, X, grid_size=44):
 def run(X, y, n_estimators=30, lr=0.1, seed=0):
     rng = np.random.default_rng(seed)
     _ = rng  # GBM with full-data stumps is deterministic; seed kept for UX.
+
+    note = ""
+    points = None
+    if X.shape[1] > 2:
+        n_orig = X.shape[1]
+        X, var = _project_2d(X)
+        note = f"Projected {n_orig} features onto 2 principal components ({var * 100:.0f}% variance) for a 2-D view. "
+        points = X.tolist()
+
     n, d = X.shape
     yb = (np.asarray(y) > 0).astype(float)
     p0 = float(np.clip(yb.mean(), 1e-6, 1 - 1e-6))
@@ -77,16 +100,20 @@ def run(X, y, n_estimators=30, lr=0.1, seed=0):
 
     step = 0
     l0, a0 = loss_acc()
-    yield {
+    init_event = {
         "type": "boundary:init",
         "step": step,
         "label": f"GBM(n={n_estimators})",
-        "explanation": (
+        "explanation": note + (
             f"Start from the prior log-odds F\u2080 = {F0:.3f} \u2014 every point predicts the "
             f"majority rate. Each round fits a tree to the residuals. loss={l0:.4f}, acc={a0:.3f}."
         ),
         "math": r"F_0(x) = \log\frac{\bar y}{1-\bar y}",
     }
+    if points is not None:
+        init_event["points"] = points
+        init_event["pointAxisLabels"] = ["PC 1", "PC 2"]
+    yield init_event
 
     for it in range(int(n_estimators)):
         p = _sigmoid(F)

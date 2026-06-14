@@ -320,3 +320,142 @@ export function makeNoisyLinear({
     source: 'Synthetic (seeded PRNG)',
   };
 }
+
+export function makeSine({
+  nSamples = 90,
+  noise = 0.25,
+  seed = 0,
+}: { nSamples?: number; noise?: number; seed?: number } = {}): Dataset {
+  // A smooth nonlinear curve: rewards polynomial / KNN regression over a line.
+  const rand = mulberry32(seed);
+  const X: number[][] = [];
+  const y: number[] = [];
+  for (let i = 0; i < nSamples; i += 1) {
+    const x = (i / (nSamples - 1)) * 6 - 3; // -3..3
+    X.push([x]);
+    y.push(Math.sin(1.4 * x) * 2 + gaussian(rand) * noise);
+  }
+  return {
+    id: 'sine',
+    name: 'Sinusoidal trend',
+    description: `${nSamples} samples along y = 2·sin(1.4x) plus Gaussian noise — a smooth nonlinear curve a straight line cannot fit.`,
+    X,
+    y,
+    featureNames: ['x'],
+    task: 'regression',
+    source: 'Synthetic (seeded PRNG)',
+  };
+}
+
+export function makeCollinear({
+  nSamples = 90,
+  seed = 0,
+}: { nSamples?: number; seed?: number } = {}): Dataset {
+  // x0, x1 and x2 are near-duplicates of one latent signal; x3 is independent.
+  // OLS splits weight arbitrarily across the collinear trio, while
+  // Ridge / Lasso / Elastic-Net shrink or select — the showcase set for
+  // regularized regression under multicollinearity.
+  const rand = mulberry32(seed);
+  const X: number[][] = [];
+  const y: number[] = [];
+  for (let i = 0; i < nSamples; i += 1) {
+    const z = gaussian(rand); // shared latent factor
+    const x0 = z + gaussian(rand) * 0.05;
+    const x1 = z + gaussian(rand) * 0.05; // ≈ x0
+    const x2 = 0.9 * z + gaussian(rand) * 0.08; // ≈ x0
+    const x3 = gaussian(rand); // independent
+    X.push([x0, x1, x2, x3]);
+    y.push(2.2 * z + 1.1 * x3 + 0.3 + gaussian(rand) * 0.3);
+  }
+  return {
+    id: 'collinear',
+    name: 'Collinear features',
+    description: `${nSamples} samples where x0, x1 and x2 are near-duplicates of one signal (x3 independent) — highlights how Ridge / Lasso / Elastic-Net handle multicollinearity.`,
+    X,
+    y,
+    featureNames: ['x0 (signal)', 'x1 (≈x0)', 'x2 (≈x0)', 'x3 (independent)'],
+    task: 'regression',
+    source: 'Synthetic (seeded PRNG)',
+  };
+}
+
+export function makeFriedman({
+  nSamples = 120,
+  noise = 1.0,
+  seed = 0,
+}: { nSamples?: number; noise?: number; seed?: number } = {}): Dataset {
+  // Friedman #1 benchmark: five features in [0,1] with a nonlinear target and
+  // an interaction term — a classic stress-test for curvature + interactions.
+  const rand = mulberry32(seed);
+  const X: number[][] = [];
+  const y: number[] = [];
+  for (let i = 0; i < nSamples; i += 1) {
+    const x0 = rand();
+    const x1 = rand();
+    const x2 = rand();
+    const x3 = rand();
+    const x4 = rand();
+    X.push([x0, x1, x2, x3, x4]);
+    y.push(
+      10 * Math.sin(Math.PI * x0 * x1) +
+        20 * (x2 - 0.5) ** 2 +
+        10 * x3 +
+        5 * x4 +
+        gaussian(rand) * noise,
+    );
+  }
+  return {
+    id: 'friedman',
+    name: 'Friedman #1',
+    description: `${nSamples} samples from the Friedman #1 benchmark: y = 10·sin(πx0x1) + 20(x2−0.5)² + 10x3 + 5x4 + noise — nonlinear with a feature interaction.`,
+    X,
+    y,
+    featureNames: ['x0', 'x1', 'x2', 'x3', 'x4'],
+    task: 'regression',
+    source: 'Synthetic (seeded PRNG)',
+  };
+}
+
+export function makeVariedBlobs({
+  nSamples = 180,
+  seed = 0,
+}: { nSamples?: number; seed?: number } = {}): Dataset {
+  // Three clusters with deliberately unequal spread and population. K-Means
+  // (which assumes roughly equal, spherical clusters) struggles here, so it is
+  // a good contrast against DBSCAN / GMM.
+  const rand = mulberry32(seed);
+  const centers = [
+    [-3.2, 0.2],
+    [2.6, 1.8],
+    [1.0, -3.0],
+  ];
+  const stds = [0.35, 1.15, 0.6];
+  const weights = [0.5, 0.3, 0.2];
+  const X: number[][] = [];
+  const y: number[] = [];
+  for (let i = 0; i < nSamples; i += 1) {
+    const r = rand();
+    let c = 0;
+    let acc = 0;
+    for (let k = 0; k < weights.length; k += 1) {
+      acc += weights[k];
+      if (r <= acc) {
+        c = k;
+        break;
+      }
+    }
+    X.push([centers[c][0] + gaussian(rand) * stds[c], centers[c][1] + gaussian(rand) * stds[c]]);
+    y.push(c);
+  }
+  return {
+    id: 'varied-blobs',
+    name: 'Varied-density blobs',
+    description: `${nSamples} points in three clusters of unequal spread and size — exposes K-Means' equal-variance assumption versus DBSCAN / GMM.`,
+    X,
+    y,
+    featureNames: ['Feature 1', 'Feature 2'],
+    classNames: ['Cluster 0', 'Cluster 1', 'Cluster 2'],
+    task: 'clustering',
+    source: 'Synthetic (seeded PRNG)',
+  };
+}
