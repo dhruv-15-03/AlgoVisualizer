@@ -25,7 +25,7 @@ export function Select({ options, groups, placeholder, className, ...props }: Se
   return (
     <select
       className={cn(
-        'h-9 rounded-md border border-ink-600 bg-ink-800 px-2.5 text-sm text-ink-100',
+        'h-9 max-w-full truncate rounded-md border border-ink-600 bg-ink-800 px-2.5 text-sm text-ink-100',
         'focus:outline-none focus:ring-2 focus:ring-accent-400',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         className,

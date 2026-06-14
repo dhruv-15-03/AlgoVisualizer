@@ -11,6 +11,21 @@
 import numpy as np
 
 
+def _project_2d(X):
+    # Deterministic PCA onto the top 2 principal components. High-dimensional
+    # data (e.g. Iris has 4 features) can't show a 2-D decision boundary, so we
+    # project everything — training, grid and scatter — into the same plane.
+    Xc = X - X.mean(axis=0)
+    _, S, Vt = np.linalg.svd(Xc, full_matrices=False)
+    comps = Vt[:2].copy()
+    for i in range(comps.shape[0]):
+        if comps[i][np.argmax(np.abs(comps[i]))] < 0:
+            comps[i] = -comps[i]  # sign convention keeps the view stable
+    total = float((S ** 2).sum())
+    var = float((S[:2] ** 2).sum() / total) if total > 0 else 0.0
+    return Xc @ comps.T, var
+
+
 def _grid_predict(X, y, k, grid_size=44):
     x_min, x_max = float(X[:, 0].min()) - 0.5, float(X[:, 0].max()) + 0.5
     y_min, y_max = float(X[:, 1].min()) - 0.5, float(X[:, 1].max()) + 0.5
@@ -36,15 +51,28 @@ def run(X, y, k=5, seed=0):
     rng = np.random.default_rng(seed)
     _ = rng  # KNN has no randomness; seed is just for the slider UX.
     classes = np.unique(y)
+
+    note = ""
+    points = None
+    if X.shape[1] > 2:
+        n_orig = X.shape[1]
+        X, var = _project_2d(X)
+        note = f"Projected {n_orig} features onto 2 principal components ({var * 100:.0f}% variance) for a 2-D view. "
+        points = X.tolist()
+
     step = 0
-    yield {
+    init_event = {
         "type": "boundary:init",
         "step": step,
         "label": f"KNN(k={k})",
-        "explanation": f"KNN memorized {len(X)} training points with k={k} neighbors. "
+        "explanation": note + f"KNN memorized {len(X)} training points with k={k} neighbors. "
                        f"There's nothing to fit — classification happens at query time.",
         "math": r"\hat y(x) = \mathrm{mode}\{ y_i : i \in \mathcal{N}_k(x) \}",
     }
+    if points is not None:
+        init_event["points"] = points
+        init_event["pointAxisLabels"] = ["PC 1", "PC 2"]
+    yield init_event
 
     # Just a couple of intermediate frames so the timeline feels animated.
     for frac in [0.4, 0.7, 1.0]:

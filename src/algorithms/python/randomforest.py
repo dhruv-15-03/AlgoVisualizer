@@ -7,6 +7,20 @@
 import numpy as np
 
 
+def _project_2d(X):
+    # Deterministic PCA onto the top 2 principal components so >2-D inputs draw
+    # a coherent boundary; bootstraps, grid and scatter all share one plane.
+    Xc = X - X.mean(axis=0)
+    _, S, Vt = np.linalg.svd(Xc, full_matrices=False)
+    comps = Vt[:2].copy()
+    for i in range(comps.shape[0]):
+        if comps[i][np.argmax(np.abs(comps[i]))] < 0:
+            comps[i] = -comps[i]
+    total = float((S ** 2).sum())
+    var = float((S[:2] ** 2).sum() / total) if total > 0 else 0.0
+    return Xc @ comps.T, var
+
+
 class _Node:
     __slots__ = ("feature", "threshold", "left", "right", "prediction")
 
@@ -111,20 +125,33 @@ def _grid_predict(X, trees, classes, grid_size=44):
 def run(X, y, n_trees=10, max_depth=4, max_features=2, seed=0):
     rng = np.random.default_rng(seed)
     classes = np.unique(y)
+
+    note = ""
+    points = None
+    if X.shape[1] > 2:
+        n_orig = X.shape[1]
+        X, var = _project_2d(X)
+        note = f"Projected {n_orig} features onto 2 principal components ({var * 100:.0f}% variance) for a 2-D view. "
+        points = X.tolist()
+
     n = len(X)
     trees = []
     step = 0
-    yield {
+    init_event = {
         "type": "forest:tree_grown",
         "step": step,
         "treeIndex": -1,
         "totalTrees": n_trees,
         "treeSummary": {"nodes": 0, "leaves": 0, "depth": 0},
         "ensembleAccuracy": 0.0,
-        "explanation": f"Starting Random Forest: {n_trees} trees, max depth {max_depth}, "
+        "explanation": note + f"Starting Random Forest: {n_trees} trees, max depth {max_depth}, "
                        f"{max_features} random features per split.",
         "math": r"\hat y(x) = \mathrm{mode}\{T_t(x)\}_{t=1}^T",
     }
+    if points is not None:
+        init_event["points"] = points
+        init_event["pointAxisLabels"] = ["PC 1", "PC 2"]
+    yield init_event
 
     for t in range(n_trees):
         # Bootstrap sample

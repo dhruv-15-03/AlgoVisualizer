@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { datasetOptionGroups } from '@/components/workspace/dataset-options';
 import type { DatasetInfo } from '@/types/dataset';
 
-function info(id: string, task: DatasetInfo['task']): DatasetInfo {
+function info(id: string, task: DatasetInfo['task'], classes: number | null = null): DatasetInfo {
   return {
     id,
     name: id,
@@ -10,7 +10,7 @@ function info(id: string, task: DatasetInfo['task']): DatasetInfo {
     task,
     samples: 100,
     features: 2,
-    classes: task === 'classification' ? 2 : null,
+    classes: task === 'classification' ? (classes ?? 2) : null,
     source: 'test',
   };
 }
@@ -69,5 +69,53 @@ describe('datasetOptionGroups', () => {
   it('enables everything when no algorithm is active', () => {
     const groups = datasetOptionGroups(datasets, null);
     expect(flat(groups).every((o) => !o.disabled)).toBe(true);
+  });
+
+  it('greys out a 3-class dataset for a binary-only model (maxClasses=2)', () => {
+    const pool: DatasetInfo[] = [
+      info('moons', 'classification', 2),
+      info('iris3', 'classification', 3),
+    ];
+    // Logistic Regression / SVM declare maxClasses: 2.
+    const groups = datasetOptionGroups(pool, {
+      name: 'Logistic Regression',
+      compatibleTasks: ['classification'],
+      maxClasses: 2,
+    });
+    const opts = flat(groups);
+    expect(opts.find((o) => o.value === 'moons')?.disabled).toBe(false);
+    expect(opts.find((o) => o.value === 'iris3')?.disabled).toBe(true);
+    expect(opts.find((o) => o.value === 'iris3')?.title).toContain('3 classes');
+  });
+
+  it('keeps a 3-class dataset enabled for a multiclass model (no maxClasses)', () => {
+    const pool: DatasetInfo[] = [
+      info('moons', 'classification', 2),
+      info('iris3', 'classification', 3),
+    ];
+    // KNN auto-adapts and has no maxClasses cap.
+    const groups = datasetOptionGroups(pool, {
+      name: 'K-Nearest Neighbors',
+      compatibleTasks: ['classification'],
+    });
+    const opts = flat(groups);
+    expect(opts.find((o) => o.value === 'moons')?.disabled).toBe(false);
+    expect(opts.find((o) => o.value === 'iris3')?.disabled).toBe(false);
+  });
+
+  it('greys out a dataset exceeding an explicit vizMaxFeatures cap', () => {
+    const pool: DatasetInfo[] = [
+      { ...info('twoD', 'classification', 2), features: 2 },
+      { ...info('wide', 'classification', 2), features: 13 },
+    ];
+    const groups = datasetOptionGroups(pool, {
+      name: 'Capped Viz',
+      compatibleTasks: ['classification'],
+      vizMaxFeatures: 2,
+    });
+    const opts = flat(groups);
+    expect(opts.find((o) => o.value === 'twoD')?.disabled).toBe(false);
+    expect(opts.find((o) => o.value === 'wide')?.disabled).toBe(true);
+    expect(opts.find((o) => o.value === 'wide')?.title).toContain('13 features');
   });
 });

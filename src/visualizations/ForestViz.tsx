@@ -30,6 +30,8 @@ interface ForestSnapshot {
   accuracyHistory: Array<{ iteration: number; loss: number }>;
   currentIteration: number | null;
   latestSummary: { nodes: number; leaves: number; depth: number } | null;
+  points: number[][] | null;
+  pointAxisLabels: [string, string] | null;
 }
 
 function snapshot(events: TraceEvent[], upTo: number): ForestSnapshot {
@@ -41,6 +43,8 @@ function snapshot(events: TraceEvent[], upTo: number): ForestSnapshot {
   const accuracyHistory: Array<{ iteration: number; loss: number }> = [];
   let currentIteration: number | null = null;
   let latestSummary: { nodes: number; leaves: number; depth: number } | null = null;
+  let points: number[][] | null = null;
+  let pointAxisLabels: [string, string] | null = null;
 
   for (let i = 0; i <= upTo && i < events.length; i += 1) {
     const e = events[i];
@@ -48,6 +52,8 @@ function snapshot(events: TraceEvent[], upTo: number): ForestSnapshot {
       treeCount = e.treeIndex + 1;
       totalTrees = e.totalTrees;
       latestSummary = e.treeSummary;
+      points = e.points ?? points;
+      pointAxisLabels = e.pointAxisLabels ?? pointAxisLabels;
       if (e.grid) {
         grid = e.grid;
         gridSize = e.gridSize ?? gridSize;
@@ -64,7 +70,7 @@ function snapshot(events: TraceEvent[], upTo: number): ForestSnapshot {
       }
     }
   }
-  return { grid, gridSize, bbox, treeCount, totalTrees, accuracyHistory, currentIteration, latestSummary };
+  return { grid, gridSize, bbox, treeCount, totalTrees, accuracyHistory, currentIteration, latestSummary, points, pointAxisLabels };
 }
 
 function ForestBoundary({
@@ -206,7 +212,7 @@ export function ForestViz({ dataset, events, currentStep }: ForestVizProps) {
   return (
     <div className="grid h-full grid-rows-[3fr,1fr] gap-3">
       <div className="relative min-h-0 rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
-        <ForestBoundary X={dataset.X} y={dataset.y} grid={snap.grid} gridSize={snap.gridSize} bbox={snap.bbox} featureNames={dataset.featureNames} />
+        <ForestBoundary X={snap.points ?? dataset.X} y={dataset.y} grid={snap.grid} gridSize={snap.gridSize} bbox={snap.bbox} featureNames={snap.pointAxisLabels ?? dataset.featureNames} />
         <div className="absolute right-3 top-2 flex gap-2 text-[10px] font-mono">
           <span className="rounded-md bg-ink-800/90 px-2 py-1 text-ink-200">
             trees <span className="text-accent-300">{snap.treeCount}/{snap.totalTrees}</span>

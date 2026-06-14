@@ -77,3 +77,36 @@ for (const id of ALGORITHMS) {
     expect(text.length).toBeGreaterThan(0);
   });
 }
+
+/**
+ * Bug 2 regression: a multiclass-capable boundary-grid classifier (KNN) on a
+ * >2-feature, 3-class dataset (Iris: 4 features, 3 classes) must auto-adapt by
+ * projecting onto 2 principal components instead of crashing with an array-shape
+ * mismatch. We switch the dataset to Iris after load and assert the run still
+ * reaches a non-zero step count and renders an explanation.
+ */
+test('smoke: knn auto-adapts on a high-dimensional multiclass dataset (Iris)', async ({ page }) => {
+  await page.goto('/workspace/knn');
+  await expect(page.getByText(STEP_RE).first()).toBeVisible({ timeout: 60_000 });
+
+  // Iris is classification-compatible with KNN, so its option is enabled.
+  await page.getByLabel('Dataset').selectOption('iris');
+
+  await expect
+    .poll(
+      async () => {
+        const runBtn = page.getByRole('button', { name: 'Run now' });
+        if (await runBtn.isVisible().catch(() => false)) {
+          await runBtn.click().catch(() => {});
+        }
+        return readStepTotal(page);
+      },
+      { timeout: 90_000, intervals: [1000, 2000, 3000, 5000] },
+    )
+    .toBeGreaterThan(0);
+
+  await expect(page.getByText('No events yet.')).toHaveCount(0);
+  const explanation = page.locator('p.leading-relaxed.text-ink-200').first();
+  await expect(explanation).toBeVisible();
+  expect(((await explanation.textContent()) ?? '').trim().length).toBeGreaterThan(0);
+});

@@ -1,10 +1,12 @@
 /**
  * Builds the grouped option list for the workspace dataset picker.
  *
- * Every dataset is shown (grouped by its task), but datasets whose task the
- * active algorithm cannot consume are marked `disabled` so they render greyed
- * out instead of vanishing. Keeping incompatible datasets visible tells the
- * learner *why* a choice is unavailable rather than silently hiding it.
+ * Every dataset is shown (grouped by its task), but a dataset is greyed out
+ * (`disabled`) when the active algorithm cannot consume it — either because the
+ * task is incompatible, or because the dataset exceeds a capability cap the
+ * algorithm declares (e.g. a binary-only model like logistic regression facing
+ * a 3-class dataset). Keeping incompatible datasets visible tells the learner
+ * *why* a choice is unavailable rather than silently hiding it.
  */
 
 import type { DatasetInfo } from '@/types/dataset';
@@ -24,6 +26,9 @@ export interface DatasetOptionGroup {
 
 type Task = DatasetInfo['task'];
 
+/** The subset of algorithm metadata the picker needs to gate datasets. */
+type PickerAlgo = Pick<AlgorithmMeta, 'name' | 'compatibleTasks' | 'maxClasses' | 'vizMaxFeatures'>;
+
 const TASK_ORDER: Task[] = ['classification', 'regression', 'clustering', 'reinforcement'];
 
 const TASK_LABELS: Record<Task, string> = {
@@ -37,26 +42,45 @@ function optionLabel(d: DatasetInfo): string {
   return `${d.name} (${d.samples}×${d.features})`;
 }
 
+/**
+ * Returns the reason a dataset is unavailable for the algorithm, or `undefined`
+ * when it is a valid choice. The first failing check wins so the tooltip points
+ * at the single most relevant blocker.
+ */
+function disableReason(d: DatasetInfo, algo: PickerAlgo): string | undefined {
+  if (!algo.compatibleTasks.includes(d.task)) {
+    return `${d.name} — ${TASK_LABELS[d.task]?.toLowerCase() ?? d.task} data; not suited for ${algo.name}`;
+  }
+  if (algo.maxClasses != null && d.classes != null && d.classes > algo.maxClasses) {
+    const need = algo.maxClasses === 2 ? 'a 2-class' : `a ≤${algo.maxClasses}-class`;
+    return `${algo.name} needs ${need} dataset; ${d.name} has ${d.classes} classes`;
+  }
+  if (algo.vizMaxFeatures != null && d.features > algo.vizMaxFeatures) {
+    return `${d.name} has ${d.features} features; ${algo.name} visualizes up to ${algo.vizMaxFeatures}`;
+  }
+  return undefined;
+}
+
 export function datasetOptionGroups(
   datasets: DatasetInfo[],
-  activeAlgo: Pick<AlgorithmMeta, 'name' | 'compatibleTasks'> | null,
+  activeAlgo: PickerAlgo | null,
 ): DatasetOptionGroup[] {
   const groups: DatasetOptionGroup[] = [];
 
   for (const task of TASK_ORDER) {
     const inTask = datasets.filter((d) => d.task === task);
     if (inTask.length === 0) continue;
-    const compatible = !activeAlgo || activeAlgo.compatibleTasks.includes(task);
     groups.push({
       label: TASK_LABELS[task],
-      options: inTask.map((d) => ({
-        value: d.id,
-        label: optionLabel(d),
-        disabled: !compatible,
-        title: compatible
-          ? undefined
-          : `${d.name} — ${TASK_LABELS[task].toLowerCase()} data; not suited for ${activeAlgo!.name}`,
-      })),
+      options: inTask.map((d) => {
+        const reason = activeAlgo ? disableReason(d, activeAlgo) : undefined;
+        return {
+          value: d.id,
+          label: optionLabel(d),
+          disabled: reason != null,
+          title: reason,
+        };
+      }),
     });
   }
 

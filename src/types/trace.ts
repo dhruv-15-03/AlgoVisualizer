@@ -91,6 +91,10 @@ export interface LogRegInit extends BaseTraceEvent {
   weights: number[];
   loss: number;
   accuracy: number;
+  /** Projected 2-D scatter coords when the input was >2-D (PCA), index-aligned with dataset.y. */
+  points?: number[][];
+  /** Axis labels for `points` (e.g. ["PC 1", "PC 2"]). */
+  pointAxisLabels?: [string, string];
 }
 export interface LogRegStep extends BaseTraceEvent {
   type: 'logreg:step';
@@ -164,6 +168,10 @@ export interface BoundaryInit extends BaseTraceEvent {
   label: string;
   /** Optional learnable params (e.g. SVM weights, NB means). */
   params?: Record<string, number | number[] | number[][]>;
+  /** Projected 2-D scatter coords when the input was >2-D (PCA), index-aligned with dataset.y. */
+  points?: number[][];
+  /** Axis labels for `points` (e.g. ["PC 1", "PC 2"]). */
+  pointAxisLabels?: [string, string];
 }
 export interface BoundaryStep extends BaseTraceEvent {
   type: 'boundary:step';
@@ -269,6 +277,10 @@ export interface ForestTreeGrown extends BaseTraceEvent {
   grid?: number[];
   gridSize?: number;
   bbox?: [number, number, number, number];
+  /** Projected 2-D scatter coords when the input was >2-D (PCA), index-aligned with dataset.y. */
+  points?: number[][];
+  /** Axis labels for `points` (e.g. ["PC 1", "PC 2"]). */
+  pointAxisLabels?: [string, string];
 }
 export interface ForestConverged extends BaseTraceEvent {
   type: 'forest:converged';
@@ -290,6 +302,10 @@ export interface MLPInit extends BaseTraceEvent {
   weights: number[][][];
   loss: number;
   accuracy: number;
+  /** Projected 2-D scatter coords when the input was >2-D (PCA), index-aligned with dataset.y. */
+  points?: number[][];
+  /** Axis labels for `points` (e.g. ["PC 1", "PC 2"]). */
+  pointAxisLabels?: [string, string];
 }
 export interface MLPStep extends BaseTraceEvent {
   type: 'mlp:step';

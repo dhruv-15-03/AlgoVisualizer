@@ -7,12 +7,35 @@
 import numpy as np
 
 
+def _project_2d(X):
+    # Insurance: a future 2-class but >2-D dataset still draws a coherent
+    # boundary line by projecting onto the top 2 principal components.
+    Xc = X - X.mean(axis=0)
+    _, S, Vt = np.linalg.svd(Xc, full_matrices=False)
+    comps = Vt[:2].copy()
+    for i in range(comps.shape[0]):
+        if comps[i][np.argmax(np.abs(comps[i]))] < 0:
+            comps[i] = -comps[i]
+    total = float((S ** 2).sum())
+    var = float((S[:2] ** 2).sum() / total) if total > 0 else 0.0
+    return Xc @ comps.T, var
+
+
 def _sigmoid(z):
     return 1.0 / (1.0 + np.exp(-np.clip(z, -30, 30)))
 
 
 def run(X, y, lr=0.1, epochs=100, seed=0):
     rng = np.random.default_rng(seed)
+
+    note = ""
+    points = None
+    if X.shape[1] > 2:
+        n_orig = X.shape[1]
+        X, var = _project_2d(X)
+        note = f"Projected {n_orig} features onto 2 principal components ({var * 100:.0f}% variance) for a 2-D view. "
+        points = X.tolist()
+
     n, d = X.shape
     Xa = np.concatenate([np.ones((n, 1)), X], axis=1)
     w = rng.standard_normal(d + 1) * 0.1
@@ -26,15 +49,19 @@ def run(X, y, lr=0.1, epochs=100, seed=0):
 
     step = 0
     loss, acc = loss_and_acc(w)
-    yield {
+    init_event = {
         "type": "logreg:init",
         "step": step,
         "weights": w.tolist(),
         "loss": loss,
         "accuracy": acc,
-        "explanation": "Initialized weights randomly. Sigmoid maps the linear score to a probability.",
+        "explanation": note + "Initialized weights randomly. Sigmoid maps the linear score to a probability.",
         "math": r"\hat p = \sigma(w^\top x) = \frac{1}{1 + e^{-w^\top x}}",
     }
+    if points is not None:
+        init_event["points"] = points
+        init_event["pointAxisLabels"] = ["PC 1", "PC 2"]
+    yield init_event
 
     prev_loss = loss
     for it in range(epochs):

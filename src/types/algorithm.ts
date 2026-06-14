@@ -86,6 +86,18 @@ export interface AlgorithmMeta {
   cons: string[];
   /** Compatible dataset task types. */
   compatibleTasks: Array<'classification' | 'regression' | 'clustering' | 'reinforcement'>;
+  /**
+   * Max number of target classes this algorithm can handle (e.g. binary-only
+   * models like logistic regression / linear SVM set this to 2). When set, the
+   * dataset picker greys out datasets with more classes. Unset = no class cap.
+   */
+  maxClasses?: number;
+  /**
+   * Max number of features the visualization can render directly. Most
+   * boundary-grid algorithms now auto-project to 2-D, so this is usually unset;
+   * set it only to grey out (rather than adapt) high-dimensional datasets.
+   */
+  vizMaxFeatures?: number;
   /** External reading material (Wikipedia, sklearn docs, papers, etc). */
   references?: AlgorithmReference[];
 }
