@@ -65,6 +65,25 @@ describe('session-store · setDataset / setCode', () => {
     expect(useSessionStore.getState().datasetId).toBe('iris');
   });
 
+  it('setDataset clears the previous run so a stale trace cannot linger', () => {
+    useSessionStore.setState({
+      datasetId: 'iris',
+      events: [makeEvent(0), makeEvent(1)],
+      currentStep: 1,
+      playing: true,
+      runStatus: 'success',
+      runError: null,
+    });
+    useSessionStore.getState().setDataset('wine');
+    const s = useSessionStore.getState();
+    expect(s.datasetId).toBe('wine');
+    expect(s.events).toEqual([]);
+    expect(s.currentStep).toBe(0);
+    expect(s.playing).toBe(false);
+    expect(s.runStatus).toBe('idle');
+    expect(s.runError).toBeNull();
+  });
+
   it('setCode replaces the code', () => {
     useSessionStore.getState().setCode('print(1)');
     expect(useSessionStore.getState().code).toBe('print(1)');

@@ -4,6 +4,10 @@ import { cn } from '@/lib/cn';
 interface Option {
   value: string;
   label: string;
+  /** Render the option greyed-out and unselectable (still visible). */
+  disabled?: boolean;
+  /** Native tooltip, handy for explaining why a disabled option is unavailable. */
+  title?: string;
 }
 
 interface OptionGroup {
@@ -37,14 +41,14 @@ export function Select({ options, groups, placeholder, className, ...props }: Se
         ? groups.map((g) => (
             <optgroup key={g.label} label={g.label}>
               {g.options.map((o) => (
-                <option key={o.value} value={o.value}>
+                <option key={o.value} value={o.value} disabled={o.disabled} title={o.title}>
                   {o.label}
                 </option>
               ))}
             </optgroup>
           ))
         : options?.map((o) => (
-            <option key={o.value} value={o.value}>
+            <option key={o.value} value={o.value} disabled={o.disabled} title={o.title}>
               {o.label}
             </option>
           ))}

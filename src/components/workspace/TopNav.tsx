@@ -10,6 +10,7 @@ import { StatusPill } from '@/components/ui/StatusPill';
 import { Slider } from '@/components/ui/Slider';
 import { ShareButton } from '@/components/workspace/ShareButton';
 import { ByoDataButton } from '@/components/workspace/ByoDataButton';
+import { datasetOptionGroups } from '@/components/workspace/dataset-options';
 import { runNow } from '@/controllers/training-controller';
 import type { AlgorithmId } from '@/types/algorithm';
 import { CATEGORY_LABELS } from '@/types/algorithm';
@@ -62,12 +63,11 @@ export function TopNav() {
       options: g.algorithms.map((a) => ({ value: a.id, label: a.name })),
     }));
   const datasets = listDatasets();
-  // Only offer datasets whose task the active algorithm can consume — keeps the
-  // gridworld env out of the picker for non-RL algos (and vice versa).
+  // Show every dataset grouped by task; the active algorithm's incompatible
+  // tasks render greyed-out (disabled) rather than being hidden, so learners
+  // can see what exists and why a choice is unavailable.
   const activeAlgo = algoId ? getAlgorithm(algoId) : null;
-  const compatibleDatasets = activeAlgo
-    ? datasets.filter((d) => activeAlgo.compatibleTasks.includes(d.task))
-    : datasets;
+  const datasetGroups = datasetOptionGroups(datasets, activeAlgo);
 
   const pyTone =
     pyodideStatus === 'ready'
@@ -217,7 +217,7 @@ export function TopNav() {
           <label className="hidden shrink-0 text-[10px] uppercase tracking-wide text-ink-400 xl:inline">Data</label>
           <Select
             value={datasetId ?? ''}
-            options={compatibleDatasets.map((d) => ({ value: d.id, label: `${d.name} (${d.samples}×${d.features})` }))}
+            groups={datasetGroups}
             onChange={(e) => setDataset(e.target.value)}
             aria-label="Dataset"
             className="min-w-0 flex-1 sm:w-[200px] sm:flex-none"

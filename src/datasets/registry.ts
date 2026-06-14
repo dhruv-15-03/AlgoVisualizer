@@ -10,18 +10,22 @@ import type { Dataset, DatasetInfo } from '@/types/dataset';
 import { iris } from '@/datasets/builtin/iris';
 import { wine } from '@/datasets/builtin/wine';
 import { makeShapes } from '@/datasets/builtin/shapes';
-import { gridworld, gridworldOpen } from '@/datasets/gridworld';
+import { gridworld, gridworldOpen, cliffWalk, maze } from '@/datasets/gridworld';
 import { useSessionStore } from '@/stores/session-store';
 import {
   makeAnisoBlobs,
   makeBlobs,
   makeCircles,
+  makeCollinear,
+  makeFriedman,
   makeGaussianMixture,
   makeLinear,
   makeMoons,
   makeNoisyLinear,
   makePolyData,
+  makeSine,
   makeSpirals,
+  makeVariedBlobs,
 } from '@/datasets/synthetic';
 
 const datasets: Dataset[] = [
@@ -30,15 +34,21 @@ const datasets: Dataset[] = [
   makeBlobs({ nSamples: 150, centers: 3, std: 0.6, seed: 7 }),
   makeAnisoBlobs({ nSamples: 180, seed: 7 }),
   makeGaussianMixture({ nSamples: 200, seed: 7 }),
+  makeVariedBlobs({ nSamples: 180, seed: 7 }),
   makeMoons({ nSamples: 200, noise: 0.1, seed: 7 }),
   makeCircles({ nSamples: 200, noise: 0.05, seed: 7 }),
   makeSpirals({ nSamples: 240, noise: 0.18, seed: 7 }),
   makeLinear({ nSamples: 80, seed: 7 }),
   makePolyData({ nSamples: 80, noise: 0.6, seed: 7 }),
   makeNoisyLinear({ nSamples: 70, seed: 7 }),
+  makeSine({ nSamples: 90, seed: 7 }),
+  makeCollinear({ nSamples: 90, seed: 7 }),
+  makeFriedman({ nSamples: 120, seed: 7 }),
   makeShapes({ nPerClass: 40, seed: 7 }),
   gridworld,
   gridworldOpen,
+  cliffWalk,
+  maze,
 ];
 
 const map = new Map<string, Dataset>(datasets.map((d) => [d.id, d]));
