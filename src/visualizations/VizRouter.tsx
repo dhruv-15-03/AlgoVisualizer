@@ -11,6 +11,7 @@ import { MLPViz } from './MLPViz';
 import { ForestViz } from './ForestViz';
 import { PolyRegViz } from './PolyRegViz';
 import { CNNViz } from './CNNViz';
+import { RLViz } from './RLViz';
 
 interface VizRouterProps {
   family: AlgorithmFamily;
@@ -44,6 +45,8 @@ export function VizRouter({ family, dataset, events, currentStep }: VizRouterPro
       return <ForestViz {...props} />;
     case 'cnn':
       return <CNNViz {...props} />;
+    case 'rl':
+      return <RLViz {...props} />;
     default:
       return (
         <div className="grid h-full place-items-center text-sm text-ink-400">

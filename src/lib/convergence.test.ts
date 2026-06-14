@@ -58,6 +58,29 @@ describe('convergence.extractConvergence', () => {
     ]);
   });
 
+  it('extracts a reward series for reinforcement-learning episodes', () => {
+    const episode = (i: number, reward: number) =>
+      ({
+        ...base(i),
+        type: 'rl:episode',
+        label: 'Q-Learning',
+        episode: i,
+        values: [0],
+        policy: [0],
+        reward,
+        steps: 10,
+      }) as TraceEvent;
+    const series = extractConvergence([episode(0, -5), episode(1, 2), episode(2, 9)]);
+    expect(series!.label).toBe('Reward');
+    expect(series!.yAxisLabel).toBe('Reward');
+    // No `iteration` field → falls back to running index.
+    expect(series!.points).toEqual([
+      { iteration: 0, loss: -5 },
+      { iteration: 1, loss: 2 },
+      { iteration: 2, loss: 9 },
+    ]);
+  });
+
   it('uses metricLabel for clustering steps', () => {
     const events = [
       { ...base(0, 0), type: 'cluster:step', label: 'GMM', labels: [0], metric: -5, metricLabel: 'Log-likelihood' },

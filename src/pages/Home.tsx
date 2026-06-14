@@ -89,7 +89,7 @@ export function Home() {
           </span>
           <span className="h-3 w-px bg-ink-700" aria-hidden />
           <span>
-            <span className="font-semibold text-ink-300">4</span> categories
+            <span className="font-semibold text-ink-300">{groups.length}</span> categories
           </span>
         </div>
       </header>

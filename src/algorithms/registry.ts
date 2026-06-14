@@ -12,16 +12,23 @@ import { knnMeta } from '@/algorithms/knn';
 import { naivebayesMeta } from '@/algorithms/naivebayes';
 import { svmMeta } from '@/algorithms/svm';
 import { randomforestMeta } from '@/algorithms/randomforest';
+import { gbmMeta } from '@/algorithms/gbm';
 import { mlpMeta } from '@/algorithms/mlp';
 import { cnnMeta } from '@/algorithms/cnn';
 import { polyregMeta } from '@/algorithms/polyreg';
 import { ridgeMeta } from '@/algorithms/ridge';
 import { lassoMeta } from '@/algorithms/lasso';
+import { elasticnetMeta } from '@/algorithms/elasticnet';
 import { dbscanMeta } from '@/algorithms/dbscan';
 import { hierarchicalMeta } from '@/algorithms/hierarchical';
 import { gmmMeta } from '@/algorithms/gmm';
 import { pcaMeta } from '@/algorithms/pca';
 import { tsneMeta } from '@/algorithms/tsne';
+import { autoencoderMeta } from '@/algorithms/autoencoder';
+import { qlearningMeta } from '@/algorithms/qlearning';
+import { dqnMeta } from '@/algorithms/dqn';
+import { reinforceMeta } from '@/algorithms/reinforce';
+import { actorcriticMeta } from '@/algorithms/actorcritic';
 
 const algorithms: AlgorithmMeta[] = [
   // Supervised — classification
@@ -31,6 +38,7 @@ const algorithms: AlgorithmMeta[] = [
   svmMeta,
   dtreeMeta,
   randomforestMeta,
+  gbmMeta,
   mlpMeta,
   cnnMeta,
   // Supervised — regression
@@ -38,6 +46,7 @@ const algorithms: AlgorithmMeta[] = [
   polyregMeta,
   ridgeMeta,
   lassoMeta,
+  elasticnetMeta,
   // Unsupervised — clustering
   kmeansMeta,
   dbscanMeta,
@@ -46,6 +55,12 @@ const algorithms: AlgorithmMeta[] = [
   // Unsupervised — dim reduction
   pcaMeta,
   tsneMeta,
+  autoencoderMeta,
+  // Reinforcement learning
+  qlearningMeta,
+  dqnMeta,
+  reinforceMeta,
+  actorcriticMeta,
 ];
 const map = new Map<AlgorithmId, AlgorithmMeta>(algorithms.map((a) => [a.id, a]));
 

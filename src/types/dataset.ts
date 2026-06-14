@@ -9,8 +9,8 @@ export interface Dataset {
   featureNames: string[];
   /** For classification: human-readable class labels. */
   classNames?: string[];
-  /** 'classification' | 'regression' | 'clustering'. */
-  task: 'classification' | 'regression' | 'clustering';
+  /** 'classification' | 'regression' | 'clustering' | 'reinforcement'. */
+  task: 'classification' | 'regression' | 'clustering' | 'reinforcement';
   source: string;
   /** Present only for image datasets — tells the viz layer to render rows as images. */
   imageShape?: { height: number; width: number };

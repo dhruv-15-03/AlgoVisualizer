@@ -1,0 +1,73 @@
+import elasticnetSource from '@/algorithms/python/elasticnet.py?raw';
+import type { AlgorithmMeta } from '@/types/algorithm';
+
+export const elasticnetMeta: AlgorithmMeta = {
+  id: 'elasticnet',
+  family: 'linreg',
+  name: 'ElasticNet Regression',
+  shortDescription: 'Linear regression with a blended L1 + L2 penalty.',
+  longDescription:
+    "ElasticNet combines Lasso's L1 penalty (which drives weak coefficients to exactly 0, giving sparsity and feature selection) with Ridge's L2 penalty (which stays stable when features are correlated). The mix is controlled by l1_ratio ρ: ρ=1 is pure Lasso, ρ=0 is pure Ridge. Use it when you want a sparse model but have groups of correlated features that Lasso alone would pick from arbitrarily.",
+  category: 'supervised-regression',
+  task: 'regression',
+  pythonFilename: 'elasticnet.py',
+  defaultCode: elasticnetSource,
+  sklearnSnippet: `from sklearn.linear_model import ElasticNet
+
+model = ElasticNet(alpha=0.5, l1_ratio=0.5)
+model.fit(X, y)`,
+  hyperparams: [
+    {
+      id: 'alpha',
+      label: 'α (penalty strength)',
+      codeKey: 'alpha=',
+      type: 'float',
+      min: 0,
+      max: 10,
+      step: 0.1,
+      default: 0.5,
+      description: 'Overall regularization strength.',
+    },
+    {
+      id: 'l1_ratio',
+      label: 'L1 ratio (ρ)',
+      codeKey: 'l1_ratio=',
+      type: 'float',
+      min: 0,
+      max: 1,
+      step: 0.05,
+      default: 0.5,
+      description: 'ρ=1 → Lasso (sparse), ρ=0 → Ridge (smooth).',
+    },
+    {
+      id: 'lr',
+      label: 'Learning rate',
+      codeKey: 'lr=',
+      type: 'float',
+      min: 0.005,
+      max: 0.5,
+      step: 0.005,
+      default: 0.05,
+    },
+    {
+      id: 'epochs',
+      label: 'Epochs',
+      codeKey: 'epochs=',
+      type: 'int',
+      min: 20,
+      max: 500,
+      step: 10,
+      default: 120,
+    },
+  ],
+  timeComplexity: 'O(n · d · epochs)',
+  spaceComplexity: 'O(d)',
+  pros: ['Sparse like Lasso, stable like Ridge', 'Handles correlated feature groups', 'Single knob (ρ) interpolates L1↔L2'],
+  cons: ['Two hyperparameters to tune (α, ρ)', "L1 part isn't differentiable at 0", 'Needs feature scaling'],
+  compatibleTasks: ['regression'],
+  references: [
+    { kind: 'wiki', label: 'Wikipedia: Elastic net regularization', url: 'https://en.wikipedia.org/wiki/Elastic_net_regularization' },
+    { kind: 'sklearn', label: 'scikit-learn user guide: Elastic-Net', url: 'https://scikit-learn.org/stable/modules/linear_model.html#elastic-net' },
+    { kind: 'video', label: 'StatQuest: ElasticNet Regression', url: 'https://www.youtube.com/watch?v=1dKRdX9bfIo' },
+  ],
+};

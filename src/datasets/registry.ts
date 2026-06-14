@@ -10,6 +10,7 @@ import type { Dataset, DatasetInfo } from '@/types/dataset';
 import { iris } from '@/datasets/builtin/iris';
 import { wine } from '@/datasets/builtin/wine';
 import { makeShapes } from '@/datasets/builtin/shapes';
+import { gridworld, gridworldOpen } from '@/datasets/gridworld';
 import { useSessionStore } from '@/stores/session-store';
 import {
   makeAnisoBlobs,
@@ -36,6 +37,8 @@ const datasets: Dataset[] = [
   makePolyData({ nSamples: 80, noise: 0.6, seed: 7 }),
   makeNoisyLinear({ nSamples: 70, seed: 7 }),
   makeShapes({ nPerClass: 40, seed: 7 }),
+  gridworld,
+  gridworldOpen,
 ];
 
 const map = new Map<string, Dataset>(datasets.map((d) => [d.id, d]));

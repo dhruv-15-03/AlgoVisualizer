@@ -351,6 +351,44 @@ export interface CNNConverged extends BaseTraceEvent {
 }
 export type CNNEvent = CNNInit | CNNStep | CNNConverged;
 
+// ─── Reinforcement learning (gridworld) ─────────────────────────────────────
+export interface RLInit extends BaseTraceEvent {
+  type: 'rl:init';
+  label: string;
+  rows: number;
+  cols: number;
+  /** Flattened cell codes, length rows*cols. 0 empty / 1 wall / 2 goal / 3 trap / 4 start. */
+  grid: number[];
+  /** Number of discrete actions (4: up/right/down/left). */
+  nActions: number;
+}
+export interface RLEpisode extends BaseTraceEvent {
+  type: 'rl:episode';
+  label: string;
+  episode: number;
+  /** State value per cell (max_a Q[s,a], V[s], or policy confidence); length rows*cols. */
+  values: number[];
+  /** Greedy action per cell (argmax); -1 for walls / terminal cells. Length rows*cols. */
+  policy: number[];
+  /** Total (undiscounted) reward collected this episode. */
+  reward: number;
+  /** Number of steps taken this episode. */
+  steps: number;
+  /** Exploration rate / temperature, when the algorithm uses one. */
+  epsilon?: number;
+  /** State indices visited this episode, for the path overlay. */
+  path?: number[];
+}
+export interface RLConverged extends BaseTraceEvent {
+  type: 'rl:converged';
+  label: string;
+  values: number[];
+  policy: number[];
+  episodes: number;
+  reason: string;
+}
+export type RLEvent = RLInit | RLEpisode | RLConverged;
+
 // ─── Universal lifecycle events ─────────────────────────────────────────────
 export interface ErrorEvent extends BaseTraceEvent {
   type: 'error';
@@ -375,6 +413,7 @@ export type TraceEvent =
   | ForestEvent
   | MLPEvent
   | CNNEvent
+  | RLEvent
   | ErrorEvent
   | FinishedEvent;
 
@@ -389,7 +428,8 @@ export type AlgorithmFamily =
   | 'projection'
   | 'forest'
   | 'mlp'
-  | 'cnn';
+  | 'cnn'
+  | 'rl';
 
 const FAMILY_PREFIXES = new Set<string>([
   'kmeans',
@@ -403,6 +443,7 @@ const FAMILY_PREFIXES = new Set<string>([
   'forest',
   'mlp',
   'cnn',
+  'rl',
 ]);
 
 export function familyOf(type: TraceEvent['type']): AlgorithmFamily | 'system' {
