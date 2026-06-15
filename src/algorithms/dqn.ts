@@ -1,4 +1,3 @@
-import dqnSource from '@/algorithms/python/dqn.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const dqnMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const dqnMeta: AlgorithmMeta = {
   category: 'reinforcement',
   task: 'reinforcement',
   pythonFilename: 'dqn.py',
-  defaultCode: dqnSource,
   sklearnSnippet: `# Production DQN: Gymnasium env + Stable-Baselines3.
 import gymnasium as gym
 from stable_baselines3 import DQN

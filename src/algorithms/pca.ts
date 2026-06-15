@@ -1,4 +1,3 @@
-import pcaSource from '@/algorithms/python/pca.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const pcaMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const pcaMeta: AlgorithmMeta = {
   category: 'unsupervised-dim-reduction',
   task: 'dim-reduction',
   pythonFilename: 'pca.py',
-  defaultCode: pcaSource,
   sklearnSnippet: `from sklearn.decomposition import PCA
 
 model = PCA(n_components=2)

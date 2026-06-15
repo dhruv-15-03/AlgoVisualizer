@@ -1,4 +1,3 @@
-import polyregSource from '@/algorithms/python/polyreg.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const polyregMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const polyregMeta: AlgorithmMeta = {
   category: 'supervised-regression',
   task: 'regression',
   pythonFilename: 'polyreg.py',
-  defaultCode: polyregSource,
   sklearnSnippet: `from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline

@@ -1,4 +1,3 @@
-import qlearningSource from '@/algorithms/python/qlearning.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const qlearningMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const qlearningMeta: AlgorithmMeta = {
   category: 'reinforcement',
   task: 'reinforcement',
   pythonFilename: 'qlearning.py',
-  defaultCode: qlearningSource,
   sklearnSnippet: `# RL lives outside sklearn — the industry stack is Gymnasium + a learner.
 import gymnasium as gym
 import numpy as np

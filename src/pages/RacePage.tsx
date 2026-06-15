@@ -15,6 +15,7 @@ import { Slider } from '@/components/ui/Slider';
 import { StatusPill } from '@/components/ui/StatusPill';
 import { Panel } from '@/components/ui/Panel';
 import { listAlgorithms, listAlgorithmsByCategory, getAlgorithm } from '@/algorithms/registry';
+import { getAlgorithmSource } from '@/algorithms/algorithm-sources';
 import { listDatasets, getDataset } from '@/datasets/registry';
 import { CATEGORY_LABELS } from '@/types/algorithm';
 import type { AlgorithmId } from '@/types/algorithm';
@@ -70,8 +71,8 @@ export function RacePage() {
       const a = algos.find((x) => x.id === 'logreg') ?? algos[0];
       const b = algos.find((x) => x.id === 'dtree') ?? algos[1] ?? algos[0];
       if (a && b) {
-        addRacer('A', a.id, a.defaultCode, hpDefaults(a));
-        addRacer('B', b.id, b.defaultCode, hpDefaults(b));
+        addRacer('A', a.id, getAlgorithmSource(a.pythonFilename), hpDefaults(a));
+        addRacer('B', b.id, getAlgorithmSource(b.pythonFilename), hpDefaults(b));
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -118,13 +119,17 @@ export function RacePage() {
     const next = algosForDataset.find((a) => !used.has(a.id)) ?? algosForDataset[0];
     if (!next) return;
     const id = SLOT_IDS[racers.length];
-    addRacer(id, next.id, next.defaultCode, hpDefaults(next));
+    addRacer(id, next.id, getAlgorithmSource(next.pythonFilename), hpDefaults(next));
   };
 
   const handleChangeRacerAlgo = (slot: string, newAlgoId: AlgorithmId) => {
     const meta = getAlgorithm(newAlgoId);
     if (!meta) return;
-    updateRacer(slot, { algorithmId: newAlgoId, code: meta.defaultCode, hyperparams: hpDefaults(meta) });
+    updateRacer(slot, {
+      algorithmId: newAlgoId,
+      code: getAlgorithmSource(meta.pythonFilename),
+      hyperparams: hpDefaults(meta),
+    });
   };
 
   const handleRunRace = async () => {

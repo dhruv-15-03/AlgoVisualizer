@@ -1,4 +1,3 @@
-import autoencoderSource from '@/algorithms/python/autoencoder.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const autoencoderMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const autoencoderMeta: AlgorithmMeta = {
   category: 'unsupervised-dim-reduction',
   task: 'dim-reduction',
   pythonFilename: 'autoencoder.py',
-  defaultCode: autoencoderSource,
   sklearnSnippet: `import torch.nn as nn
 
 ae = nn.Sequential(

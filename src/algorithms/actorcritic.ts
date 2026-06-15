@@ -1,4 +1,3 @@
-import actorcriticSource from '@/algorithms/python/actorcritic.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const actorcriticMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const actorcriticMeta: AlgorithmMeta = {
   category: 'reinforcement',
   task: 'reinforcement',
   pythonFilename: 'actorcritic.py',
-  defaultCode: actorcriticSource,
   sklearnSnippet: `# Modern actor-critic (A2C) via Stable-Baselines3.
 import gymnasium as gym
 from stable_baselines3 import A2C

@@ -1,4 +1,3 @@
-import gbmSource from '@/algorithms/python/gbm.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const gbmMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const gbmMeta: AlgorithmMeta = {
   category: 'supervised-classification',
   task: 'classification',
   pythonFilename: 'gbm.py',
-  defaultCode: gbmSource,
   sklearnSnippet: `from sklearn.ensemble import GradientBoostingClassifier
 
 model = GradientBoostingClassifier(

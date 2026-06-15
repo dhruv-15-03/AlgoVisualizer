@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 // family has a `case` without importing the heavy D3 viz components.
 import vizRouterSource from '@/visualizations/VizRouter.tsx?raw';
 import { listAlgorithms } from '@/algorithms/registry';
+import { getAlgorithmSource } from '@/algorithms/algorithm-sources';
 import { getDataset } from '@/datasets/registry';
 import { DEFAULT_DATASET_BY_ALGO } from '@/algorithms/default-datasets';
 
@@ -40,8 +41,9 @@ describe('algorithm registry · integrity', () => {
 for (const meta of algorithms) {
   describe(`algorithm · ${meta.id}`, () => {
     it('has a non-empty default Python source', () => {
-      expect(typeof meta.defaultCode).toBe('string');
-      expect(meta.defaultCode.trim().length).toBeGreaterThan(0);
+      const source = getAlgorithmSource(meta.pythonFilename);
+      expect(typeof source).toBe('string');
+      expect(source.trim().length).toBeGreaterThan(0);
     });
 
     it('has a family that VizRouter can render', () => {
@@ -86,7 +88,9 @@ for (const meta of algorithms) {
 
         // The slider must have a real assignment to patch in the default code.
         const keyName = hp.codeKey.replace(/=\s*$/, '').trim();
-        const assigned = new RegExp(`\\b${escapeRegExp(keyName)}\\s*=`).test(meta.defaultCode);
+        const assigned = new RegExp(`\\b${escapeRegExp(keyName)}\\s*=`).test(
+          getAlgorithmSource(meta.pythonFilename),
+        );
         expect(assigned, `codeKey "${hp.codeKey}" not assigned in ${meta.id} source`).toBe(true);
       }
     });

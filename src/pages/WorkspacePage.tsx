@@ -12,6 +12,7 @@ import { usePlaybackKeyboard } from '@/hooks/usePlaybackKeyboard';
 import { useSessionStore } from '@/stores/session-store';
 import { useFamilyTheme } from '@/hooks/useFamilyTheme';
 import { getAlgorithm, listAlgorithms } from '@/algorithms/registry';
+import { getAlgorithmSource } from '@/algorithms/algorithm-sources';
 import { getDataset } from '@/datasets/registry';
 import { DEFAULT_DATASET_BY_ALGO } from '@/algorithms/default-datasets';
 import { decodeShareState, readTokenFromHash } from '@/lib/share-link';
@@ -65,7 +66,10 @@ export function WorkspacePage() {
     // clobber a just-hydrated session back to defaults.
     const liveAlgoId = currentAlgoId ?? useSessionStore.getState().algorithmId;
     if (liveAlgoId !== algoId) {
-      setAlgorithm(algoId, { code: meta.defaultCode, hyperparams: meta.hyperparams });
+      setAlgorithm(algoId, {
+        code: getAlgorithmSource(meta.pythonFilename),
+        hyperparams: meta.hyperparams,
+      });
     }
   }, [algoId, currentAlgoId, setAlgorithm, navigate]);
 

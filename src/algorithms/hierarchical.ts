@@ -1,4 +1,3 @@
-import hierSource from '@/algorithms/python/hierarchical.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const hierarchicalMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const hierarchicalMeta: AlgorithmMeta = {
   category: 'unsupervised-clustering',
   task: 'clustering',
   pythonFilename: 'hierarchical.py',
-  defaultCode: hierSource,
   sklearnSnippet: `from sklearn.cluster import AgglomerativeClustering
 
 model = AgglomerativeClustering(n_clusters=3, linkage='single')

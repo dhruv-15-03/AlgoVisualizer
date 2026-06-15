@@ -73,9 +73,13 @@ export interface AlgorithmMeta {
   /** High-level grouping for the home page and dropdown. */
   category: AlgorithmCategory;
   task: 'classification' | 'regression' | 'clustering' | 'dim-reduction' | 'reinforcement';
+  /**
+   * Basename of the algorithm's Python source under `src/algorithms/python/`.
+   * The source itself is loaded lazily via `getAlgorithmSource()` so it never
+   * ships in the eager Home/entry chunk — only the lazy Workspace/Race routes
+   * pull it. See `src/algorithms/algorithm-sources.ts`.
+   */
   pythonFilename: string;
-  /** The default Python source shown in the Monaco editor. */
-  defaultCode: string;
   /** Equivalent canonical sklearn call (read-only reference). */
   sklearnSnippet: string;
   hyperparams: AlgorithmHyperparam[];

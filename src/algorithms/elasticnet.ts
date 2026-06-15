@@ -1,4 +1,3 @@
-import elasticnetSource from '@/algorithms/python/elasticnet.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const elasticnetMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const elasticnetMeta: AlgorithmMeta = {
   category: 'supervised-regression',
   task: 'regression',
   pythonFilename: 'elasticnet.py',
-  defaultCode: elasticnetSource,
   sklearnSnippet: `from sklearn.linear_model import ElasticNet
 
 model = ElasticNet(alpha=0.5, l1_ratio=0.5)

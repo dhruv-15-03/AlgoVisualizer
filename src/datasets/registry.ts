@@ -6,7 +6,7 @@
  * through the exact same `getDataset` / `listDatasets` pathway the built-ins use.
  */
 
-import type { Dataset, DatasetInfo } from '@/types/dataset';
+import type { Dataset } from '@/types/dataset';
 import { iris } from '@/datasets/builtin/iris';
 import { wine } from '@/datasets/builtin/wine';
 import { makeShapes } from '@/datasets/builtin/shapes';
@@ -28,7 +28,7 @@ import {
   makeVariedBlobs,
 } from '@/datasets/synthetic';
 
-const datasets: Dataset[] = [
+export const buildBuiltins = (): Dataset[] => [
   iris,
   wine,
   makeBlobs({ nSamples: 150, centers: 3, std: 0.6, seed: 7 }),
@@ -51,31 +51,29 @@ const datasets: Dataset[] = [
   maze,
 ];
 
-const map = new Map<string, Dataset>(datasets.map((d) => [d.id, d]));
+// The built-in datasets — Iris/Wine data tables plus every synthetic generator
+// — are only materialized the first time a *full* Dataset is requested. Listing
+// datasets uses the static BUILTIN_DATASET_INFO catalog instead, so neither the
+// data nor the generator code is pulled into the eager Home/entry chunk, and no
+// generation runs during the initial paint.
+let builtinMap: Map<string, Dataset> | null = null;
 
-function toInfo(d: Dataset): DatasetInfo {
-  return {
-    id: d.id,
-    name: d.name,
-    description: d.description,
-    samples: d.X.length,
-    features: d.X[0]?.length ?? 0,
-    classes: d.task === 'regression' || d.y === null ? null : new Set(d.y).size,
-    task: d.task,
-    source: d.source,
-    imageShape: d.imageShape,
-  };
-}
-
-function customDatasets(): Dataset[] {
-  return useSessionStore.getState().customDatasets;
-}
-
-export function listDatasets(): DatasetInfo[] {
-  return [...datasets, ...customDatasets()].map(toInfo);
+function builtins(): Map<string, Dataset> {
+  if (!builtinMap) {
+    builtinMap = new Map(buildBuiltins().map((d) => [d.id, d]));
+  }
+  return builtinMap;
 }
 
 export function getDataset(id: string): Dataset | null {
-  return map.get(id) ?? customDatasets().find((d) => d.id === id) ?? null;
+  if (builtins().has(id)) return builtins().get(id) ?? null;
+  const custom = useSessionStore.getState().customDatasets;
+  return custom.find((d) => d.id === id) ?? null;
 }
+
+// Re-exported so callers that already pull `getDataset` from the registry can
+// grab the lightweight listing from the same module. The implementation lives
+// in the generator-free `catalog.ts`; Home imports it from there directly to
+// keep the dataset generators out of the eager entry chunk.
+export { listDatasets, toInfo } from '@/datasets/catalog';
 

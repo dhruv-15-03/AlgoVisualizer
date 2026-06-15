@@ -77,7 +77,6 @@ yielding — the worker JSON-serializes each event.
 Create `src/algorithms/<id>.ts`:
 
 ```ts
-import source from '@/algorithms/python/<id>.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const <id>Meta: AlgorithmMeta = {
@@ -88,8 +87,10 @@ export const <id>Meta: AlgorithmMeta = {
   longDescription: '…',
   category: 'supervised-classification',
   task: 'classification',
+  // The Python source is loaded lazily from src/algorithms/python/<id>.py via
+  // getAlgorithmSource(pythonFilename) so it never ships in the Home/entry
+  // chunk. Just point at the filename — do NOT `?raw`-import it here.
   pythonFilename: '<id>.py',
-  defaultCode: source,
   sklearnSnippet: '…',
   hyperparams: [/* sliders that patch codeKey into the source */],
   timeComplexity: 'O(…)',

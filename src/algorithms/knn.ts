@@ -1,4 +1,3 @@
-import knnSource from '@/algorithms/python/knn.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const knnMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const knnMeta: AlgorithmMeta = {
   category: 'supervised-classification',
   task: 'classification',
   pythonFilename: 'knn.py',
-  defaultCode: knnSource,
   sklearnSnippet: `from sklearn.neighbors import KNeighborsClassifier
 
 model = KNeighborsClassifier(n_neighbors=5)

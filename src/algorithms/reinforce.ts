@@ -1,4 +1,3 @@
-import reinforceSource from '@/algorithms/python/reinforce.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const reinforceMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const reinforceMeta: AlgorithmMeta = {
   category: 'reinforcement',
   task: 'reinforcement',
   pythonFilename: 'reinforce.py',
-  defaultCode: reinforceSource,
   sklearnSnippet: `# Policy gradient in PyTorch: sample, score the return, backprop log-prob.
 import torch
 import torch.nn as nn

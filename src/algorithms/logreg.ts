@@ -1,4 +1,3 @@
-import logregSource from '@/algorithms/python/logreg.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const logregMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const logregMeta: AlgorithmMeta = {
   category: 'supervised-classification',
   task: 'classification',
   pythonFilename: 'logreg.py',
-  defaultCode: logregSource,
   sklearnSnippet: `from sklearn.linear_model import LogisticRegression
 
 model = LogisticRegression(C=1e6, max_iter=100, solver='lbfgs')

@@ -1,4 +1,3 @@
-import lassoSource from '@/algorithms/python/lasso.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const lassoMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const lassoMeta: AlgorithmMeta = {
   category: 'supervised-regression',
   task: 'regression',
   pythonFilename: 'lasso.py',
-  defaultCode: lassoSource,
   sklearnSnippet: `from sklearn.linear_model import Lasso
 
 model = Lasso(alpha=0.4)

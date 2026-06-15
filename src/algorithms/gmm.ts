@@ -1,4 +1,3 @@
-import gmmSource from '@/algorithms/python/gmm.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const gmmMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const gmmMeta: AlgorithmMeta = {
   category: 'unsupervised-clustering',
   task: 'clustering',
   pythonFilename: 'gmm.py',
-  defaultCode: gmmSource,
   sklearnSnippet: `from sklearn.mixture import GaussianMixture
 
 model = GaussianMixture(n_components=3, random_state=0)

@@ -1,4 +1,3 @@
-import kmeansSource from '@/algorithms/python/kmeans.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const kmeansMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const kmeansMeta: AlgorithmMeta = {
   category: 'unsupervised-clustering',
   task: 'clustering',
   pythonFilename: 'kmeans.py',
-  defaultCode: kmeansSource,
   sklearnSnippet: `from sklearn.cluster import KMeans
 
 model = KMeans(n_clusters=3, random_state=0, n_init=10)

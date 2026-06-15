@@ -1,4 +1,3 @@
-import cnnSource from '@/algorithms/python/cnn.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const cnnMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const cnnMeta: AlgorithmMeta = {
   category: 'supervised-classification',
   task: 'classification',
   pythonFilename: 'cnn.py',
-  defaultCode: cnnSource,
   sklearnSnippet: `# Real CNNs use PyTorch / TensorFlow:
 import torch
 import torch.nn as nn

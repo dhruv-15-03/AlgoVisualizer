@@ -1,4 +1,3 @@
-import dbscanSource from '@/algorithms/python/dbscan.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const dbscanMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const dbscanMeta: AlgorithmMeta = {
   category: 'unsupervised-clustering',
   task: 'clustering',
   pythonFilename: 'dbscan.py',
-  defaultCode: dbscanSource,
   sklearnSnippet: `from sklearn.cluster import DBSCAN
 
 model = DBSCAN(eps=0.5, min_samples=5)

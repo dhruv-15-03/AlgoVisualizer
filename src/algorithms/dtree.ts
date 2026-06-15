@@ -1,4 +1,3 @@
-import dtreeSource from '@/algorithms/python/dtree.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const dtreeMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const dtreeMeta: AlgorithmMeta = {
   category: 'supervised-classification',
   task: 'classification',
   pythonFilename: 'dtree.py',
-  defaultCode: dtreeSource,
   sklearnSnippet: `from sklearn.tree import DecisionTreeClassifier
 
 model = DecisionTreeClassifier(max_depth=4, min_samples_split=4, criterion='gini')

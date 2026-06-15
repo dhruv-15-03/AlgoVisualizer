@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { listAlgorithms, listAlgorithmsByCategory } from '@/algorithms/registry';
-import { listDatasets } from '@/datasets/registry';
+import { listDatasets } from '@/datasets/catalog';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { CATEGORY_LABELS } from '@/types/algorithm';

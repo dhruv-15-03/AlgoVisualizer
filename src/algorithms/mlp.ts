@@ -1,4 +1,3 @@
-import mlpSource from '@/algorithms/python/mlp.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const mlpMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const mlpMeta: AlgorithmMeta = {
   category: 'supervised-classification',
   task: 'classification',
   pythonFilename: 'mlp.py',
-  defaultCode: mlpSource,
   sklearnSnippet: `from sklearn.neural_network import MLPClassifier
 
 model = MLPClassifier(hidden_layer_sizes=(8, 8), learning_rate_init=0.1, max_iter=80)

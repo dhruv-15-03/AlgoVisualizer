@@ -1,4 +1,3 @@
-import linregSource from '@/algorithms/python/linreg.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const linregMeta: AlgorithmMeta = {
@@ -11,7 +10,6 @@ export const linregMeta: AlgorithmMeta = {
   category: 'supervised-regression',
   task: 'regression',
   pythonFilename: 'linreg.py',
-  defaultCode: linregSource,
   sklearnSnippet: `from sklearn.linear_model import SGDRegressor
 
 model = SGDRegressor(learning_rate='constant', eta0=0.05, max_iter=80)
