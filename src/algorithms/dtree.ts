@@ -10,11 +10,6 @@ export const dtreeMeta: AlgorithmMeta = {
   category: 'supervised-classification',
   task: 'classification',
   pythonFilename: 'dtree.py',
-  sklearnSnippet: `from sklearn.tree import DecisionTreeClassifier
-
-model = DecisionTreeClassifier(max_depth=4, min_samples_split=4, criterion='gini')
-model.fit(X, y)
-predictions = model.predict(X)`,
   hyperparams: [
     {
       id: 'max_depth',

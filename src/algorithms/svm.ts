@@ -10,11 +10,6 @@ export const svmMeta: AlgorithmMeta = {
   category: 'supervised-classification',
   task: 'classification',
   pythonFilename: 'svm.py',
-  sklearnSnippet: `from sklearn.svm import LinearSVC
-
-model = LinearSVC(C=1.0, loss='hinge')
-model.fit(X, y)
-y_pred = model.predict(X_new)`,
   hyperparams: [
     {
       id: 'C',

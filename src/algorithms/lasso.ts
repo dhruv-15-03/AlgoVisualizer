@@ -10,10 +10,6 @@ export const lassoMeta: AlgorithmMeta = {
   category: 'supervised-regression',
   task: 'regression',
   pythonFilename: 'lasso.py',
-  sklearnSnippet: `from sklearn.linear_model import Lasso
-
-model = Lasso(alpha=0.4)
-model.fit(X, y)`,
   hyperparams: [
     {
       id: 'alpha',

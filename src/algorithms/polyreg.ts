@@ -10,12 +10,6 @@ export const polyregMeta: AlgorithmMeta = {
   category: 'supervised-regression',
   task: 'regression',
   pythonFilename: 'polyreg.py',
-  sklearnSnippet: `from sklearn.preprocessing import PolynomialFeatures
-from sklearn.linear_model import LinearRegression
-from sklearn.pipeline import make_pipeline
-
-model = make_pipeline(PolynomialFeatures(degree=3), LinearRegression())
-model.fit(X, y)`,
   hyperparams: [
     {
       id: 'degree',

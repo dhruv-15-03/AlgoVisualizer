@@ -10,12 +10,6 @@ export const kmeansMeta: AlgorithmMeta = {
   category: 'unsupervised-clustering',
   task: 'clustering',
   pythonFilename: 'kmeans.py',
-  sklearnSnippet: `from sklearn.cluster import KMeans
-
-model = KMeans(n_clusters=3, random_state=0, n_init=10)
-model.fit(X)
-labels = model.labels_
-centroids = model.cluster_centers_`,
   hyperparams: [
     {
       id: 'k',

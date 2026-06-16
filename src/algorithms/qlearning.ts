@@ -10,21 +10,6 @@ export const qlearningMeta: AlgorithmMeta = {
   category: 'reinforcement',
   task: 'reinforcement',
   pythonFilename: 'qlearning.py',
-  sklearnSnippet: `# RL lives outside sklearn — the industry stack is Gymnasium + a learner.
-import gymnasium as gym
-import numpy as np
-
-env = gym.make("FrozenLake-v1", is_slippery=False)
-Q = np.zeros((env.observation_space.n, env.action_space.n))
-
-for episode in range(500):
-    s, _ = env.reset()
-    done = False
-    while not done:
-        a = env.action_space.sample() if np.random.rand() < 0.1 else Q[s].argmax()
-        s2, r, term, trunc, _ = env.step(a)
-        Q[s, a] += 0.1 * (r + 0.95 * Q[s2].max() - Q[s, a])
-        s, done = s2, term or trunc`,
   hyperparams: [
     { id: 'episodes', label: 'Episodes', codeKey: 'episodes=', type: 'int', min: 20, max: 200, step: 10, default: 60 },
     { id: 'lr', label: 'Learning rate (α)', codeKey: 'lr=', type: 'float', min: 0.01, max: 0.5, step: 0.01, default: 0.1 },

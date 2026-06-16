@@ -10,13 +10,6 @@ export const autoencoderMeta: AlgorithmMeta = {
   category: 'unsupervised-dim-reduction',
   task: 'dim-reduction',
   pythonFilename: 'autoencoder.py',
-  sklearnSnippet: `import torch.nn as nn
-
-ae = nn.Sequential(
-    nn.Linear(n_features, 2), nn.Tanh(),  # encoder → bottleneck
-    nn.Linear(2, n_features),             # decoder
-)
-# train to minimize MSE(ae(X), X); the bottleneck is the embedding`,
   hyperparams: [
     {
       id: 'lr',

@@ -10,12 +10,6 @@ export const gbmMeta: AlgorithmMeta = {
   category: 'supervised-classification',
   task: 'classification',
   pythonFilename: 'gbm.py',
-  sklearnSnippet: `from sklearn.ensemble import GradientBoostingClassifier
-
-model = GradientBoostingClassifier(
-    n_estimators=30, learning_rate=0.1, max_depth=1)
-model.fit(X, y)
-y_pred = model.predict(X_new)`,
   hyperparams: [
     {
       id: 'n_estimators',

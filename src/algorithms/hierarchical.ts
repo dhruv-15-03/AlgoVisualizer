@@ -10,10 +10,6 @@ export const hierarchicalMeta: AlgorithmMeta = {
   category: 'unsupervised-clustering',
   task: 'clustering',
   pythonFilename: 'hierarchical.py',
-  sklearnSnippet: `from sklearn.cluster import AgglomerativeClustering
-
-model = AgglomerativeClustering(n_clusters=3, linkage='single')
-labels = model.fit_predict(X)`,
   hyperparams: [
     {
       id: 'n_clusters',

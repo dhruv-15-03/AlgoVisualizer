@@ -10,11 +10,6 @@ export const mlpMeta: AlgorithmMeta = {
   category: 'supervised-classification',
   task: 'classification',
   pythonFilename: 'mlp.py',
-  sklearnSnippet: `from sklearn.neural_network import MLPClassifier
-
-model = MLPClassifier(hidden_layer_sizes=(8, 8), learning_rate_init=0.1, max_iter=80)
-model.fit(X, y)
-y_pred = model.predict(X_new)`,
   hyperparams: [
     {
       id: 'hidden',

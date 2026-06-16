@@ -10,11 +10,6 @@ export const naivebayesMeta: AlgorithmMeta = {
   category: 'supervised-classification',
   task: 'classification',
   pythonFilename: 'naivebayes.py',
-  sklearnSnippet: `from sklearn.naive_bayes import GaussianNB
-
-model = GaussianNB()
-model.fit(X, y)
-y_pred = model.predict(X_new)`,
   hyperparams: [
     {
       id: 'smoothing',

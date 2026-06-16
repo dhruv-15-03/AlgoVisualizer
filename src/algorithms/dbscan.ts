@@ -10,10 +10,6 @@ export const dbscanMeta: AlgorithmMeta = {
   category: 'unsupervised-clustering',
   task: 'clustering',
   pythonFilename: 'dbscan.py',
-  sklearnSnippet: `from sklearn.cluster import DBSCAN
-
-model = DBSCAN(eps=0.5, min_samples=5)
-labels = model.fit_predict(X)`,
   hyperparams: [
     {
       id: 'eps',

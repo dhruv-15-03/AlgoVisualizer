@@ -10,11 +10,6 @@ export const linregMeta: AlgorithmMeta = {
   category: 'supervised-regression',
   task: 'regression',
   pythonFilename: 'linreg.py',
-  sklearnSnippet: `from sklearn.linear_model import SGDRegressor
-
-model = SGDRegressor(learning_rate='constant', eta0=0.05, max_iter=80)
-model.fit(X, y)
-predictions = model.predict(X)`,
   hyperparams: [
     {
       id: 'lr',

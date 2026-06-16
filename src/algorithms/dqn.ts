@@ -10,19 +10,6 @@ export const dqnMeta: AlgorithmMeta = {
   category: 'reinforcement',
   task: 'reinforcement',
   pythonFilename: 'dqn.py',
-  sklearnSnippet: `# Production DQN: Gymnasium env + Stable-Baselines3.
-import gymnasium as gym
-from stable_baselines3 import DQN
-
-env = gym.make("CartPole-v1")
-model = DQN(
-    "MlpPolicy", env,
-    learning_rate=1e-3,
-    buffer_size=50_000,        # experience replay
-    target_update_interval=500, # target network sync
-    exploration_fraction=0.2,
-)
-model.learn(total_timesteps=100_000)`,
   hyperparams: [
     { id: 'episodes', label: 'Episodes', codeKey: 'episodes=', type: 'int', min: 30, max: 150, step: 10, default: 80 },
     { id: 'lr', label: 'Learning rate', codeKey: 'lr=', type: 'float', min: 0.02, max: 0.4, step: 0.01, default: 0.15 },

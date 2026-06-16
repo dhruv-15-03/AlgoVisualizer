@@ -80,8 +80,6 @@ export interface AlgorithmMeta {
    * pull it. See `src/algorithms/algorithm-sources.ts`.
    */
   pythonFilename: string;
-  /** Equivalent canonical sklearn call (read-only reference). */
-  sklearnSnippet: string;
   hyperparams: AlgorithmHyperparam[];
   /** Time complexity formula for the info card. */
   timeComplexity: string;

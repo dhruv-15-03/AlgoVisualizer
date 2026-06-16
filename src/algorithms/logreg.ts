@@ -10,11 +10,6 @@ export const logregMeta: AlgorithmMeta = {
   category: 'supervised-classification',
   task: 'classification',
   pythonFilename: 'logreg.py',
-  sklearnSnippet: `from sklearn.linear_model import LogisticRegression
-
-model = LogisticRegression(C=1e6, max_iter=100, solver='lbfgs')
-model.fit(X, y)
-probabilities = model.predict_proba(X)`,
   hyperparams: [
     {
       id: 'lr',

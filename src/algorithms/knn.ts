@@ -10,11 +10,6 @@ export const knnMeta: AlgorithmMeta = {
   category: 'supervised-classification',
   task: 'classification',
   pythonFilename: 'knn.py',
-  sklearnSnippet: `from sklearn.neighbors import KNeighborsClassifier
-
-model = KNeighborsClassifier(n_neighbors=5)
-model.fit(X, y)
-y_pred = model.predict(X_new)`,
   hyperparams: [
     {
       id: 'k',

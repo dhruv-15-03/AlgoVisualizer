@@ -10,11 +10,6 @@ export const pcaMeta: AlgorithmMeta = {
   category: 'unsupervised-dim-reduction',
   task: 'dim-reduction',
   pythonFilename: 'pca.py',
-  sklearnSnippet: `from sklearn.decomposition import PCA
-
-model = PCA(n_components=2)
-X_proj = model.fit_transform(X)
-print(model.explained_variance_ratio_)`,
   hyperparams: [
     {
       id: 'n_components',

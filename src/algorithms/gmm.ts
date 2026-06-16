@@ -10,10 +10,6 @@ export const gmmMeta: AlgorithmMeta = {
   category: 'unsupervised-clustering',
   task: 'clustering',
   pythonFilename: 'gmm.py',
-  sklearnSnippet: `from sklearn.mixture import GaussianMixture
-
-model = GaussianMixture(n_components=3, random_state=0)
-labels = model.fit_predict(X)`,
   hyperparams: [
     {
       id: 'k',
