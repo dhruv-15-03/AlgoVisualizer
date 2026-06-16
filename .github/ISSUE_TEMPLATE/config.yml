@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Live app
+    url: https://algo-visualizer-beige.vercel.app/
+    about: Try AlgoVisualizer in your browser — no install required.
+  - name: Contributing guide
+    url: https://github.com/dhruv-15-03/AlgoVisualizer/blob/main/CONTRIBUTING.md
+    about: How to add an algorithm, dataset, or visualization.
