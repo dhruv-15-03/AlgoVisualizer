@@ -20,10 +20,12 @@ and this project aims to follow [Semantic Versioning](https://semver.org/).
   has accepted analytics. Always logs locally; never throws.
 - **Security headers** in `vercel.json`: `X-Content-Type-Options`,
   `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`, and an **enforced
-  `Content-Security-Policy`** compatible with Pyodide, Monaco, fonts, and
-  Clarity. The policy was first shipped in report-only mode and validated
-  against the live app (zero violations across home, a full Pyodide/Monaco
-  workspace run, and Clarity) before being promoted to enforcing.
+  `Content-Security-Policy`**. The policy keeps `default-src 'self'` and locks
+  down `object-src`, `base-uri`, and `frame-ancestors`, while explicitly
+  allowing the exact origins the app uses: jsDelivr for the Monaco editor and
+  KaTeX assets (script, style, font, and `connect`), `data:` fonts for Monaco's
+  icon set, Google Fonts, and Microsoft Clarity. Validated against the live app
+  with CSP violation reporting until clean.
 - **Pyodide CDN resilience**: the runtime now loads with bounded retry + backoff
   (`src/lib/retry.ts`) and resets its load state on failure so a transient CDN
   hiccup no longer permanently wedges the workspace.
