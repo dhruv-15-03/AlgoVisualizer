@@ -13,6 +13,7 @@
 
 import * as Comlink from 'comlink';
 import { loadPyodide, type PyodideInterface } from 'pyodide';
+import { withRetry } from '@/lib/retry';
 
 // Pyodide is heavy; keep one instance for the worker's lifetime.
 let pyodide: PyodideInterface | null = null;
@@ -63,18 +64,42 @@ async function init(onProgress: (p: InitProgress) => void): Promise<void> {
   loadPromise = (async () => {
     try {
       onProgress({ stage: 'loading-runtime', message: 'Loading Python runtime…' });
-      pyodide = await loadPyodide({
-        indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/',
-        stdout: (msg) => console.log('[py]', msg),
-        stderr: (msg) => console.warn('[py-err]', msg),
-      });
+      // The runtime cold-loads ~10 MB from the jsDelivr CDN. Retry with backoff
+      // so a transient network blip doesn't permanently fail the workspace.
+      pyodide = await withRetry(
+        () =>
+          loadPyodide({
+            indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/',
+            stdout: (msg) => console.log('[py]', msg),
+            stderr: (msg) => console.warn('[py-err]', msg),
+          }),
+        {
+          retries: 2,
+          onRetry: (attempt) =>
+            onProgress({
+              stage: 'loading-runtime',
+              message: `Network hiccup — retrying Python runtime (attempt ${attempt + 1})…`,
+            }),
+        },
+      );
       onProgress({ stage: 'loading-numpy', message: 'Loading numpy…' });
-      await pyodide.loadPackage(['numpy']);
+      await withRetry(() => pyodide!.loadPackage(['numpy']), {
+        retries: 2,
+        onRetry: (attempt) =>
+          onProgress({
+            stage: 'loading-numpy',
+            message: `Network hiccup — retrying numpy (attempt ${attempt + 1})…`,
+          }),
+      });
       pyodide.runPython(RUNNER_PY);
       onProgress({ stage: 'ready', message: 'Ready' });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       onProgress({ stage: 'error', message });
+      // Reset load state so a later init() can retry from scratch instead of
+      // re-returning this rejected promise forever.
+      pyodide = null;
+      loadPromise = null;
       throw err;
     }
   })();

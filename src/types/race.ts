@@ -17,7 +17,7 @@ export interface RacerConfig {
   /** Slot id, stable across the page lifetime (e.g. "A" / "B"). */
   id: string;
   algorithmId: AlgorithmId;
-  /** The code that gets executed — defaults to algorithm.defaultCode, mutable later. */
+  /** The code that gets executed — seeded from the algorithm's Python source (getAlgorithmSource), mutable later. */
   code: string;
   hyperparams: Record<string, number | string | boolean>;
 }

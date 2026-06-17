@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { Icon } from '@/components/ui/Icon';
+import { reportError } from '@/lib/error-reporting';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -32,8 +33,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
-    // Surface for debugging; the UI already shows a recoverable message.
-    console.error('ErrorBoundary caught an error:', error, info.componentStack);
+    // The UI already shows a recoverable message; forward to consent-gated
+    // reporting (which also logs to the console for local debugging).
+    reportError(error, { source: 'react', componentStack: info.componentStack ?? undefined });
   }
 
   handleReset = (): void => {

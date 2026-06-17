@@ -1,0 +1,49 @@
+name: Bug report
+description: Something in AlgoVisualizer is broken or behaving unexpectedly.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to file a bug! Please fill in as much as you can.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, including what you expected instead.
+      placeholder: When I open the K-Means workspace and click Run, ...
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps so we can see it too.
+      placeholder: |
+        1. Go to /workspace/kmeans
+        2. Change the dataset to "..."
+        3. Click Run
+        4. See error
+    validations:
+      required: true
+  - type: input
+    id: algorithm
+    attributes:
+      label: Algorithm / page
+      description: Which algorithm or route (e.g. /workspace/svm, /race)?
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Chrome / Edge (Chromium)
+        - Firefox
+        - Safari
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: console
+    attributes:
+      label: Console output
+      description: Any errors from the browser devtools console.
+      render: shell

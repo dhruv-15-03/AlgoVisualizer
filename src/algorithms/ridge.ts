@@ -1,4 +1,3 @@
-import ridgeSource from '@/algorithms/python/ridge.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const ridgeMeta: AlgorithmMeta = {
@@ -11,11 +10,6 @@ export const ridgeMeta: AlgorithmMeta = {
   category: 'supervised-regression',
   task: 'regression',
   pythonFilename: 'ridge.py',
-  defaultCode: ridgeSource,
-  sklearnSnippet: `from sklearn.linear_model import Ridge
-
-model = Ridge(alpha=0.5)
-model.fit(X, y)`,
   hyperparams: [
     {
       id: 'alpha',

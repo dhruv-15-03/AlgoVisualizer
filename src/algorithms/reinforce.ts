@@ -1,4 +1,3 @@
-import reinforceSource from '@/algorithms/python/reinforce.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const reinforceMeta: AlgorithmMeta = {
@@ -11,19 +10,6 @@ export const reinforceMeta: AlgorithmMeta = {
   category: 'reinforcement',
   task: 'reinforcement',
   pythonFilename: 'reinforce.py',
-  defaultCode: reinforceSource,
-  sklearnSnippet: `# Policy gradient in PyTorch: sample, score the return, backprop log-prob.
-import torch
-import torch.nn as nn
-
-policy = nn.Sequential(nn.Linear(n_states, 64), nn.ReLU(), nn.Linear(64, n_actions))
-opt = torch.optim.Adam(policy.parameters(), lr=1e-2)
-
-for episode in episodes:
-    logps, rewards = run_episode(policy)          # sample a trajectory
-    returns = discounted_returns(rewards, gamma=0.99)
-    loss = -(torch.stack(logps) * (returns - returns.mean())).sum()
-    opt.zero_grad(); loss.backward(); opt.step()`,
   hyperparams: [
     { id: 'episodes', label: 'Episodes', codeKey: 'episodes=', type: 'int', min: 50, max: 300, step: 10, default: 150 },
     { id: 'lr', label: 'Learning rate', codeKey: 'lr=', type: 'float', min: 0.05, max: 1, step: 0.05, default: 0.4 },

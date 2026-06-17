@@ -33,9 +33,9 @@
 
   <!-- stat chips -->
   <g font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="24" font-weight="600" fill="#cbd5e1">
-    <text x="98" y="545">18 algorithms</text>
+    <text x="98" y="545">25 algorithms</text>
     <text x="320" y="545" fill="#334155">•</text>
-    <text x="346" y="545">11 visual families</text>
+    <text x="346" y="545">12 visual families</text>
     <text x="616" y="545" fill="#334155">•</text>
     <text x="642" y="545">Powered by Pyodide</text>
   </g>

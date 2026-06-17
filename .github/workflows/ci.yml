@@ -26,13 +26,14 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run build
+      - run: npm run size:check
       - run: npm run test
 
   e2e:
     name: E2E smoke (non-blocking)
     runs-on: ubuntu-latest
     needs: verify
-    # Pyodide cold-loads from a CDN and runs real Python for 18 algorithms, so
+    # Pyodide cold-loads from a CDN and runs real Python for 25 algorithms, so
     # this job can be slow/flaky. Keep it informational — never block a merge.
     continue-on-error: true
     steps:
@@ -51,4 +52,26 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
+          retention-days: 7
+
+  lighthouse:
+    name: Lighthouse CI (non-blocking)
+    runs-on: ubuntu-latest
+    needs: verify
+    # Performance/SEO/a11y scoring is informational signal, not a merge gate.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run lhci
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-report
+          path: .lighthouseci/
           retention-days: 7

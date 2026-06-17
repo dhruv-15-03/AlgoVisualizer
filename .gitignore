@@ -29,6 +29,7 @@ coverage
 test-results
 playwright-report
 playwright/.cache
+.lighthouseci
 
 # Python
 __pycache__/

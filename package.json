@@ -6,8 +6,11 @@
   "description": "Interactive ML algorithm visualizer — edit real Python, watch algorithms train step by step.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && node scripts/prerender.mjs",
     "preview": "vite preview",
+    "prerender": "node scripts/prerender.mjs",
+    "size:check": "node scripts/check-bundle-size.mjs",
+    "lhci": "lhci autorun",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -29,6 +32,8 @@
     "zustand": "^4.5.4"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@lhci/cli": "^0.14.0",
     "@playwright/test": "^1.45.3",
     "@testing-library/jest-dom": "^6.4.8",
     "@testing-library/react": "^14.3.1",
@@ -41,6 +46,7 @@
     "@typescript-eslint/parser": "^7.13.1",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
+    "esbuild": "^0.23.0",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",

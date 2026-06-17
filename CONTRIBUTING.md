@@ -77,7 +77,6 @@ yielding — the worker JSON-serializes each event.
 Create `src/algorithms/<id>.ts`:
 
 ```ts
-import source from '@/algorithms/python/<id>.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const <id>Meta: AlgorithmMeta = {
@@ -88,9 +87,10 @@ export const <id>Meta: AlgorithmMeta = {
   longDescription: '…',
   category: 'supervised-classification',
   task: 'classification',
+  // The Python source is loaded lazily from src/algorithms/python/<id>.py via
+  // getAlgorithmSource(pythonFilename) so it never ships in the Home/entry
+  // chunk. Just point at the filename — do NOT `?raw`-import it here.
   pythonFilename: '<id>.py',
-  defaultCode: source,
-  sklearnSnippet: '…',
   hyperparams: [/* sliders that patch codeKey into the source */],
   timeComplexity: 'O(…)',
   spaceComplexity: 'O(…)',
@@ -100,6 +100,12 @@ export const <id>Meta: AlgorithmMeta = {
   references: [/* optional reading links */],
 };
 ```
+
+The canonical sklearn snippet shown in the info panel lives separately in
+`src/algorithms/sklearn-snippets.ts` (keyed by id), not on the meta — it's only
+read by the lazy Workspace panel, so keeping it out of the metadata keeps it out
+of the eager Home/entry chunk. Add an entry there for your new id; the
+`Record<AlgorithmId, string>` type makes a missing snippet a compile error.
 
 Hyperparameter sliders work by string-patching the source: each one's `codeKey` (e.g.
 `k=`) must appear verbatim in your Python `run()` signature so the slider can rewrite it.

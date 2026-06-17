@@ -5,6 +5,7 @@ import { attachController } from '@/controllers/training-controller';
 import { ConsentBanner } from '@/components/ConsentBanner';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { maybeLoadClarity } from '@/lib/consent';
+import { installGlobalErrorReporting } from '@/lib/error-reporting';
 
 // Route-level code splitting. Home stays eager (it's the entry point);
 // WorkspacePage and RacePage are pulled lazily so the initial bundle
@@ -41,6 +42,9 @@ export default function App() {
   useEffect(() => {
     maybeLoadClarity();
   }, []);
+
+  // Route uncaught errors / promise rejections into consent-gated reporting.
+  useEffect(() => installGlobalErrorReporting(), []);
 
   return (
     <>

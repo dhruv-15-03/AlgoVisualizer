@@ -1,4 +1,3 @@
-import nbSource from '@/algorithms/python/naivebayes.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const naivebayesMeta: AlgorithmMeta = {
@@ -11,12 +10,6 @@ export const naivebayesMeta: AlgorithmMeta = {
   category: 'supervised-classification',
   task: 'classification',
   pythonFilename: 'naivebayes.py',
-  defaultCode: nbSource,
-  sklearnSnippet: `from sklearn.naive_bayes import GaussianNB
-
-model = GaussianNB()
-model.fit(X, y)
-y_pred = model.predict(X_new)`,
   hyperparams: [
     {
       id: 'smoothing',

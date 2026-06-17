@@ -1,4 +1,3 @@
-import actorcriticSource from '@/algorithms/python/actorcritic.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const actorcriticMeta: AlgorithmMeta = {
@@ -11,19 +10,6 @@ export const actorcriticMeta: AlgorithmMeta = {
   category: 'reinforcement',
   task: 'reinforcement',
   pythonFilename: 'actorcritic.py',
-  defaultCode: actorcriticSource,
-  sklearnSnippet: `# Modern actor-critic (A2C) via Stable-Baselines3.
-import gymnasium as gym
-from stable_baselines3 import A2C
-
-env = gym.make("CartPole-v1")
-model = A2C(
-    "MlpPolicy", env,
-    learning_rate=7e-4,
-    gamma=0.99,
-    n_steps=5,          # TD bootstrap horizon
-)
-model.learn(total_timesteps=100_000)`,
   hyperparams: [
     { id: 'episodes', label: 'Episodes', codeKey: 'episodes=', type: 'int', min: 30, max: 150, step: 10, default: 70 },
     { id: 'lr_actor', label: 'Actor LR', codeKey: 'lr_actor=', type: 'float', min: 0.01, max: 0.5, step: 0.01, default: 0.2 },

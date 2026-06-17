@@ -14,7 +14,6 @@
 import * as Comlink from 'comlink';
 import { ensureWorker } from '@/workers/pyodide.client';
 import { useSessionStore } from '@/stores/session-store';
-import { getDataset } from '@/datasets/registry';
 import type { TraceEvent } from '@/types/trace';
 import { debounce } from '@/lib/utils';
 
@@ -52,6 +51,10 @@ async function runOnce(): Promise<void> {
   const { algorithmId, datasetId, code, hyperparams } = state;
   if (!algorithmId || !datasetId || !code) return;
 
+  // Dynamic import keeps the dataset generators + Iris/Wine tables out of the
+  // eager controller chunk (this module is imported on app boot); they load
+  // lazily the first time a run actually needs the data.
+  const { getDataset } = await import('@/datasets/registry');
   const dataset = getDataset(datasetId);
   if (!dataset) {
     state.beginRun();

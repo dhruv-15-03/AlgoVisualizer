@@ -1,4 +1,3 @@
-import tsneSource from '@/algorithms/python/tsne.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const tsneMeta: AlgorithmMeta = {
@@ -11,11 +10,6 @@ export const tsneMeta: AlgorithmMeta = {
   category: 'unsupervised-dim-reduction',
   task: 'dim-reduction',
   pythonFilename: 'tsne.py',
-  defaultCode: tsneSource,
-  sklearnSnippet: `from sklearn.manifold import TSNE
-
-model = TSNE(n_components=2, perplexity=20, n_iter=300, random_state=0)
-X_emb = model.fit_transform(X)`,
   hyperparams: [
     {
       id: 'perplexity',

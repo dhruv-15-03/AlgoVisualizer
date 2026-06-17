@@ -1,4 +1,3 @@
-import rfSource from '@/algorithms/python/randomforest.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const randomforestMeta: AlgorithmMeta = {
@@ -11,12 +10,6 @@ export const randomforestMeta: AlgorithmMeta = {
   category: 'supervised-classification',
   task: 'classification',
   pythonFilename: 'randomforest.py',
-  defaultCode: rfSource,
-  sklearnSnippet: `from sklearn.ensemble import RandomForestClassifier
-
-model = RandomForestClassifier(n_estimators=10, max_depth=4, random_state=0)
-model.fit(X, y)
-y_pred = model.predict(X_new)`,
   hyperparams: [
     {
       id: 'n_trees',

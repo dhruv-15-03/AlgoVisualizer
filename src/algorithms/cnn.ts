@@ -1,4 +1,3 @@
-import cnnSource from '@/algorithms/python/cnn.py?raw';
 import type { AlgorithmMeta } from '@/types/algorithm';
 
 export const cnnMeta: AlgorithmMeta = {
@@ -11,24 +10,6 @@ export const cnnMeta: AlgorithmMeta = {
   category: 'supervised-classification',
   task: 'classification',
   pythonFilename: 'cnn.py',
-  defaultCode: cnnSource,
-  sklearnSnippet: `# Real CNNs use PyTorch / TensorFlow:
-import torch
-import torch.nn as nn
-
-class TinyCNN(nn.Module):
-    def __init__(self, n_filters=4, n_classes=3):
-        super().__init__()
-        self.conv = nn.Conv2d(1, n_filters, kernel_size=3)
-        self.pool = nn.MaxPool2d(2)
-        self.fc = nn.Linear(n_filters * 5 * 5, n_classes)
-    def forward(self, x):
-        x = torch.relu(self.conv(x))
-        x = self.pool(x)
-        return self.fc(x.flatten(1))
-
-model = TinyCNN()
-opt = torch.optim.SGD(model.parameters(), lr=0.1)`,
   hyperparams: [
     {
       id: 'n_filters',

@@ -3,6 +3,7 @@ import { Slider } from '@/components/ui/Slider';
 import { Icon } from '@/components/ui/Icon';
 import { useSessionStore, useCurrentEvent } from '@/stores/session-store';
 import { getAlgorithm } from '@/algorithms/registry';
+import { getSklearnSnippet } from '@/algorithms/sklearn-snippets';
 import { getDataset, listDatasets } from '@/datasets/registry';
 import { patchCode } from '@/lib/code-binding';
 import { formatNumber } from '@/lib/utils';
@@ -289,7 +290,7 @@ function AlgorithmInfo() {
         <ReferencesList references={refs} />
       ) : (
         <pre className="overflow-x-auto rounded-md bg-ink-900 p-3 font-mono text-[11px] leading-relaxed text-ink-200">
-          {algorithm.sklearnSnippet}
+          {getSklearnSnippet(algorithm.id)}
         </pre>
       )}
     </Panel>

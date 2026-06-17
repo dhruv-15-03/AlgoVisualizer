@@ -37,21 +37,31 @@ leaves the page.
 
 ## Features
 
-- **18 algorithms across 4 categories** — supervised classification, supervised
-  regression, unsupervised clustering, and dimensionality reduction. Each ships with
-  editable Python, a canonical scikit-learn reference, complexity notes, pros/cons, and
-  curated reading links.
+- **25 algorithms across 5 categories** — supervised classification, supervised
+  regression, unsupervised clustering, dimensionality reduction, and reinforcement
+  learning. Each ships with editable Python, a canonical scikit-learn reference,
+  complexity notes, pros/cons, and curated reading links.
 - **Editable, runnable code** — a Monaco editor holds the real Python. Edit it and the
   visualization re-runs automatically (debounced).
 - **Hyperparameter sliders** — drag a slider and it patches the exact value in the source,
   then re-runs. A "sweep" mode runs the algorithm across a range of values.
 - **Step-by-step playback** — scrub, play, pause, and change speed. Every step carries an
   explanation and a LaTeX math expression.
-- **12 datasets** — real (Iris, Wine) and synthetic (blobs, moons, circles, spirals,
-  Gaussian mixtures, linear/polynomial trends, and small image shapes for the CNN).
+- **20 built-in datasets + your own** — real (Iris, Wine), synthetic 2-D sets (blobs,
+  moons, circles, spirals, Gaussian mixtures), regression trends (linear, polynomial,
+  sine, Friedman), small image shapes for the CNN, and gridworld environments for RL. Or
+  **bring your own**: upload a CSV or draw points by hand.
 - **Algorithm Race** — run several algorithms side by side on the same dataset.
-- **Quiz mode** — hides the "what's happening" panel so you can predict the next step.
-- **Responsive** — adapts from a three-column desktop workspace to a tabbed mobile layout.
+- **Active-learning modes** — _Quiz mode_ blurs the "what's happening" panel until you
+  reveal it; _predict-then-reveal_ lets you guess an outcome before each run and tracks a
+  streak; per-algorithm _challenges_ set goals like "reach ≥90% accuracy in ≤8 iterations".
+- **Share & export** — copy a link that encodes your algorithm, edited code, hyperparameters
+  and dataset, or export the current visualization as a PNG.
+- **Friendly errors** — Python exceptions are translated into plain-English explanations.
+- **Installable PWA** — works offline after the first load (the Pyodide runtime is cached)
+  and prompts before applying an update instead of silently reloading.
+- **Accessible & responsive** — full keyboard transport, reduced-motion support, and a
+  layout that adapts from a three-column desktop workspace to a tabbed mobile view.
 - **Zero backend** — static hosting only; all computation is client-side.
 
 ## How it works
@@ -91,10 +101,11 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full design.
 | Worker bridge      | Comlink                                                       |
 | State              | Zustand (with `subscribeWithSelector`)                        |
 | Code editor        | Monaco (`@monaco-editor/react`)                               |
-| Visualization      | D3 + hand-rolled SVG; Recharts for loss curves                |
+| Visualization      | D3 scales + hand-rolled SVG (one charting engine — no Recharts)|
 | Math typesetting   | KaTeX (`react-katex`)                                         |
 | Styling            | Tailwind CSS; Google Material Symbols (subsetted)             |
 | Routing            | React Router                                                  |
+| Offline / PWA      | `vite-plugin-pwa` + Workbox (prompt-to-update)                |
 
 ## Getting started
 
@@ -123,6 +134,9 @@ the Pyodide runtime (~10 MB) once; subsequent runs are instant.
 | `npm run preview`   | Serve the production build locally.                     |
 | `npm run lint`      | ESLint over `ts`/`tsx` (zero warnings allowed).         |
 | `npm run typecheck` | Type-check only, no emit.                               |
+| `npm run test`      | Run the Vitest unit suite once.                         |
+| `npm run test:watch`| Run Vitest in watch mode.                               |
+| `npm run test:e2e`  | Run the Playwright end-to-end suite.                    |
 
 ## Project structure
 
@@ -131,7 +145,9 @@ src/
 ├─ algorithms/        # Per-algorithm metadata (*.ts) + Python source (python/*.py)
 │  └─ registry.ts     # Single source of truth for the algorithm picker
 ├─ controllers/       # Glue between the store and the Pyodide worker
-├─ datasets/          # Built-in + synthetic datasets and their registry
+├─ datasets/          # Built-in, synthetic, and gridworld datasets + their registry
+├─ hooks/             # Reusable React hooks (keyboard transport, theming, a11y)
+├─ lib/               # Framework-agnostic helpers (challenges, predictions, sharing, …)
 ├─ pages/             # Route entry points (Home, Workspace, Race)
 ├─ stores/            # Zustand stores (session, race)
 ├─ types/             # Shared types — trace events are the core contract
@@ -139,6 +155,7 @@ src/
 ├─ workers/           # Pyodide Web Worker + its Comlink client
 └─ components/        # UI primitives (ui/) and workspace panels (workspace/)
 docs/                 # Architecture notes and the original wireframe
+e2e/                  # Playwright end-to-end tests
 ```
 
 ## The trace-event contract
@@ -189,8 +206,8 @@ The initial Home payload is kept small (~115 KB gzipped) through:
 
 - **Route-level code splitting** — `WorkspacePage` and `RacePage` (which pull in Monaco,
   KaTeX, D3, and the worker) are lazy-loaded; Home ships only the entry + React + router.
-- **Vendor chunk splitting** — Monaco, charts (D3/Recharts), math (KaTeX), router, and
-  React are split so a code change doesn't bust their long-lived caches.
+- **Vendor chunk splitting** — Monaco, charts (D3), math (KaTeX), router, and React are
+  split so a code change doesn't bust their long-lived caches.
 - **Font subsetting** — Material Symbols is requested with an explicit `icon_names=` subset
   (~8.5 KB instead of ~600 KB) while keeping all four variable-font axes.
 - **Idle prewarming** — while you read the Home page, the Workspace bundle and the Pyodide
@@ -199,9 +216,11 @@ The initial Home payload is kept small (~115 KB gzipped) through:
 ## Analytics
 
 [Microsoft Clarity](https://clarity.microsoft.com) (anonymous session replay + heatmaps) is
-loaded asynchronously from `index.html`. It never blocks the initial paint and masks form
-input by default. The project id lives inline in `index.html`; remove that `<script>` block
-to disable it.
+**consent-gated**. Nothing is requested from Clarity until the visitor clicks "Accept" on
+the consent banner (`src/components/ConsentBanner.tsx`); a stored "declined" choice loads
+nothing on future visits. The loader and project id live in
+[`src/lib/consent.ts`](src/lib/consent.ts) — clear `CLARITY_PROJECT_ID` (or remove the
+`maybeLoadClarity` call in `src/App.tsx`) to disable it entirely.
 
 ## Documentation
 

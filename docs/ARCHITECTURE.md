@@ -107,13 +107,14 @@ pure function of those props:
 - Layout sizing uses a `ResizeObserver` so visualizations are responsive without fixed
   dimensions.
 
-Loss curves use Recharts; everything else is hand-rolled SVG driven by D3 scales for full
-control over the step-by-step animation.
+All charts — including the loss/convergence curves — are hand-rolled SVG driven by D3
+scales for full control over the step-by-step animation. The app ships a single charting
+engine; there is no Recharts (or other charting library) dependency.
 
 ## Build & delivery
 
 - **Vite** bundles the app. `vite.config.ts` defines `manualChunks` that split Monaco,
-  charts (D3/Recharts), math (KaTeX), router, and React into separate vendor chunks for
+  charts (D3), math (KaTeX), router, and React into separate vendor chunks for
   cache stability.
 - **Code splitting** keeps the Home payload minimal; the workspace/race bundles and the
   Pyodide runtime are prefetched during browser idle time from the Home page.
