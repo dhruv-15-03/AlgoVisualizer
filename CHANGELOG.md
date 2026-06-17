@@ -19,9 +19,11 @@ and this project aims to follow [Semantic Versioning](https://semver.org/).
   are forwarded to Microsoft Clarity as a custom event — but only when the user
   has accepted analytics. Always logs locally; never throws.
 - **Security headers** in `vercel.json`: `X-Content-Type-Options`,
-  `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`, and a
-  `Content-Security-Policy-Report-Only` policy compatible with Pyodide, Monaco,
-  fonts, and Clarity.
+  `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`, and an **enforced
+  `Content-Security-Policy`** compatible with Pyodide, Monaco, fonts, and
+  Clarity. The policy was first shipped in report-only mode and validated
+  against the live app (zero violations across home, a full Pyodide/Monaco
+  workspace run, and Clarity) before being promoted to enforcing.
 - **Pyodide CDN resilience**: the runtime now loads with bounded retry + backoff
   (`src/lib/retry.ts`) and resets its load state on failure so a transient CDN
   hiccup no longer permanently wedges the workspace.
