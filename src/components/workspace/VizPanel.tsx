@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { BlockMath } from 'react-katex';
+import 'katex/dist/katex.min.css';
 import { Panel } from '@/components/ui/Panel';
 import { Icon } from '@/components/ui/Icon';
 import { VizRouter } from '@/visualizations/VizRouter';
