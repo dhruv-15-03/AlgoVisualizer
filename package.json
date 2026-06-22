@@ -29,7 +29,7 @@
     "react-katex": "^3.0.1",
     "react-router-dom": "^6.24.0",
     "tailwind-merge": "^3.6.0",
-    "zustand": "^4.5.4"
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",
