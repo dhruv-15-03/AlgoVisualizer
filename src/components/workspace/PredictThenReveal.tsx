@@ -257,7 +257,7 @@ export function PredictThenReveal() {
         type="button"
         onClick={runAndReveal}
         disabled={choice === null}
-        className="inline-flex w-fit items-center gap-1.5 rounded-md bg-accent-500 px-3 py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-accent-400 disabled:cursor-not-allowed disabled:opacity-40"
+        className="inline-flex w-fit items-center gap-1.5 rounded-md bg-accent-600 px-3 py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-accent-500 disabled:cursor-not-allowed disabled:opacity-40"
       >
         <Icon name="play_arrow" size={14} fill />
         Run &amp; reveal

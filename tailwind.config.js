@@ -14,7 +14,7 @@ export default {
           100: '#eceff3',
           200: '#d4dae3',
           300: '#a8b3c4',
-          400: '#7280a0',
+          400: '#808da9', // muted text; clears WCAG AA (>=4.5:1) on ink-800 cards
           500: '#4a587a',
           600: '#34405e',
           700: '#222b44',

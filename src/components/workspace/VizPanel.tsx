@@ -127,7 +127,7 @@ function EmptyState({ message, showRun }: { message: string; showRun?: boolean }
         {showRun && (
           <button
             onClick={() => runNow()}
-            className="inline-flex items-center gap-1.5 rounded-md bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-400"
+            className="inline-flex items-center gap-1.5 rounded-md bg-accent-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-500"
           >
             <Icon name="play_arrow" size={14} fill />
             Run now
@@ -189,7 +189,7 @@ export function VizPanel() {
           <ExplainErrorPanel traceback={runError || 'Unknown error'} />
           <button
             onClick={() => runNow()}
-            className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-400"
+            className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-accent-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-500"
           >
             <Icon name="refresh" size={14} />
             Try again
