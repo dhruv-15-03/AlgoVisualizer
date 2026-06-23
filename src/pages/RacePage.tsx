@@ -169,7 +169,7 @@ export function RacePage() {
         </Link>
         <div className="min-w-0">
           <div className="truncate text-sm font-semibold text-ink-50">Race Mode</div>
-          <div className="hidden text-[10px] uppercase tracking-wider text-ink-500 sm:block">Watch algorithms learn side-by-side</div>
+          <div className="hidden text-[10px] uppercase tracking-wider text-ink-400 sm:block">Watch algorithms learn side-by-side</div>
         </div>
 
         {/* Selectors wrap onto a second row when narrow. */}
@@ -267,7 +267,7 @@ export function RacePage() {
                   {dataset && meta && r.events.length > 0 ? (
                     <VizRouter family={meta.family} dataset={dataset} events={r.events} currentStep={stepIdx} />
                   ) : (
-                    <div className="grid h-full place-items-center text-xs text-ink-500">
+                    <div className="grid h-full place-items-center text-xs text-ink-400">
                       {r.status === 'running' ? 'Training…' : r.status === 'error' ? `Error: ${r.errorMessage}` : 'Press "Train & race" to start.'}
                     </div>
                   )}
@@ -397,7 +397,7 @@ function RaceComparison({ racers, progress }: RaceComparisonProps) {
   }, [racers, progress]);
 
   if (series.length === 0) {
-    return <div className="grid h-32 place-items-center text-xs text-ink-500">Run the race to see the comparison.</div>;
+    return <div className="grid h-32 place-items-center text-xs text-ink-400">Run the race to see the comparison.</div>;
   }
 
   // Each series may use a different metric — that would make the chart misleading.

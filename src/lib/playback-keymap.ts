@@ -75,6 +75,31 @@ export function resolvePlaybackAction(ctx: PlaybackKeyContext): PlaybackAction |
 }
 
 /**
+ * Human-facing catalog of the keyboard transport shortcuts, used to render the
+ * in-app shortcuts help (see {@link KeyboardHelp}). `eventKey` is the
+ * `KeyboardEvent.key` the shortcut is triggered by; a drift-guard test asserts
+ * each one still resolves to an action via {@link resolvePlaybackAction}, so the
+ * visible help can never silently fall out of sync with real transport behaviour.
+ */
+export interface PlaybackShortcut {
+  /** Key-cap label(s) to display, e.g. `['Space']` or `['←']`. */
+  keys: string[];
+  /** What the shortcut does. */
+  description: string;
+  /** Representative `KeyboardEvent.key` value used by the drift guard. */
+  eventKey: string;
+}
+
+export const PLAYBACK_SHORTCUTS: readonly PlaybackShortcut[] = [
+  { keys: ['Space'], description: 'Play / pause', eventKey: ' ' },
+  { keys: ['←'], description: 'Step back one frame', eventKey: 'ArrowLeft' },
+  { keys: ['→'], description: 'Step forward one frame', eventKey: 'ArrowRight' },
+  { keys: ['Home'], description: 'Jump to first frame', eventKey: 'Home' },
+  { keys: ['End'], description: 'Jump to last frame', eventKey: 'End' },
+  { keys: ['R'], description: 'Reset / replay', eventKey: 'r' },
+];
+
+/**
  * Whether the given event target is an editable element where playback
  * shortcuts must defer to text entry. Covers native form controls,
  * contenteditable regions, and the Monaco editor's input surface.

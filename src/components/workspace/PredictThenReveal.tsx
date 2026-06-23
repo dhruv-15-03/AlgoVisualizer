@@ -227,7 +227,7 @@ export function PredictThenReveal() {
             reset();
           }}
           aria-label="Dismiss prediction"
-          className="ml-auto shrink-0 rounded p-0.5 text-ink-500 transition-colors hover:text-ink-200"
+          className="ml-auto shrink-0 rounded p-0.5 text-ink-400 transition-colors hover:text-ink-200"
         >
           <Icon name="close" size={14} />
         </button>
