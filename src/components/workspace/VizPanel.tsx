@@ -82,7 +82,7 @@ function LoadingState({ stage, message }: { stage: PyodideStage; message: string
                       ? 'text-accent-300'
                       : active
                         ? 'text-ink-200'
-                        : 'text-ink-500')
+                        : 'text-ink-400')
                   }
                 >
                   <Icon
@@ -110,7 +110,7 @@ function LoadingState({ stage, message }: { stage: PyodideStage; message: string
           </p>
         </div>
 
-        <div className="text-[11px] text-ink-500">
+        <div className="text-[11px] text-ink-400">
           First load downloads the ~10MB Python runtime; it&apos;s cached so repeat
           visits are near-instant.
         </div>
@@ -267,7 +267,7 @@ export function VizPanel() {
               className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-ink-700 accent-accent-400"
               aria-label="Timeline scrubber"
             />
-            <div className="mt-1 flex justify-between text-[9px] font-mono text-ink-500">
+            <div className="mt-1 flex justify-between text-[9px] font-mono text-ink-400">
               <span>step 1</span>
               <span>{event?.type ?? ''}</span>
               <span>step {events.length}</span>

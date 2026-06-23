@@ -30,11 +30,11 @@ const KIND_LABEL: Record<ReferenceKind, string> = {
 
 function ReferencesList({ references }: { references: AlgorithmReference[] }) {
   if (references.length === 0) {
-    return <div className="text-xs text-ink-500">No external references yet.</div>;
+    return <div className="text-xs text-ink-400">No external references yet.</div>;
   }
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="text-[10px] uppercase tracking-wide text-ink-500">
+      <div className="text-[10px] uppercase tracking-wide text-ink-400">
         Curated reading & video material. Opens in a new tab.
       </div>
       {references.map((r) => (
@@ -47,14 +47,14 @@ function ReferencesList({ references }: { references: AlgorithmReference[] }) {
         >
           <Icon name={KIND_ICON[r.kind]} size={18} className="mt-0.5 text-ink-400 group-hover:text-accent-300" />
           <div className="min-w-0 flex-1">
-            <div className="text-[10px] uppercase tracking-wide text-ink-500">{KIND_LABEL[r.kind]}</div>
+            <div className="text-[10px] uppercase tracking-wide text-ink-400">{KIND_LABEL[r.kind]}</div>
             <div className="truncate text-xs text-ink-200 group-hover:text-accent-200">{r.label}</div>
-            <div className="truncate font-mono text-[10px] text-ink-500">{r.url.replace(/^https?:\/\//, '')}</div>
+            <div className="truncate font-mono text-[10px] text-ink-400">{r.url.replace(/^https?:\/\//, '')}</div>
           </div>
           <Icon
             name="open_in_new"
             size={14}
-            className="mt-0.5 text-ink-500 group-hover:text-accent-300"
+            className="mt-0.5 text-ink-400 group-hover:text-accent-300"
           />
         </a>
       ))}
@@ -94,7 +94,7 @@ function Hyperparams() {
                 <div className="mb-1 flex items-center justify-between">
                   <div>
                     <div className="text-xs font-semibold text-ink-200">{p.label}</div>
-                    <div className="font-mono text-[10px] text-ink-500">{p.codeKey}&quot;{value}&quot;</div>
+                    <div className="font-mono text-[10px] text-ink-400">{p.codeKey}&quot;{value}&quot;</div>
                   </div>
                 </div>
                 <div className="flex gap-1">
@@ -116,7 +116,7 @@ function Hyperparams() {
                     </button>
                   ))}
                 </div>
-                {p.description && <div className="mt-1 text-[11px] leading-snug text-ink-500">{p.description}</div>}
+                {p.description && <div className="mt-1 text-[11px] leading-snug text-ink-400">{p.description}</div>}
               </div>
             );
           }
@@ -128,7 +128,7 @@ function Hyperparams() {
               <div className="mb-1 flex items-center justify-between">
                 <div>
                   <div className="text-xs font-semibold text-ink-200">{p.label}</div>
-                  <div className="font-mono text-[10px] text-ink-500">{p.codeKey}{fmt}</div>
+                  <div className="font-mono text-[10px] text-ink-400">{p.codeKey}{fmt}</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-sm text-accent-300">{fmt}</span>
@@ -154,7 +154,7 @@ function Hyperparams() {
                   setCode(patchCode(code, p.codeKey, p.type === 'int' ? Math.round(v) : v));
                 }}
               />
-              {p.description && <div className="mt-1 text-[11px] leading-snug text-ink-500">{p.description}</div>}
+              {p.description && <div className="mt-1 text-[11px] leading-snug text-ink-400">{p.description}</div>}
             </div>
           );
         })}
@@ -171,7 +171,7 @@ function Metrics() {
   if (!algorithmId || events.length === 0) {
     return (
       <Panel title="Metrics" className="shrink-0">
-        <div className="text-xs text-ink-500">Run the algorithm to see metrics.</div>
+        <div className="text-xs text-ink-400">Run the algorithm to see metrics.</div>
       </Panel>
     );
   }
@@ -323,7 +323,7 @@ function DatasetInfo() {
           </div>
         </div>
       </div>
-      <div className="mt-2 text-[10px] text-ink-500">{info.source}</div>
+      <div className="mt-2 text-[10px] text-ink-400">{info.source}</div>
     </Panel>
   );
 }
