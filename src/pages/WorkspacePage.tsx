@@ -120,7 +120,7 @@ export function WorkspacePage() {
     <div className="flex h-full min-h-0 flex-col bg-ink-900" style={familyTheme.style}>
       <a
         href="#main-content"
-        className="sr-only z-50 rounded-md bg-accent-500 px-3 py-2 text-sm font-medium text-white focus:not-sr-only focus:absolute focus:left-3 focus:top-3"
+        className="sr-only z-50 rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white focus:not-sr-only focus:absolute focus:left-3 focus:top-3"
       >
         Skip to content
       </a>
