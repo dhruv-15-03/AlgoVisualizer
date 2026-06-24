@@ -9,6 +9,16 @@ and this project aims to follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Per-algorithm social cards (Open Graph images).** The build now generates a
+  distinct 1200×630 share card for every algorithm into `dist/og/<id>.png`
+  (`scripts/generate-og-images.mjs`), so a shared `/workspace/<id>` link unfurls
+  with its own branded card (name, category, one-line description) instead of one
+  generic image. Cards are rendered deterministically with satori → resvg using
+  Inter embedded from the pinned `@fontsource/inter` devDep (no headless
+  browser), driven by the live registry so new algorithms get a card
+  automatically. `scripts/prerender.mjs` points each page's `og:image` /
+  `twitter:image` / `og:image:alt` at the matching card, and `vercel.json` serves
+  `/og/*` as static files.
 - **Per-algorithm SEO pages.** The production build now pre-renders a static,
   crawlable HTML page for each of the 25 algorithm workspaces
   (`/workspace/<id>`) with its own `<title>`, meta description, canonical URL,
