@@ -85,7 +85,7 @@ function ShortcutsDialog({ onClose }: { onClose: () => void }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="shortcuts-title"
-        className="flex max-h-[90vh] w-full max-w-sm flex-col overflow-hidden rounded-xl border border-ink-700 bg-ink-800 shadow-2xl focus:outline-none"
+        className="flex max-h-[90vh] w-full max-w-sm flex-col overflow-hidden rounded-xl border border-ink-700 bg-ink-800 shadow-e28 focus:outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-ink-700 px-4 py-3">

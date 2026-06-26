@@ -111,7 +111,7 @@ export function Home() {
                 return (
                   <div
                     key={a.id}
-                    className="group relative rounded-xl border border-ink-700 bg-ink-800 p-4 transition-colors hover:border-accent-500/50 hover:bg-ink-800/80"
+                    className="group relative rounded-xl border border-ink-700 bg-ink-800 p-4 shadow-e2 transition-all duration-150 ease-standard hover:-translate-y-0.5 hover:border-accent-500/50 hover:bg-ink-750 hover:shadow-e8"
                   >
                     <Link
                       to={`/workspace/${a.id}`}
