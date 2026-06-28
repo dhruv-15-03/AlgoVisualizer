@@ -38,7 +38,7 @@ export function ConsentBanner() {
       aria-describedby="consent-desc"
       className="fixed inset-x-0 bottom-0 z-50 flex justify-center p-3 sm:p-4"
     >
-      <div className="w-full max-w-2xl rounded-xl border border-ink-700 bg-ink-800/95 p-4 shadow-2xl backdrop-blur supports-[backdrop-filter]:bg-ink-800/80">
+      <div className="w-full max-w-2xl rounded-xl border border-ink-700 bg-ink-800/95 p-4 shadow-e16 backdrop-blur supports-[backdrop-filter]:bg-ink-800/80">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             <span className="mt-0.5 text-accent-300">

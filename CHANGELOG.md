@@ -9,6 +9,16 @@ and this project aims to follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Fluent 2 elevation & depth design tokens.** Added a dark-tuned elevation
+  scale to the Tailwind theme (`shadow-e2`/`e4`/`e8`/`e16`/`e28` two-layer
+  ambient+key shadows, plus a recessed `shadow-well` inset), a raised surface
+  shade (`ink-750`), a `250ms` duration step, and Fluent motion easing curves
+  (`ease-standard`/`decel`/`accel`). Applied them as a design language over the
+  existing system: panels and Home algorithm cards now rest on subtle
+  elevation (cards lift on hover), metric tiles sit in recessed wells, and
+  dialogs, banners, and flyout chips use consistent overlay shadows in place of
+  ad-hoc Tailwind defaults. Pure CSS — no bundle or runtime cost, all
+  accessibility and family-theming preserved.
 - **Per-algorithm social cards (Open Graph images).** The build now generates a
   distinct 1200×630 share card for every algorithm into `dist/og/<id>.png`
   (`scripts/generate-og-images.mjs`), so a shared `/workspace/<id>` link unfurls

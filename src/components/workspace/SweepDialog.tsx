@@ -126,7 +126,7 @@ export function SweepDialog({ hyperparamId, onClose }: SweepDialogProps) {
     <ModalPortal>
     <div className="fixed inset-0 z-50 flex items-stretch justify-center bg-black/60 backdrop-blur-sm sm:items-center sm:p-4">
       <div
-        className="flex h-full max-h-[100dvh] w-full flex-col overflow-hidden border border-ink-600 bg-ink-900 shadow-2xl sm:max-h-[90vh] sm:max-w-3xl sm:rounded-xl"
+        className="flex h-full max-h-[100dvh] w-full flex-col overflow-hidden border border-ink-600 bg-ink-900 shadow-e28 sm:max-h-[90vh] sm:max-w-3xl sm:rounded-xl"
         role="dialog"
         aria-modal="true"
         aria-labelledby="sweep-dialog-title"
