@@ -2,6 +2,30 @@
 
 > Edit real Python machine-learning code in your browser and watch the algorithm train, step by step, on real datasets.
 
+<p align="center">
+  <a href="https://algo-visualizer-beige.vercel.app">
+    <img src="docs/hero.png" alt="The AlgoVisualizer workspace: editable Python on the left, a live K-Means clustering visualization in the center showing three converged colour-coded clusters with numbered centroids, and hyperparameter sliders on the right." width="100%" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://algo-visualizer-beige.vercel.app"><b>▶&nbsp; Live demo</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://algo-visualizer-beige.vercel.app/race">Algorithm Race</a>
+  &nbsp;·&nbsp;
+  <a href="#getting-started">Run it locally</a>
+</p>
+
+<details>
+  <summary><b>More screenshots</b></summary>
+  <br />
+  <p align="center">
+    <img src="docs/home.png" alt="The AlgoVisualizer home page: a grid of 25 algorithm cards across 5 categories, each with a short description and its default hyperparameters." width="100%" />
+    <br />
+    <em>Browse 25 algorithms across 5 categories from the home page.</em>
+  </p>
+</details>
+
 AlgoVisualizer is an interactive, fully client-side playground for understanding how
 classic ML algorithms actually work. Pick an algorithm, tweak a hyperparameter (or rewrite
 the Python directly), and watch each iteration unfold — centroids moving, decision

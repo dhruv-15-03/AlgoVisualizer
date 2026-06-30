@@ -56,6 +56,11 @@ and this project aims to follow [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **README hero & screenshots.** The README now leads with a labelled screenshot
+  of the live workspace (editable Python next to a converged K-Means
+  visualization) plus a collapsible home-page gallery shot, both linking to the
+  live demo, so the repo shows what the app does at a glance (`docs/hero.png`,
+  `docs/home.png`).
 - **Bundle optimization.** Heavy, route-specific payloads — the 25 Python
   algorithm sources, the built-in dataset generators, and the 25 sklearn-
   equivalent snippets — were moved out of the eager entry chunk into lazily
