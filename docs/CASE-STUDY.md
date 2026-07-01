@@ -45,14 +45,14 @@ flowchart LR
         Py["Pyodide<br/>CPython + NumPy (WASM)"]
         Gen["User code → generator<br/>yields TraceEvents"]
     end
-    UI -->|edit code / hyperparams| Store
+    UI -->|"edit code / hyperparams"| Store
     Store --> Ctrl
-    Ctrl -->|run(code, X, y, hp, onEvent)| Cl
+    Ctrl -->|"run(code, X, y, hp, onEvent)"| Cl
     Cl --> Py --> Gen
-    Gen -->|yield dict| Cl
-    Cl -->|onEvent (proxied callback)| Ctrl
-    Ctrl -->|appendEvent(e, token)| Store
-    Store -->|currentStep| UI
+    Gen -->|"yield dict"| Cl
+    Cl -->|"onEvent (proxied callback)"| Ctrl
+    Ctrl -->|"appendEvent(e, token)"| Store
+    Store -->|"currentStep"| UI
 ```
 
 The contract between the two halves is a **single TypeScript type**. Everything else is an implementation detail on one side or the other.
