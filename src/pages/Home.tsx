@@ -58,8 +58,14 @@ export function Home() {
           surface, a decision tree split its data. No backend, no setup — just press play.
         </p>
         <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
-          <Link to={`/workspace/${firstAlgorithm.id}`}>
+          <Link to="/learn">
             <Button variant="primary" size="lg">
+              <Icon name="menu_book" size={18} />
+              Start learning
+            </Button>
+          </Link>
+          <Link to={`/workspace/${firstAlgorithm.id}`}>
+            <Button variant="secondary" size="lg">
               Open the workspace
               <Icon name="arrow_forward" size={18} />
             </Button>

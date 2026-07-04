@@ -6,6 +6,7 @@ import { VizPanel } from '@/components/workspace/VizPanel';
 import { RightPanel } from '@/components/workspace/RightPanel';
 import { WorkspaceTabBar } from '@/components/workspace/WorkspaceTabBar';
 import { LiveAnnouncer } from '@/components/workspace/LiveAnnouncer';
+import { LessonProgressBridge } from '@/components/workspace/LessonProgressBridge';
 import type { WorkspacePane } from '@/components/workspace/workspace-pane';
 import { useIsXlUp } from '@/lib/use-media-query';
 import { usePlaybackKeyboard } from '@/hooks/usePlaybackKeyboard';
@@ -130,6 +131,7 @@ export function WorkspacePage() {
         <WorkspaceBody />
       </main>
       <LiveAnnouncer />
+      <LessonProgressBridge />
     </div>
   );
 }
