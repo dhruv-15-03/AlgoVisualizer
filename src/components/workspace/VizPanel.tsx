@@ -15,7 +15,7 @@ import { useSessionStore, useCurrentEvent } from '@/stores/session-store';
 import { getAlgorithm } from '@/algorithms/registry';
 import { getDataset } from '@/datasets/registry';
 import { familyOf } from '@/types/trace';
-import { runNow } from '@/controllers/training-controller';
+import { runNow, retryPyodide } from '@/controllers/training-controller';
 import { pyodideLoadProgress, type PyodideStage } from '@/lib/pyodide-progress';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { factAt, factCount } from '@/lib/ml-facts';
@@ -175,6 +175,13 @@ export function VizPanel() {
           <pre className="mt-2 max-h-40 overflow-auto rounded-md bg-rose-500/10 p-3 text-left text-[11px] text-rose-200">
             {pyodideProgress}
           </pre>
+          <button
+            onClick={() => retryPyodide()}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-rose-400/40 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-100 transition-colors hover:bg-rose-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+          >
+            <Icon name="refresh" size={14} />
+            Retry
+          </button>
         </div>
       </div>
     );
