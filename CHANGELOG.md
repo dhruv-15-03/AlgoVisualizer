@@ -67,3 +67,19 @@ and this project aims to follow [Semantic Versioning](https://semver.org/).
   loaded modules. The entry chunk shrank from ~63.9 kB to ~31.9 kB gzipped
   (~50% smaller). A CI gzip **size budget** (`scripts/check-bundle-size.mjs`)
   now guards against regressions.
+
+### Fixed
+
+- **Recover from a failed Python start.** If the in-browser Python runtime
+  (Pyodide/Web Worker) failed to boot — the worker throwing on creation or dying
+  before it reported ready — the workspace was stuck on an infinite "loading
+  Python" spinner with no way out. The training controller now surfaces the
+  failure as an error state (with the underlying message) instead of hanging,
+  and the visualization panel shows a **Retry** button that terminates the dead
+  worker and cleanly re-initializes the runtime.
+- **Reject malformed shared/imported datasets.** Decoding a share link now
+  deep-validates the embedded dataset and ignores it if it is malformed — an
+  empty or zero-width feature matrix, ragged rows of inconsistent width,
+  non-finite values, or a label vector whose length does not match the number of
+  rows — so a corrupt or hand-tampered link can no longer feed invalid data into
+  training.

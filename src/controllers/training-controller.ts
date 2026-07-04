@@ -12,7 +12,7 @@
  */
 
 import * as Comlink from 'comlink';
-import { ensureWorker } from '@/workers/pyodide.client';
+import { ensureWorker, terminateWorker } from '@/workers/pyodide.client';
 import { useSessionStore } from '@/stores/session-store';
 import type { TraceEvent } from '@/types/trace';
 import { debounce } from '@/lib/utils';
@@ -31,22 +31,40 @@ async function ensurePyodide(): Promise<void> {
   setStatus('loading', 'Starting Python…', 'loading-runtime');
 
   initPromise = (async () => {
-    const worker = ensureWorker();
-    await worker.init(
-      Comlink.proxy((p) => {
-        if (p.stage === 'error') setStatus('error', p.message, 'error');
-        else if (p.stage === 'ready') setStatus('ready', p.message, 'ready');
-        else setStatus('loading', p.message, p.stage);
-      }),
-    );
-    initialized = true;
+    try {
+      const worker = ensureWorker();
+      await worker.init(
+        Comlink.proxy((p) => {
+          if (p.stage === 'error') setStatus('error', p.message, 'error');
+          else if (p.stage === 'ready') setStatus('ready', p.message, 'ready');
+          else setStatus('loading', p.message, p.stage);
+        }),
+      );
+      initialized = true;
+    } catch (err) {
+      // Surface the failure instead of leaving the UI stuck on the loading
+      // spinner forever. This catches the cases the worker's own progress
+      // callback can't report — e.g. `new Worker()` throwing, or the worker
+      // dying before it ever posts a status. Reset init state so a later run
+      // (or retryPyodide()) can cleanly re-attempt.
+      const message = err instanceof Error ? err.message : String(err);
+      setStatus('error', `Python failed to start: ${message}`, 'error');
+      initPromise = null;
+      throw err;
+    }
   })();
 
   return initPromise;
 }
 
 async function runOnce(): Promise<void> {
-  await ensurePyodide();
+  try {
+    await ensurePyodide();
+  } catch {
+    // ensurePyodide() already set an 'error' status; there's nothing to run.
+    // Swallow so `void runOnce()` callers don't emit an unhandled rejection.
+    return;
+  }
   const state = useSessionStore.getState();
   const { algorithmId, datasetId, code, hyperparams } = state;
   if (!algorithmId || !datasetId || !code) return;
@@ -248,6 +266,19 @@ function hpChanged(
 
 /** Force a re-run right now (e.g. "Run" button). Bypasses the debounce. */
 export function runNow(): void {
+  void runOnce();
+}
+
+/**
+ * Recover from a failed Python load. Tears down the (possibly wedged) worker,
+ * clears the init latch, and kicks off a fresh attempt. Wired to the "Retry"
+ * button on the load-error state so users don't have to hard-reload the page
+ * after a transient CDN blip.
+ */
+export function retryPyodide(): void {
+  terminateWorker();
+  initialized = false;
+  initPromise = null;
   void runOnce();
 }
 
