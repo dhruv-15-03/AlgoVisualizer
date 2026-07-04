@@ -130,6 +130,19 @@ const LESSON_BY_ID = new Map<string, Lesson>(
   LEARNING_PATHS.flatMap((p) => p.lessons).map((l) => [l.id, l]),
 );
 
+// Reverse indices for the workspace bridges: a met challenge → the lesson it
+// completes, and an opened algorithm → the lesson(s) that teach it.
+const LESSON_BY_CHALLENGE = new Map<string, Lesson>();
+const LESSONS_BY_ALGORITHM = new Map<AlgorithmId, Lesson[]>();
+for (const l of LESSON_BY_ID.values()) {
+  if (l.challengeId && !LESSON_BY_CHALLENGE.has(l.challengeId)) {
+    LESSON_BY_CHALLENGE.set(l.challengeId, l);
+  }
+  const forAlgo = LESSONS_BY_ALGORITHM.get(l.algorithmId) ?? [];
+  forAlgo.push(l);
+  LESSONS_BY_ALGORITHM.set(l.algorithmId, forAlgo);
+}
+
 /** All defined learning paths (stable order). */
 export function listLearningPaths(): LearningPath[] {
   return LEARNING_PATHS;
@@ -148,6 +161,19 @@ export function allLessons(): Lesson[] {
 /** A lesson by id across all paths, or undefined when unknown. */
 export function findLesson(lessonId: string): Lesson | undefined {
   return LESSON_BY_ID.get(lessonId);
+}
+
+/**
+ * The lesson a given challenge id completes, or undefined. Used by the
+ * workspace to promote a met challenge into lesson completion.
+ */
+export function lessonForChallenge(challengeId: string): Lesson | undefined {
+  return LESSON_BY_CHALLENGE.get(challengeId);
+}
+
+/** Lessons that teach a given algorithm across all paths (stable order). */
+export function lessonsForAlgorithm(algorithmId: AlgorithmId): Lesson[] {
+  return LESSONS_BY_ALGORITHM.get(algorithmId) ?? [];
 }
 
 /** The workspace route a lesson opens. */

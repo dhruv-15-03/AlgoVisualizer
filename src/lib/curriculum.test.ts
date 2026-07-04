@@ -5,6 +5,8 @@ import {
   getLearningPath,
   allLessons,
   findLesson,
+  lessonForChallenge,
+  lessonsForAlgorithm,
   lessonWorkspacePath,
   pathProgress,
   nextLesson,
@@ -147,5 +149,20 @@ describe('curriculum — lookups', () => {
   it('getLearningPath resolves a known id and rejects junk', () => {
     expect(getLearningPath('foundations')?.id).toBe('foundations');
     expect(getLearningPath('nope')).toBeUndefined();
+  });
+});
+
+describe('curriculum — reverse lookups', () => {
+  it('lessonForChallenge maps every challenge-gated lesson back to itself', () => {
+    for (const l of allLessons()) {
+      if (!l.challengeId) continue;
+      expect(lessonForChallenge(l.challengeId)?.id).toBe(l.id);
+    }
+    expect(lessonForChallenge('nonexistent-challenge')).toBeUndefined();
+  });
+
+  it('lessonsForAlgorithm returns the lessons teaching that algorithm', () => {
+    expect(lessonsForAlgorithm('linreg').map((l) => l.id)).toContain('foundations:linreg');
+    expect(lessonsForAlgorithm('tsne')).toEqual([]);
   });
 });
