@@ -9,6 +9,13 @@ and this project aims to follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Draw-your-own-data: drag to scatter points (touch, pen & mouse).** The BYO
+  "Draw points" canvas now uses unified Pointer Events, so a press-and-drag
+  scatters spaced points in a single gesture (throttled by a minimum distance)
+  instead of requiring one click per point — and it works with touch and pen, not
+  just a mouse. `touch-action: none` plus pointer capture keep a drag from
+  scrolling the modal or breaking when the pointer leaves the canvas; a single
+  tap/click still drops one point.
 - **Fluent 2 elevation & depth design tokens.** Added a dark-tuned elevation
   scale to the Tailwind theme (`shadow-e2`/`e4`/`e8`/`e16`/`e28` two-layer
   ambient+key shadows, plus a recessed `shadow-well` inset), a raised surface

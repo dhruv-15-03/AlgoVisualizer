@@ -29,6 +29,30 @@ export type DrawnResult = { ok: true; dataset: Dataset } | { ok: false; error: s
 export const DRAW_MIN_POINTS = CSV_MIN_ROWS;
 
 /**
+ * Minimum gap (px) between consecutive drag-placed points, so a single drag
+ * scatters spaced samples instead of dumping hundreds of overlapping ones —
+ * which is also the right shape for a 2D scatter dataset.
+ */
+export const DRAW_DRAG_MIN_DISTANCE = 14;
+
+/**
+ * True when `next` is at least `minDist` px from `last` (or there is no `last`
+ * yet). Pure geometry helper for the draw canvas's drag throttle; keeps the
+ * density logic unit-testable without a DOM. Compares squared distance to skip
+ * a sqrt.
+ */
+export function isFarEnough(
+  last: { x: number; y: number } | null,
+  next: { x: number; y: number },
+  minDist: number = DRAW_DRAG_MIN_DISTANCE,
+): boolean {
+  if (!last) return true;
+  const dx = next.x - last.x;
+  const dy = next.y - last.y;
+  return dx * dx + dy * dy >= minDist * minDist;
+}
+
+/**
  * Build a Dataset from drawn points. Returns a structured result; never throws.
  */
 export function drawnPointsToDataset(

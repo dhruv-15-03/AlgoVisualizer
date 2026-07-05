@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { drawnPointsToDataset, DRAW_MIN_POINTS, type DrawnPoint } from '@/lib/draw-points';
+import {
+  drawnPointsToDataset,
+  isFarEnough,
+  DRAW_DRAG_MIN_DISTANCE,
+  DRAW_MIN_POINTS,
+  type DrawnPoint,
+} from '@/lib/draw-points';
 
 const pts = (specs: Array<[number, number, number]>): DrawnPoint[] =>
   specs.map(([x, y, label]) => ({ x, y, label }));
@@ -74,5 +80,25 @@ describe('draw-points', () => {
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.dataset.classNames).toEqual(['Class 1', 'Class 2']);
+  });
+});
+
+describe('isFarEnough (drag throttle)', () => {
+  it('always places the first point of a stroke (no previous point)', () => {
+    expect(isFarEnough(null, { x: 5, y: 5 })).toBe(true);
+  });
+
+  it('rejects a point closer than the minimum distance', () => {
+    expect(isFarEnough({ x: 0, y: 0 }, { x: DRAW_DRAG_MIN_DISTANCE - 1, y: 0 })).toBe(false);
+  });
+
+  it('accepts a point at or beyond the minimum distance', () => {
+    expect(isFarEnough({ x: 0, y: 0 }, { x: DRAW_DRAG_MIN_DISTANCE, y: 0 })).toBe(true);
+  });
+
+  it('measures Euclidean (diagonal) distance, not per-axis', () => {
+    // 3-4-5 triangle → distance exactly 5.
+    expect(isFarEnough({ x: 0, y: 0 }, { x: 3, y: 4 }, 5)).toBe(true);
+    expect(isFarEnough({ x: 0, y: 0 }, { x: 3, y: 4 }, 6)).toBe(false);
   });
 });
