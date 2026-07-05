@@ -306,6 +306,10 @@ export interface MLPInit extends BaseTraceEvent {
   points?: number[][];
   /** Axis labels for `points` (e.g. ["PC 1", "PC 2"]). */
   pointAxisLabels?: [string, string];
+  /** Forward-pass activation value per unit, per layer, for the probe sample. */
+  sampleActivations?: number[][];
+  /** Index (into `points`/dataset) of the sample whose activations are shown. */
+  probeIndex?: number;
 }
 export interface MLPStep extends BaseTraceEvent {
   type: 'mlp:step';
@@ -317,6 +321,10 @@ export interface MLPStep extends BaseTraceEvent {
   grid?: number[];
   gridSize?: number;
   bbox?: [number, number, number, number];
+  /** Forward-pass activation value per unit, per layer, for the probe sample. */
+  sampleActivations?: number[][];
+  /** Index (into `points`/dataset) of the sample whose activations are shown. */
+  probeIndex?: number;
 }
 export interface MLPConverged extends BaseTraceEvent {
   type: 'mlp:converged';
