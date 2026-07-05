@@ -58,8 +58,14 @@ export function Home() {
           surface, a decision tree split its data. No backend, no setup — just press play.
         </p>
         <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
-          <Link to={`/workspace/${firstAlgorithm.id}`}>
+          <Link to="/learn">
             <Button variant="primary" size="lg">
+              <Icon name="menu_book" size={18} />
+              Start learning
+            </Button>
+          </Link>
+          <Link to={`/workspace/${firstAlgorithm.id}`}>
+            <Button variant="secondary" size="lg">
               Open the workspace
               <Icon name="arrow_forward" size={18} />
             </Button>
@@ -79,7 +85,7 @@ export function Home() {
             Powered by Pyodide
           </a>
         </div>
-        <div className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-ink-500">
+        <div className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-ink-400">
           <span>
             <span className="font-semibold text-ink-300">{totalAlgorithms}</span> algorithms
           </span>
@@ -101,7 +107,7 @@ export function Home() {
               <h2 className="text-sm font-semibold uppercase tracking-widest text-ink-300">
                 {CATEGORY_LABELS[category]}
               </h2>
-              <span className="text-[11px] text-ink-500">
+              <span className="text-[11px] text-ink-400">
                 {algorithms.length} {algorithms.length === 1 ? 'algorithm' : 'algorithms'}
               </span>
             </div>
@@ -111,7 +117,7 @@ export function Home() {
                 return (
                   <div
                     key={a.id}
-                    className="group relative rounded-xl border border-ink-700 bg-ink-800 p-4 transition-colors hover:border-accent-500/50 hover:bg-ink-800/80"
+                    className="group relative rounded-xl border border-ink-700 bg-ink-800 p-4 shadow-e2 transition-all duration-150 ease-standard hover:-translate-y-0.5 hover:border-accent-500/50 hover:bg-ink-750 hover:shadow-e8"
                   >
                     <Link
                       to={`/workspace/${a.id}`}
@@ -125,7 +131,7 @@ export function Home() {
                         href={wiki.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="absolute right-4 top-4 z-10 shrink-0 text-ink-500 hover:text-accent-300"
+                        className="absolute right-4 top-4 z-10 shrink-0 text-ink-400 hover:text-accent-300"
                         title="Read on Wikipedia"
                         aria-label="Read on Wikipedia"
                       >
@@ -160,7 +166,7 @@ export function Home() {
       </section>
 
       <section className="mt-10">
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-ink-500">Datasets</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-ink-400">Datasets</h2>
         <div className="mt-3 flex flex-wrap gap-2">
           {datasets.map((d) => (
             <div
@@ -168,7 +174,7 @@ export function Home() {
               className="rounded-md border border-ink-700 bg-ink-800 px-3 py-1.5 text-xs text-ink-300"
             >
               <span className="font-semibold text-ink-100">{d.name}</span>
-              <span className="ml-2 text-ink-500">
+              <span className="ml-2 text-ink-400">
                 {d.samples}×{d.features} <span className="px-1 text-ink-700">·</span> {d.task}
               </span>
             </div>
@@ -176,7 +182,7 @@ export function Home() {
         </div>
       </section>
 
-      <footer className="mt-auto pt-12 text-center text-[11px] text-ink-500">
+      <footer className="mt-auto pt-12 text-center text-[11px] text-ink-400">
         Open source <span className="px-1 text-ink-700">·</span> MIT <span className="px-1 text-ink-700">·</span> Built with React, Vite, Pyodide &amp; Monaco
       </footer>
     </div>

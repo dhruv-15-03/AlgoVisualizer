@@ -250,7 +250,7 @@ function GridBoard({ snap }: { snap: RLSnapshot }) {
 function StatChip({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline gap-1.5">
-      <span className="text-[10px] uppercase tracking-wide text-ink-500">{label}</span>
+      <span className="text-[10px] uppercase tracking-wide text-ink-400">{label}</span>
       <span className="font-mono text-xs tabular-nums text-ink-200">{value}</span>
     </div>
   );

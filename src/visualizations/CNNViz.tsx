@@ -279,7 +279,7 @@ export function CNNViz({ dataset, events, currentStep }: CNNVizProps) {
       {/* Row 1: Sample selector + per-sample prediction */}
       <div className="rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
         <div className="flex items-center justify-between gap-3">
-          <div className="text-[10px] uppercase tracking-wider text-ink-500">Sample</div>
+          <div className="text-[10px] uppercase tracking-wider text-ink-400">Sample</div>
           <div className="flex gap-1">
             {snap.sampleInputs.map((img, i) => {
               const url = imageToDataUrl(img, 0, 1, 'gray');
@@ -328,7 +328,7 @@ export function CNNViz({ dataset, events, currentStep }: CNNVizProps) {
           <div className="mt-2 grid grid-cols-[120px,1fr] items-center gap-3">
             <ImageTile img={activeInput} size={104} label={classNames?.[activeLabel ?? 0]} />
             <div>
-              <div className="mb-1 text-[10px] uppercase tracking-wider text-ink-500">Prediction</div>
+              <div className="mb-1 text-[10px] uppercase tracking-wider text-ink-400">Prediction</div>
               <PredBars probs={activePreds} classNames={classNames} trueLabel={activeLabel} />
             </div>
           </div>
@@ -338,8 +338,8 @@ export function CNNViz({ dataset, events, currentStep }: CNNVizProps) {
       {/* Row 2: Learned filters */}
       <div className="rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
         <div className="mb-1 flex items-center justify-between">
-          <div className="text-[10px] uppercase tracking-wider text-ink-500">Learned filters (3×3, diverging)</div>
-          <div className="font-mono text-[9px] text-ink-500">range ±{filterMax.toFixed(3)}</div>
+          <div className="text-[10px] uppercase tracking-wider text-ink-400">Learned filters (3×3, diverging)</div>
+          <div className="font-mono text-[9px] text-ink-400">range ±{filterMax.toFixed(3)}</div>
         </div>
         <div className="flex flex-wrap gap-3">
           {snap.filters.map((F, i) => (
@@ -361,7 +361,7 @@ export function CNNViz({ dataset, events, currentStep }: CNNVizProps) {
 
       {/* Row 3: Feature maps for active sample */}
       <div className="rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
-        <div className="mb-1 text-[10px] uppercase tracking-wider text-ink-500">
+        <div className="mb-1 text-[10px] uppercase tracking-wider text-ink-400">
           Feature maps (after conv + ReLU) — {classNames?.[activeLabel ?? 0] ?? 'sample'}
         </div>
         {activeMaps ? (
@@ -388,13 +388,13 @@ export function CNNViz({ dataset, events, currentStep }: CNNVizProps) {
             })}
           </div>
         ) : (
-          <div className="text-xs text-ink-500">No feature maps emitted for this step (sub-sampled for perf).</div>
+          <div className="text-xs text-ink-400">No feature maps emitted for this step (sub-sampled for perf).</div>
         )}
       </div>
 
       {/* Row 4: Loss/accuracy curve */}
       <div className="min-h-0 rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
-        <div className="mb-0.5 text-[10px] uppercase tracking-wider text-ink-500">Training curve</div>
+        <div className="mb-0.5 text-[10px] uppercase tracking-wider text-ink-400">Training curve</div>
         <div className="h-[calc(100%-14px)]">
           <LossCurve history={snap.lossHistory} />
         </div>

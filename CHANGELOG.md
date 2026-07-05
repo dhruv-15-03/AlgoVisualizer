@@ -9,6 +9,26 @@ and this project aims to follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Fluent 2 elevation & depth design tokens.** Added a dark-tuned elevation
+  scale to the Tailwind theme (`shadow-e2`/`e4`/`e8`/`e16`/`e28` two-layer
+  ambient+key shadows, plus a recessed `shadow-well` inset), a raised surface
+  shade (`ink-750`), a `250ms` duration step, and Fluent motion easing curves
+  (`ease-standard`/`decel`/`accel`). Applied them as a design language over the
+  existing system: panels and Home algorithm cards now rest on subtle
+  elevation (cards lift on hover), metric tiles sit in recessed wells, and
+  dialogs, banners, and flyout chips use consistent overlay shadows in place of
+  ad-hoc Tailwind defaults. Pure CSS — no bundle or runtime cost, all
+  accessibility and family-theming preserved.
+- **Per-algorithm social cards (Open Graph images).** The build now generates a
+  distinct 1200×630 share card for every algorithm into `dist/og/<id>.png`
+  (`scripts/generate-og-images.mjs`), so a shared `/workspace/<id>` link unfurls
+  with its own branded card (name, category, one-line description) instead of one
+  generic image. Cards are rendered deterministically with satori → resvg using
+  Inter embedded from the pinned `@fontsource/inter` devDep (no headless
+  browser), driven by the live registry so new algorithms get a card
+  automatically. `scripts/prerender.mjs` points each page's `og:image` /
+  `twitter:image` / `og:image:alt` at the matching card, and `vercel.json` serves
+  `/og/*` as static files.
 - **Per-algorithm SEO pages.** The production build now pre-renders a static,
   crawlable HTML page for each of the 25 algorithm workspaces
   (`/workspace/<id>`) with its own `<title>`, meta description, canonical URL,
@@ -36,9 +56,30 @@ and this project aims to follow [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **README hero & screenshots.** The README now leads with a labelled screenshot
+  of the live workspace (editable Python next to a converged K-Means
+  visualization) plus a collapsible home-page gallery shot, both linking to the
+  live demo, so the repo shows what the app does at a glance (`docs/hero.png`,
+  `docs/home.png`).
 - **Bundle optimization.** Heavy, route-specific payloads — the 25 Python
   algorithm sources, the built-in dataset generators, and the 25 sklearn-
   equivalent snippets — were moved out of the eager entry chunk into lazily
   loaded modules. The entry chunk shrank from ~63.9 kB to ~31.9 kB gzipped
   (~50% smaller). A CI gzip **size budget** (`scripts/check-bundle-size.mjs`)
   now guards against regressions.
+
+### Fixed
+
+- **Recover from a failed Python start.** If the in-browser Python runtime
+  (Pyodide/Web Worker) failed to boot — the worker throwing on creation or dying
+  before it reported ready — the workspace was stuck on an infinite "loading
+  Python" spinner with no way out. The training controller now surfaces the
+  failure as an error state (with the underlying message) instead of hanging,
+  and the visualization panel shows a **Retry** button that terminates the dead
+  worker and cleanly re-initializes the runtime.
+- **Reject malformed shared/imported datasets.** Decoding a share link now
+  deep-validates the embedded dataset and ignores it if it is malformed — an
+  empty or zero-width feature matrix, ragged rows of inconsistent width,
+  non-finite values, or a label vector whose length does not match the number of
+  rows — so a corrupt or hand-tampered link can no longer feed invalid data into
+  training.

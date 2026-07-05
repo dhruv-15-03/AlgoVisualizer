@@ -14,6 +14,7 @@ import { patchCode } from '@/lib/code-binding';
 import type { SweepPoint } from '@/types/sweep';
 import { formatNumber } from '@/lib/utils';
 import { Icon } from '@/components/ui/Icon';
+import { ModalPortal } from '@/components/ui/ModalPortal';
 
 interface SweepDialogProps {
   hyperparamId: string;
@@ -122,9 +123,10 @@ export function SweepDialog({ hyperparamId, onClose }: SweepDialogProps) {
   }
 
   return (
+    <ModalPortal>
     <div className="fixed inset-0 z-50 flex items-stretch justify-center bg-black/60 backdrop-blur-sm sm:items-center sm:p-4">
       <div
-        className="flex h-full max-h-[100dvh] w-full flex-col overflow-hidden border border-ink-600 bg-ink-900 shadow-2xl sm:max-h-[90vh] sm:max-w-3xl sm:rounded-xl"
+        className="flex h-full max-h-[100dvh] w-full flex-col overflow-hidden border border-ink-600 bg-ink-900 shadow-e28 sm:max-h-[90vh] sm:max-w-3xl sm:rounded-xl"
         role="dialog"
         aria-modal="true"
         aria-labelledby="sweep-dialog-title"
@@ -183,7 +185,7 @@ export function SweepDialog({ hyperparamId, onClose }: SweepDialogProps) {
                 {metricKind && (
                   <span className="inline-flex items-center gap-1">
                     · tracking <span className="font-mono text-ink-200">{metricKind}</span>
-                    <span className="inline-flex items-center gap-0.5 text-ink-500">
+                    <span className="inline-flex items-center gap-0.5 text-ink-400">
                       (<Icon name={betterIsHigher ? 'trending_up' : 'trending_down'} size={12} />
                       {betterIsHigher ? 'higher better' : 'lower better'})
                     </span>
@@ -219,6 +221,7 @@ export function SweepDialog({ hyperparamId, onClose }: SweepDialogProps) {
         )}
       </div>
     </div>
+    </ModalPortal>
   );
 }
 
@@ -271,7 +274,7 @@ function SweepChart({ points, bestIndex, betterIsHigher, currentIndex, onApply }
   const done = points.filter((p) => p.status === 'done' && p.metric !== null);
   if (done.length === 0) {
     return (
-      <div className="flex h-[220px] items-center justify-center text-xs text-ink-500">
+      <div className="flex h-[220px] items-center justify-center text-xs text-ink-400">
         {points.length === 0 ? 'Configure a range and run.' : 'Waiting for results…'}
       </div>
     );

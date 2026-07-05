@@ -79,7 +79,7 @@ export function ShareButton() {
       </button>
       <span
         aria-live="polite"
-        className={`pointer-events-none absolute right-0 top-full z-10 mt-1 whitespace-nowrap rounded-md border px-2 py-1 text-[11px] font-medium shadow-lg transition-opacity ${
+        className={`pointer-events-none absolute right-0 top-full z-10 mt-1 whitespace-nowrap rounded-md border px-2 py-1 text-[11px] font-medium shadow-e8 transition-opacity ${
           feedback ? 'opacity-100' : 'opacity-0'
         } ${
           feedback?.tone === 'error'

@@ -91,7 +91,7 @@
 
 @layer components {
   .panel {
-    @apply bg-ink-800 border border-ink-700 rounded-xl flex flex-col overflow-hidden;
+    @apply bg-ink-800 border border-ink-700 rounded-xl flex flex-col overflow-hidden shadow-e2;
     /* Family-coded top edge — subtly tints every panel by the active algorithm
        family (defaults to indigo via the :root custom properties). */
     border-top: 2px solid rgb(var(--family-accent-rgb) / 0.5);
@@ -106,7 +106,7 @@
     @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold;
   }
   .metric {
-    @apply bg-ink-900 border border-ink-700/60 rounded-lg p-2.5;
+    @apply bg-ink-900 border border-ink-700/60 rounded-lg p-2.5 shadow-well;
   }
   .metric-label {
     @apply text-[10px] uppercase tracking-wide font-semibold text-ink-400;

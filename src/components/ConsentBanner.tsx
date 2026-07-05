@@ -38,7 +38,7 @@ export function ConsentBanner() {
       aria-describedby="consent-desc"
       className="fixed inset-x-0 bottom-0 z-50 flex justify-center p-3 sm:p-4"
     >
-      <div className="w-full max-w-2xl rounded-xl border border-ink-700 bg-ink-800/95 p-4 shadow-2xl backdrop-blur supports-[backdrop-filter]:bg-ink-800/80">
+      <div className="w-full max-w-2xl rounded-xl border border-ink-700 bg-ink-800/95 p-4 shadow-e16 backdrop-blur supports-[backdrop-filter]:bg-ink-800/80">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             <span className="mt-0.5 text-accent-300">
@@ -59,7 +59,7 @@ export function ConsentBanner() {
           <div className="flex shrink-0 items-center gap-2 sm:flex-col sm:items-stretch">
             <button
               onClick={accept}
-              className="inline-flex items-center justify-center gap-1.5 rounded-md bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-800"
+              className="inline-flex items-center justify-center gap-1.5 rounded-md bg-accent-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-800"
             >
               <Icon name="check_circle" size={14} fill />
               Accept

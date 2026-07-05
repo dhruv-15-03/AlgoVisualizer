@@ -67,7 +67,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             </pre>
             <button
               onClick={this.handleReset}
-              className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-400"
+              className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-accent-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-500"
             >
               Try again
             </button>
@@ -90,7 +90,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           <div className="mt-5 flex items-center justify-center gap-2">
             <button
               onClick={this.handleReset}
-              className="inline-flex items-center gap-1.5 rounded-md bg-accent-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-400"
+              className="inline-flex items-center gap-1.5 rounded-md bg-accent-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-500"
             >
               Try again
             </button>

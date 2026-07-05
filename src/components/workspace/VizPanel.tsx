@@ -15,7 +15,7 @@ import { useSessionStore, useCurrentEvent } from '@/stores/session-store';
 import { getAlgorithm } from '@/algorithms/registry';
 import { getDataset } from '@/datasets/registry';
 import { familyOf } from '@/types/trace';
-import { runNow } from '@/controllers/training-controller';
+import { runNow, retryPyodide } from '@/controllers/training-controller';
 import { pyodideLoadProgress, type PyodideStage } from '@/lib/pyodide-progress';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { factAt, factCount } from '@/lib/ml-facts';
@@ -82,7 +82,7 @@ function LoadingState({ stage, message }: { stage: PyodideStage; message: string
                       ? 'text-accent-300'
                       : active
                         ? 'text-ink-200'
-                        : 'text-ink-500')
+                        : 'text-ink-400')
                   }
                 >
                   <Icon
@@ -110,7 +110,7 @@ function LoadingState({ stage, message }: { stage: PyodideStage; message: string
           </p>
         </div>
 
-        <div className="text-[11px] text-ink-500">
+        <div className="text-[11px] text-ink-400">
           First load downloads the ~10MB Python runtime; it&apos;s cached so repeat
           visits are near-instant.
         </div>
@@ -127,7 +127,7 @@ function EmptyState({ message, showRun }: { message: string; showRun?: boolean }
         {showRun && (
           <button
             onClick={() => runNow()}
-            className="inline-flex items-center gap-1.5 rounded-md bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-400"
+            className="inline-flex items-center gap-1.5 rounded-md bg-accent-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-500"
           >
             <Icon name="play_arrow" size={14} fill />
             Run now
@@ -175,6 +175,13 @@ export function VizPanel() {
           <pre className="mt-2 max-h-40 overflow-auto rounded-md bg-rose-500/10 p-3 text-left text-[11px] text-rose-200">
             {pyodideProgress}
           </pre>
+          <button
+            onClick={() => retryPyodide()}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-rose-400/40 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-100 transition-colors hover:bg-rose-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+          >
+            <Icon name="refresh" size={14} />
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -189,7 +196,7 @@ export function VizPanel() {
           <ExplainErrorPanel traceback={runError || 'Unknown error'} />
           <button
             onClick={() => runNow()}
-            className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-400"
+            className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-accent-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-500"
           >
             <Icon name="refresh" size={14} />
             Try again
@@ -267,7 +274,7 @@ export function VizPanel() {
               className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-ink-700 accent-accent-400"
               aria-label="Timeline scrubber"
             />
-            <div className="mt-1 flex justify-between text-[9px] font-mono text-ink-500">
+            <div className="mt-1 flex justify-between text-[9px] font-mono text-ink-400">
               <span>step 1</span>
               <span>{event?.type ?? ''}</span>
               <span>step {events.length}</span>

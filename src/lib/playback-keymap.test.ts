@@ -3,6 +3,7 @@ import {
   resolvePlaybackAction,
   isEditableTarget,
   hasModifierKey,
+  PLAYBACK_SHORTCUTS,
   type PlaybackKeyContext,
 } from '@/lib/playback-keymap';
 
@@ -120,5 +121,34 @@ describe('playback-keymap.hasModifierKey', () => {
 
   it('is false when no modifier is held (Shift is allowed)', () => {
     expect(hasModifierKey({ ctrlKey: false, metaKey: false, altKey: false })).toBe(false);
+  });
+});
+
+describe('playback-keymap.PLAYBACK_SHORTCUTS (help-vs-behaviour drift guard)', () => {
+  it('documents every transport shortcut with a non-empty key cap and description', () => {
+    expect(PLAYBACK_SHORTCUTS.length).toBeGreaterThan(0);
+    for (const s of PLAYBACK_SHORTCUTS) {
+      expect(s.keys.length).toBeGreaterThan(0);
+      expect(s.keys.every((k) => k.trim().length > 0)).toBe(true);
+      expect(s.description.trim().length).toBeGreaterThan(0);
+    }
+  });
+
+  it('every documented shortcut still resolves to a real playback action', () => {
+    // The visible help can never claim a shortcut the keymap no longer honours:
+    // each catalog `eventKey` must resolve to a non-null action (frame guards
+    // open so Home/End/arrows are live).
+    for (const s of PLAYBACK_SHORTCUTS) {
+      const action = resolvePlaybackAction(
+        ctx({ key: s.eventKey, canStepBack: true, canStepForward: true }),
+      );
+      expect(action, `"${s.description}" (${s.eventKey}) should map to an action`).not.toBeNull();
+    }
+  });
+
+  it('covers all six transport keys exactly once', () => {
+    const keys = PLAYBACK_SHORTCUTS.map((s) => s.eventKey);
+    expect(new Set(keys).size).toBe(keys.length);
+    expect(keys).toEqual([' ', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'r']);
   });
 });
