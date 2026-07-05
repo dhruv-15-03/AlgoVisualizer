@@ -54,7 +54,7 @@ export function UpdatePrompt() {
   if (!needRefresh && !offlineReady) return null;
 
   const cardBase =
-    'pointer-events-auto w-full max-w-sm rounded-xl border bg-ink-800/95 p-4 shadow-2xl backdrop-blur supports-[backdrop-filter]:bg-ink-800/80';
+    'pointer-events-auto w-full max-w-sm rounded-xl border bg-ink-800/95 p-4 shadow-e16 backdrop-blur supports-[backdrop-filter]:bg-ink-800/80';
   // Respect the OS reduce-motion setting: skip the entrance animation entirely
   // rather than relying solely on the global CSS duration collapse.
   const anim = reducedMotion ? '' : 'animate-fade-in';

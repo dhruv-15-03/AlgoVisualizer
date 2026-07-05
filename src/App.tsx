@@ -16,6 +16,9 @@ const WorkspacePage = lazy(() =>
 const RacePage = lazy(() =>
   import('@/pages/RacePage').then((m) => ({ default: m.RacePage })),
 );
+const LearnPage = lazy(() =>
+  import('@/pages/LearnPage').then((m) => ({ default: m.LearnPage })),
+);
 
 function RouteSplash() {
   return (
@@ -51,6 +54,7 @@ export default function App() {
       <Suspense fallback={<RouteSplash />}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/learn" element={<LearnPage />} />
           <Route path="/workspace" element={<WorkspacePage />} />
           <Route path="/workspace/:algoId" element={<WorkspacePage />} />
           <Route path="/race" element={<RacePage />} />

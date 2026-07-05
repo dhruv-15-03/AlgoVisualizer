@@ -151,11 +151,24 @@ function isValidDataset(v: unknown): boolean {
   const d = v as Record<string, unknown>;
   if (typeof d.id !== 'string' || d.id.length === 0) return false;
   if (typeof d.name !== 'string') return false;
-  if (!Array.isArray(d.X)) return false;
-  const rowsOk = d.X.every((row) => Array.isArray(row) && row.every((n) => typeof n === 'number'));
+  if (!Array.isArray(d.X) || d.X.length === 0) return false;
+  // Every sample must be a non-empty numeric vector of the SAME width, and
+  // every value must be finite. Rejecting NaN/Infinity + ragged/empty rows
+  // here stops a malformed share link or BYO import from feeding garbage into
+  // an algorithm (which would either crash the worker or silently produce
+  // nonsense) — the decoder falls back to defaults instead.
+  const width = Array.isArray(d.X[0]) ? (d.X[0] as unknown[]).length : 0;
+  if (width === 0) return false;
+  const isFiniteNumber = (n: unknown): boolean => typeof n === 'number' && Number.isFinite(n);
+  const rowsOk = d.X.every(
+    (row) => Array.isArray(row) && row.length === width && row.every(isFiniteNumber),
+  );
   if (!rowsOk) return false;
-  if (d.y !== null && !(Array.isArray(d.y) && (d.y as unknown[]).every((n) => typeof n === 'number')))
-    return false;
+  if (d.y !== null) {
+    if (!Array.isArray(d.y)) return false;
+    if (d.y.length !== d.X.length) return false;
+    if (!(d.y as unknown[]).every(isFiniteNumber)) return false;
+  }
   if (d.task !== 'classification' && d.task !== 'regression' && d.task !== 'clustering') return false;
   return true;
 }
