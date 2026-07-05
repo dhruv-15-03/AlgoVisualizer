@@ -6,6 +6,7 @@ import { VizPanel } from '@/components/workspace/VizPanel';
 import { RightPanel } from '@/components/workspace/RightPanel';
 import { WorkspaceTabBar } from '@/components/workspace/WorkspaceTabBar';
 import { LiveAnnouncer } from '@/components/workspace/LiveAnnouncer';
+import { LessonProgressBridge } from '@/components/workspace/LessonProgressBridge';
 import type { WorkspacePane } from '@/components/workspace/workspace-pane';
 import { useIsXlUp } from '@/lib/use-media-query';
 import { usePlaybackKeyboard } from '@/hooks/usePlaybackKeyboard';
@@ -120,7 +121,7 @@ export function WorkspacePage() {
     <div className="flex h-full min-h-0 flex-col bg-ink-900" style={familyTheme.style}>
       <a
         href="#main-content"
-        className="sr-only z-50 rounded-md bg-accent-500 px-3 py-2 text-sm font-medium text-white focus:not-sr-only focus:absolute focus:left-3 focus:top-3"
+        className="sr-only z-50 rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white focus:not-sr-only focus:absolute focus:left-3 focus:top-3"
       >
         Skip to content
       </a>
@@ -130,6 +131,7 @@ export function WorkspacePage() {
         <WorkspaceBody />
       </main>
       <LiveAnnouncer />
+      <LessonProgressBridge />
     </div>
   );
 }

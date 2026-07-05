@@ -16,6 +16,9 @@ const WorkspacePage = lazy(() =>
 const RacePage = lazy(() =>
   import('@/pages/RacePage').then((m) => ({ default: m.RacePage })),
 );
+const LearnPage = lazy(() =>
+  import('@/pages/LearnPage').then((m) => ({ default: m.LearnPage })),
+);
 
 function RouteSplash() {
   return (
@@ -25,7 +28,7 @@ function RouteSplash() {
           <div className="absolute inset-0 rounded-full border-2 border-ink-700" />
           <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-accent-400" />
         </div>
-        <div className="text-xs uppercase tracking-wider text-ink-500">Loading…</div>
+        <div className="text-xs uppercase tracking-wider text-ink-400">Loading…</div>
       </div>
     </div>
   );
@@ -51,6 +54,7 @@ export default function App() {
       <Suspense fallback={<RouteSplash />}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/learn" element={<LearnPage />} />
           <Route path="/workspace" element={<WorkspacePage />} />
           <Route path="/workspace/:algoId" element={<WorkspacePage />} />
           <Route path="/race" element={<RacePage />} />

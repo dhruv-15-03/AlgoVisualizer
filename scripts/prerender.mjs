@@ -21,16 +21,15 @@
  * Run: `node scripts/prerender.mjs` (chained after `vite build`).
  */
 
-import { mkdirSync, writeFileSync, readFileSync, existsSync, rmSync } from 'node:fs';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-import { dirname, resolve, join } from 'node:path';
-import { tmpdir } from 'node:os';
-import * as esbuild from 'esbuild';
+import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+import { loadRegistry } from './load-registry.mjs';
+import { ogImageUrl, ogImageAlt } from './og-card.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
 const distDir = resolve(root, 'dist');
-const srcDir = resolve(root, 'src');
 const ORIGIN = 'https://algo-visualizer-beige.vercel.app';
 
 function escapeHtml(value) {
@@ -40,33 +39,6 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-/** Bundle the registry + category labels with esbuild and import the result. */
-async function loadRegistry() {
-  const result = await esbuild.build({
-    stdin: {
-      contents:
-        "export { listAlgorithms } from '@/algorithms/registry';\n" +
-        "export { CATEGORY_LABELS } from '@/types/algorithm';\n",
-      resolveDir: root,
-      loader: 'ts',
-    },
-    bundle: true,
-    format: 'esm',
-    platform: 'node',
-    write: false,
-    logLevel: 'silent',
-    alias: { '@': srcDir },
-  });
-
-  const tmpFile = join(tmpdir(), `av-registry-${Date.now()}.mjs`);
-  writeFileSync(tmpFile, result.outputFiles[0].text, 'utf8');
-  try {
-    return await import(pathToFileURL(tmpFile).href);
-  } finally {
-    rmSync(tmpFile, { force: true });
-  }
 }
 
 function replaceOnce(html, regex, replacement, label) {
@@ -169,6 +141,27 @@ function renderPage(template, meta, categoryLabel) {
     /<meta name="twitter:description" content="[^"]*"\s*\/?>/,
     `<meta name="twitter:description" content="${escapeHtml(description)}" />`,
     'twitter:description',
+  );
+
+  const ogImage = ogImageUrl(ORIGIN, meta.id);
+  const ogAlt = ogImageAlt(meta);
+  html = replaceOnce(
+    html,
+    /<meta property="og:image" content="[^"]*"\s*\/?>/,
+    `<meta property="og:image" content="${escapeHtml(ogImage)}" />`,
+    'og:image',
+  );
+  html = replaceOnce(
+    html,
+    /<meta property="og:image:alt" content="[^"]*"\s*\/?>/,
+    `<meta property="og:image:alt" content="${escapeHtml(ogAlt)}" />`,
+    'og:image:alt',
+  );
+  html = replaceOnce(
+    html,
+    /<meta name="twitter:image" content="[^"]*"\s*\/?>/,
+    `<meta name="twitter:image" content="${escapeHtml(ogImage)}" />`,
+    'twitter:image',
   );
 
   html = replaceOnce(html, /<\/head>/, `${jsonLd(meta)}</head>`, 'head close');

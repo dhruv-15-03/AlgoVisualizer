@@ -115,6 +115,66 @@ describe('share-link · graceful fallback', () => {
   });
 });
 
+describe('share-link · dataset validation', () => {
+  const mk = (obj: unknown) =>
+    btoa(JSON.stringify(obj)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const wrap = (x: unknown) => mk({ v: 1, a: 'kmeans', c: '', h: {}, d: 'c', x });
+
+  it('rejects an empty feature matrix', () => {
+    expect(
+      decodeShareState(wrap({ id: 'c', name: 'c', X: [], y: null, task: 'clustering' })),
+    ).toBeNull();
+  });
+
+  it('rejects ragged rows (inconsistent feature width)', () => {
+    expect(
+      decodeShareState(
+        wrap({
+          id: 'c',
+          name: 'c',
+          X: [
+            [0, 0],
+            [1],
+          ],
+          y: null,
+          task: 'clustering',
+        }),
+      ),
+    ).toBeNull();
+  });
+
+  it('rejects a label vector whose length does not match X', () => {
+    expect(
+      decodeShareState(
+        wrap({
+          id: 'c',
+          name: 'c',
+          X: [
+            [0, 0],
+            [1, 1],
+          ],
+          y: [0],
+          task: 'classification',
+        }),
+      ),
+    ).toBeNull();
+  });
+
+  it('accepts a clean unlabelled (clustering) dataset', () => {
+    const x = {
+      id: 'c',
+      name: 'pts',
+      X: [
+        [0, 0],
+        [1, 1],
+      ],
+      y: null,
+      task: 'clustering',
+    };
+    expect(decodeShareState(wrap(x))?.customDataset?.id).toBe('c');
+  });
+});
+
 describe('share-link · URL helpers', () => {
   it('builds a hash-based share URL', () => {
     const url = buildShareUrl('TOKEN', { origin: 'https://x.dev', pathname: '/workspace/kmeans' });

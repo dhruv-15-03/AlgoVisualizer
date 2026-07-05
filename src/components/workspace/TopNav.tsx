@@ -10,6 +10,7 @@ import { StatusPill } from '@/components/ui/StatusPill';
 import { Slider } from '@/components/ui/Slider';
 import { ShareButton } from '@/components/workspace/ShareButton';
 import { ByoDataButton } from '@/components/workspace/ByoDataButton';
+import { KeyboardHelp } from '@/components/workspace/KeyboardHelp';
 import { datasetOptionGroups } from '@/components/workspace/dataset-options';
 import { runNow } from '@/controllers/training-controller';
 import type { AlgorithmId } from '@/types/algorithm';
@@ -159,7 +160,7 @@ export function TopNav() {
           </div>
           <div className="min-w-0">
             <div className="truncate font-display text-sm font-semibold tracking-tight text-ink-50">AlgoVisualizer</div>
-            <div className="hidden text-[10px] uppercase tracking-wider text-ink-500 sm:block">Visual ML workspace</div>
+            <div className="hidden text-[10px] uppercase tracking-wider text-ink-400 sm:block">Visual ML workspace</div>
           </div>
         </Link>
 
@@ -189,6 +190,7 @@ export function TopNav() {
             <Icon name="flag" size={16} />
             <span className="hidden md:inline">Race</span>
           </Link>
+          <KeyboardHelp />
           <StatusPill tone={pyTone} pulse={pyodideStatus === 'loading'}>
             <span className="hidden md:inline">{pyLabel}</span>
             <span aria-label={pyLabel} className="md:hidden">

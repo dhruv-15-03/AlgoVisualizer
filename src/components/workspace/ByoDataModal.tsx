@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useSessionStore } from '@/stores/session-store';
 import { Icon } from '@/components/ui/Icon';
+import { ModalPortal } from '@/components/ui/ModalPortal';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
@@ -53,6 +54,7 @@ export function ByoDataModal({ support, onClose }: ByoDataModalProps) {
   );
 
   return (
+    <ModalPortal>
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
       onClick={onClose}
@@ -63,7 +65,7 @@ export function ByoDataModal({ support, onClose }: ByoDataModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="byo-title"
-        className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-ink-700 bg-ink-800 shadow-2xl focus:outline-none"
+        className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-ink-700 bg-ink-800 shadow-e28 focus:outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-ink-700 px-4 py-3">
@@ -96,6 +98,7 @@ export function ByoDataModal({ support, onClose }: ByoDataModalProps) {
         </div>
       </div>
     </div>
+    </ModalPortal>
   );
 }
 
@@ -222,7 +225,7 @@ function CsvTab({ tasks, onCommit }: { tasks: CsvTask[]; onCommit: (d: Dataset) 
               placeholder="last"
               className="h-9 w-28 rounded-md border border-ink-600 bg-ink-900 px-2 text-sm text-ink-100 focus:outline-none focus:ring-2 focus:ring-accent-400"
             />
-            <span className="mt-0.5 block text-[10px] text-ink-500">“last” or a column number (1-based)</span>
+            <span className="mt-0.5 block text-[10px] text-ink-400">“last” or a column number (1-based)</span>
           </label>
         )}
       </div>
@@ -361,7 +364,7 @@ function DrawTab({ tasks, onCommit }: { tasks: CsvTask[]; onCommit: (d: Dataset)
           />
         ))}
         {points.length === 0 && (
-          <span className="pointer-events-none absolute inset-0 grid place-items-center text-xs text-ink-500">
+          <span className="pointer-events-none absolute inset-0 grid place-items-center text-xs text-ink-400">
             Click to place points
           </span>
         )}

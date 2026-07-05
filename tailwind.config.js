@@ -14,10 +14,11 @@ export default {
           100: '#eceff3',
           200: '#d4dae3',
           300: '#a8b3c4',
-          400: '#7280a0',
+          400: '#808da9', // muted text; clears WCAG AA (>=4.5:1) on ink-800 cards
           500: '#4a587a',
           600: '#34405e',
           700: '#222b44',
+          750: '#1b2138', // raised surface — one step lighter than 800 (Fluent elevation: lift = lighter surface + shadow)
           800: '#161c2e',
           900: '#0b0f1c',
         },
@@ -39,6 +40,28 @@ export default {
         ok: '#4ade80',
         warn: '#facc15',
         danger: '#f87171',
+      },
+      // Fluent 2 elevation, dark-tuned. Two-layer recipe (ambient ring + key
+      // light) with higher alpha than Fluent's defaults so depth reads against
+      // the near-black canvas (ink-900 #0b0f1c). Step = resting → overlay.
+      boxShadow: {
+        e2: '0 0 2px 0 rgb(0 0 0 / 0.30), 0 1px 2px 0 rgb(0 0 0 / 0.36)',
+        e4: '0 0 2px 0 rgb(0 0 0 / 0.30), 0 2px 4px 0 rgb(0 0 0 / 0.40)',
+        e8: '0 0 2px 0 rgb(0 0 0 / 0.30), 0 4px 8px 0 rgb(0 0 0 / 0.44)',
+        e16: '0 0 2px 0 rgb(0 0 0 / 0.30), 0 8px 16px 0 rgb(0 0 0 / 0.48)',
+        e28: '0 0 8px 0 rgb(0 0 0 / 0.30), 0 14px 28px 0 rgb(0 0 0 / 0.52)',
+        well: 'inset 0 1px 2px 0 rgb(0 0 0 / 0.28)',
+      },
+      transitionDuration: {
+        // Fluent durations: fast 150 / normal 200 / gentle 250 / slow 300.
+        // 150/200/300 ship with Tailwind; add the gentle step.
+        250: '250ms',
+      },
+      transitionTimingFunction: {
+        // Fluent 2 motion curves.
+        standard: 'cubic-bezier(0.33, 0, 0.67, 1)', // curveEasyEase
+        decel: 'cubic-bezier(0.1, 0.9, 0.2, 1)', // entrances
+        accel: 'cubic-bezier(0.7, 0, 1, 0.5)', // exits
       },
       animation: {
         'pulse-soft': 'pulse-soft 1.4s ease-in-out infinite',

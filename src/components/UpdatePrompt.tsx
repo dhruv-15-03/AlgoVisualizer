@@ -54,7 +54,7 @@ export function UpdatePrompt() {
   if (!needRefresh && !offlineReady) return null;
 
   const cardBase =
-    'pointer-events-auto w-full max-w-sm rounded-xl border bg-ink-800/95 p-4 shadow-2xl backdrop-blur supports-[backdrop-filter]:bg-ink-800/80';
+    'pointer-events-auto w-full max-w-sm rounded-xl border bg-ink-800/95 p-4 shadow-e16 backdrop-blur supports-[backdrop-filter]:bg-ink-800/80';
   // Respect the OS reduce-motion setting: skip the entrance animation entirely
   // rather than relying solely on the global CSS duration collapse.
   const anim = reducedMotion ? '' : 'animate-fade-in';
@@ -79,7 +79,7 @@ export function UpdatePrompt() {
                 <button
                   type="button"
                   onClick={() => void updateServiceWorker(true)}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-md bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-800"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-md bg-accent-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-800"
                 >
                   <Icon name="refresh" size={14} />
                   Reload
