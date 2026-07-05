@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { csvToDataset, type CsvTask } from '@/lib/csv-dataset';
-import { drawnPointsToDataset, type DrawnPoint } from '@/lib/draw-points';
+import { drawnPointsToDataset, isFarEnough, type DrawnPoint } from '@/lib/draw-points';
 import type { ByoSupport } from '@/lib/byo-support';
 import type { Dataset } from '@/types/dataset';
 
@@ -258,18 +258,69 @@ function DrawTab({ tasks, onCommit }: { tasks: CsvTask[]; onCommit: (d: Dataset)
   const [points, setPoints] = useState<DrawnPoint[]>([]);
   const [error, setError] = useState('');
   const surfaceRef = useRef<HTMLDivElement>(null);
+  const drawingRef = useRef(false);
+  const lastPosRef = useRef<{ x: number; y: number } | null>(null);
 
-  const place = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+  // Box-relative pointer position, or null if the surface isn't mounted.
+  const localPoint = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>): { x: number; y: number } | null => {
       const box = surfaceRef.current?.getBoundingClientRect();
-      if (!box) return;
-      const x = e.clientX - box.left;
-      const y = e.clientY - box.top;
+      if (!box) return null;
+      return { x: e.clientX - box.left, y: e.clientY - box.top };
+    },
+    [],
+  );
+
+  const placePoint = useCallback(
+    (x: number, y: number) => {
       // Flip y so "up" is positive, like a normal scatter plot.
       setPoints((prev) => [...prev, { x, y: CANVAS_H - y, label: task === 'clustering' ? 0 : activeClass }]);
+      lastPosRef.current = { x, y };
     },
     [task, activeClass],
   );
+
+  // Pointer Events unify mouse, touch and pen: a tap/click drops one point, a
+  // drag scatters points spaced by DRAW_DRAG_MIN_DISTANCE. Pointer capture keeps
+  // the stroke alive if the finger/cursor leaves the canvas mid-drag.
+  const onPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      const pt = localPoint(e);
+      if (!pt) return;
+      drawingRef.current = true;
+      try {
+        surfaceRef.current?.setPointerCapture(e.pointerId);
+      } catch {
+        /* stale pointer id — drawing still works without capture */
+      }
+      placePoint(pt.x, pt.y);
+    },
+    [localPoint, placePoint],
+  );
+
+  const onPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!drawingRef.current) return;
+      const pt = localPoint(e);
+      if (!pt || !isFarEnough(lastPosRef.current, pt)) return;
+      placePoint(pt.x, pt.y);
+    },
+    [localPoint, placePoint],
+  );
+
+  const endDraw = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!drawingRef.current) return;
+    drawingRef.current = false;
+    lastPosRef.current = null;
+    try {
+      if (surfaceRef.current?.hasPointerCapture(e.pointerId)) {
+        surfaceRef.current.releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      /* ignore release errors */
+    }
+  }, []);
 
   const onUse = useCallback(() => {
     setError('');
@@ -346,10 +397,13 @@ function DrawTab({ tasks, onCommit }: { tasks: CsvTask[]; onCommit: (d: Dataset)
 
       <div
         ref={surfaceRef}
-        onClick={place}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDraw}
+        onPointerCancel={endDraw}
         role="application"
-        aria-label="Drawing canvas — click to place points"
-        className="relative cursor-crosshair overflow-hidden rounded-md border border-ink-600 bg-ink-900"
+        aria-label="Drawing canvas — click or drag to place points"
+        className="relative cursor-crosshair touch-none select-none overflow-hidden rounded-md border border-ink-600 bg-ink-900"
         style={{ width: CANVAS_W, height: CANVAS_H, maxWidth: '100%' }}
       >
         {points.map((p, i) => (
@@ -365,7 +419,7 @@ function DrawTab({ tasks, onCommit }: { tasks: CsvTask[]; onCommit: (d: Dataset)
         ))}
         {points.length === 0 && (
           <span className="pointer-events-none absolute inset-0 grid place-items-center text-xs text-ink-400">
-            Click to place points
+            Click or drag to place points
           </span>
         )}
       </div>
