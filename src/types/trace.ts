@@ -405,6 +405,32 @@ export interface RLConverged extends BaseTraceEvent {
 }
 export type RLEvent = RLInit | RLEpisode | RLConverged;
 
+// ─── Self-Attention (toy scaled dot-product attention) ─────────────────────
+export interface AttentionInit extends BaseTraceEvent {
+  type: 'attention:init';
+  tokens: string[];
+  dModel: number;
+  dK: number;
+  Q: number[][];
+  K: number[][];
+  V: number[][];
+}
+export interface AttentionStep extends BaseTraceEvent {
+  type: 'attention:step';
+  stage: 'scores' | 'scaled' | 'softmax';
+  /** n × n matrix for this stage (raw scores, scaled scores, or softmax weights). */
+  scores: number[][];
+}
+export interface AttentionConverged extends BaseTraceEvent {
+  type: 'attention:converged';
+  /** Final softmax attention-weight matrix, n × n. */
+  weights: number[][];
+  /** Weighted sum of Value vectors, n × d_k — the contextualized output. */
+  output: number[][];
+  reason: string;
+}
+export type AttentionEvent = AttentionInit | AttentionStep | AttentionConverged;
+
 // ─── Universal lifecycle events ─────────────────────────────────────────────
 export interface ErrorEvent extends BaseTraceEvent {
   type: 'error';
@@ -430,6 +456,7 @@ export type TraceEvent =
   | MLPEvent
   | CNNEvent
   | RLEvent
+  | AttentionEvent
   | ErrorEvent
   | FinishedEvent;
 
@@ -445,7 +472,8 @@ export type AlgorithmFamily =
   | 'forest'
   | 'mlp'
   | 'cnn'
-  | 'rl';
+  | 'rl'
+  | 'attention';
 
 const FAMILY_PREFIXES = new Set<string>([
   'kmeans',
@@ -460,6 +488,7 @@ const FAMILY_PREFIXES = new Set<string>([
   'mlp',
   'cnn',
   'rl',
+  'attention',
 ]);
 
 export function familyOf(type: TraceEvent['type']): AlgorithmFamily | 'system' {
