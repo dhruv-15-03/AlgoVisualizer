@@ -28,7 +28,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-katex": "^3.0.1",
-    "react-router-dom": "^6.24.0",
+    "react-router-dom": "^7.18.0",
     "tailwind-merge": "^3.6.0",
     "zustand": "^5.0.14"
   },
