@@ -22,11 +22,12 @@ describe('SITEMAP_ALGORITHM_IDS', () => {
 });
 
 describe('sitemapUrls', () => {
-  it('emits home + race + every workspace route', () => {
+  it('emits home + race + learn + every workspace route', () => {
     const urls = sitemapUrls();
-    expect(urls).toHaveLength(2 + SITEMAP_ALGORITHM_IDS.length);
+    expect(urls).toHaveLength(3 + SITEMAP_ALGORITHM_IDS.length);
     expect(urls[0].loc).toBe(`${SITE_ORIGIN}/`);
     expect(urls[1].loc).toBe(`${SITE_ORIGIN}/race`);
+    expect(urls[2].loc).toBe(`${SITE_ORIGIN}/learn`);
     expect(urls.some((u) => u.loc === `${SITE_ORIGIN}/workspace/kmeans`)).toBe(true);
   });
 
@@ -43,8 +44,9 @@ describe('buildSitemap', () => {
     expect(xml.startsWith('<?xml')).toBe(true);
     expect(xml).toContain('<urlset');
     const locCount = (xml.match(/<loc>/g) ?? []).length;
-    expect(locCount).toBe(2 + SITEMAP_ALGORITHM_IDS.length);
+    expect(locCount).toBe(3 + SITEMAP_ALGORITHM_IDS.length);
     expect(xml).toContain(`<loc>${SITE_ORIGIN}/workspace/tsne</loc>`);
+    expect(xml).toContain(`<loc>${SITE_ORIGIN}/learn</loc>`);
   });
 
   it('is deterministic for stable input', () => {
