@@ -405,27 +405,34 @@ export interface RLConverged extends BaseTraceEvent {
 }
 export type RLEvent = RLInit | RLEpisode | RLConverged;
 
-// ─── Self-Attention (toy scaled dot-product attention) ─────────────────────
+// ─── Self-Attention (toy multi-head scaled dot-product attention) ──────────
 export interface AttentionInit extends BaseTraceEvent {
   type: 'attention:init';
   tokens: string[];
   dModel: number;
   dK: number;
-  Q: number[][];
-  K: number[][];
-  V: number[][];
+  /** Number of attention heads, each with its own Wq/Wk/Wv. */
+  nHeads: number;
+  /** Per-head Query/Key/Value matrices, each shaped [nHeads][n][dK]. */
+  headsQ: number[][][];
+  headsK: number[][][];
+  headsV: number[][][];
 }
 export interface AttentionStep extends BaseTraceEvent {
   type: 'attention:step';
   stage: 'scores' | 'scaled' | 'softmax';
-  /** n × n matrix for this stage (raw scores, scaled scores, or softmax weights). */
-  scores: number[][];
+  /** Per-head n × n matrices for this stage, shaped [nHeads][n][n]. */
+  headMatrices: number[][][];
 }
 export interface AttentionConverged extends BaseTraceEvent {
   type: 'attention:converged';
-  /** Final softmax attention-weight matrix, n × n. */
-  weights: number[][];
-  /** Weighted sum of Value vectors, n × d_k — the contextualized output. */
+  /** Final per-head softmax attention-weight matrices, [nHeads][n][n]. */
+  headWeights: number[][][];
+  /** Per-head weighted sum of Value vectors, [nHeads][n][dK]. */
+  headOutputs: number[][][];
+  /** All heads concatenated along the last axis, n × (nHeads * dK). */
+  concatOutput: number[][];
+  /** Concat projected through Wo back to d_model — the contextualized block output. */
   output: number[][];
   reason: string;
 }

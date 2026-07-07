@@ -20,7 +20,7 @@ import { Slider } from '@/components/ui/Slider';
 import { CodeEditor } from '@/components/CodeEditor';
 import { ensureWorker } from '@/workers/pyodide.client';
 import { tokenize, embedTokens } from '@/lib/toy-embeddings';
-import { attentionSnapshot, STAGE_LABELS } from '@/visualizations/attention-snapshot';
+import { attentionSnapshot, STAGE_LABELS, type HeadSelector } from '@/visualizations/attention-snapshot';
 import { AttentionViz } from '@/visualizations/AttentionViz';
 import type { TraceEvent } from '@/types/trace';
 import attentionPy from '@/algorithms/python/attention.py?raw';
@@ -32,6 +32,8 @@ export function AttentionPage() {
   const [code, setCode] = useState(attentionPy);
   const [dModel, setDModel] = useState(8);
   const [dK, setDK] = useState(4);
+  const [nHeads, setNHeads] = useState(2);
+  const [headView, setHeadView] = useState<HeadSelector>(0);
   const [seed, setSeed] = useState(0);
   const [scale, setScale] = useState(true);
   const [causal, setCausal] = useState(false);
@@ -45,7 +47,12 @@ export function AttentionPage() {
 
   const tokens = useMemo(() => tokenize(sentence), [sentence]);
 
-  const snapshot = useMemo(() => attentionSnapshot(events, step), [events, step]);
+  const snapshot = useMemo(() => attentionSnapshot(events, step, headView), [events, step, headView]);
+
+  // Keep the head selector in range if the user drags n_heads down below it.
+  useEffect(() => {
+    if (typeof headView === 'number' && headView >= nHeads) setHeadView(0);
+  }, [nHeads, headView]);
 
   const run = useCallback(async () => {
     const toks = tokenize(sentence);
@@ -94,6 +101,7 @@ export function AttentionPage() {
     const hyperparams = {
       tokens_json: JSON.stringify(toks),
       d_k: dK,
+      n_heads: nHeads,
       seed,
       scale: scale ? 1 : 0,
       causal: causal ? 1 : 0,
@@ -127,7 +135,7 @@ export function AttentionPage() {
       setStatus('error');
       setStatusMessage(err instanceof Error ? err.message : String(err));
     }
-  }, [sentence, code, dModel, dK, seed, scale, causal]);
+  }, [sentence, code, dModel, dK, nHeads, seed, scale, causal]);
 
   // Auto-run once on mount so the page never opens on an empty state.
   useEffect(() => {
@@ -207,6 +215,13 @@ export function AttentionPage() {
               </label>
               <label className="flex flex-col gap-1">
                 <span className="flex justify-between">
+                  <span>n_heads (parallel attention heads)</span>
+                  <span className="font-mono text-ink-100">{nHeads}</span>
+                </span>
+                <Slider value={nHeads} min={1} max={8} step={1} onValueChange={setNHeads} />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="flex justify-between">
                   <span>seed</span>
                   <span className="font-mono text-ink-100">{seed}</span>
                 </span>
@@ -263,6 +278,37 @@ export function AttentionPage() {
             title={STAGE_LABELS[snapshot.stage]}
             subtitle="Rows = queries, columns = keys. Hover a row to see what it attends to."
             className="min-h-[340px]"
+            right={
+              snapshot.nHeads > 1 ? (
+                <div className="flex flex-wrap items-center gap-1" role="tablist" aria-label="Attention head">
+                  {Array.from({ length: snapshot.nHeads }, (_, h) => h).map((h) => (
+                    <button
+                      key={h}
+                      role="tab"
+                      aria-selected={headView === h}
+                      onClick={() => setHeadView(h)}
+                      className={`rounded-md px-2 py-1 text-[11px] font-medium transition-colors ${
+                        headView === h
+                          ? 'bg-accent-500/20 text-accent-300'
+                          : 'text-ink-500 hover:text-ink-200'
+                      }`}
+                    >
+                      Head {h + 1}
+                    </button>
+                  ))}
+                  <button
+                    role="tab"
+                    aria-selected={headView === 'mean'}
+                    onClick={() => setHeadView('mean')}
+                    className={`rounded-md px-2 py-1 text-[11px] font-medium transition-colors ${
+                      headView === 'mean' ? 'bg-accent-500/20 text-accent-300' : 'text-ink-500 hover:text-ink-200'
+                    }`}
+                  >
+                    Mean
+                  </button>
+                </div>
+              ) : undefined
+            }
           >
             <AttentionViz snapshot={snapshot} />
           </Panel>
