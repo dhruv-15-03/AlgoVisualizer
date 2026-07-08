@@ -8,7 +8,7 @@
  */
 import type { TraceEvent } from '@/types/trace';
 
-export type AttentionStage = 'none' | 'scores' | 'scaled' | 'softmax' | 'output';
+export type AttentionStage = 'none' | 'embedding' | 'scores' | 'scaled' | 'softmax' | 'output';
 
 /** Which head's matrix to surface: a 0-based index, or 'mean' to average across all heads. */
 export type HeadSelector = number | 'mean';
@@ -27,6 +27,14 @@ export interface AttentionSnapshot {
   headOutput: number[][] | null;
   /** Final block output n × d_model (post concat + Wo), only once converged. */
   output: number[][] | null;
+  /** Raw (position-free) toy token embeddings, n × d_model — only at the 'embedding' stage. */
+  tokenEmbeddings: number[][] | null;
+  /** Sinusoidal positional encoding matrix, n × d_model — only at the 'embedding' stage. */
+  positionalEncoding: number[][] | null;
+  /** tokenEmbeddings + positionalEncoding, n × d_model — only at the 'embedding' stage. */
+  positionedEmbeddings: number[][] | null;
+  /** Whether positional encoding was added this run. */
+  usePosEnc: boolean;
   explanation: string;
   math: string;
 }
@@ -41,6 +49,10 @@ const EMPTY: AttentionSnapshot = {
   headMatrices: null,
   headOutput: null,
   output: null,
+  tokenEmbeddings: null,
+  positionalEncoding: null,
+  positionedEmbeddings: null,
+  usePosEnc: true,
   explanation: '',
   math: '',
 };
@@ -71,13 +83,25 @@ export function attentionSnapshot(
   let headMatrices: number[][][] | null = null;
   let headOutput: number[][] | null = null;
   let output: number[][] | null = null;
+  let tokenEmbeddings: number[][] | null = null;
+  let positionalEncoding: number[][] | null = null;
+  let positionedEmbeddings: number[][] | null = null;
+  let usePosEnc = true;
   let explanation = '';
   let math = '';
 
   const last = Math.min(upTo, events.length - 1);
   for (let i = 0; i <= last; i += 1) {
     const e = events[i];
-    if (e.type === 'attention:init') {
+    if (e.type === 'attention:embed') {
+      tokenEmbeddings = e.tokenEmbeddings;
+      positionalEncoding = e.positionalEncoding;
+      positionedEmbeddings = e.positionedEmbeddings;
+      usePosEnc = e.usePosEnc;
+      stage = 'embedding';
+      explanation = e.explanation;
+      math = e.math;
+    } else if (e.type === 'attention:init') {
       tokens = e.tokens;
       dModel = e.dModel;
       dK = e.dK;
@@ -99,14 +123,31 @@ export function attentionSnapshot(
     }
   }
 
-  if (tokens.length === 0 && headMatrices === null) return EMPTY;
+  if (tokens.length === 0 && headMatrices === null && tokenEmbeddings === null) return EMPTY;
   const matrix = pickMatrix(headMatrices, head);
-  return { tokens, dModel, dK, nHeads, stage, matrix, headMatrices, headOutput, output, explanation, math };
+  return {
+    tokens,
+    dModel,
+    dK,
+    nHeads,
+    stage,
+    matrix,
+    headMatrices,
+    headOutput,
+    output,
+    tokenEmbeddings,
+    positionalEncoding,
+    positionedEmbeddings,
+    usePosEnc,
+    explanation,
+    math,
+  };
 }
 
 /** Human-friendly label for a stage, used in the step scrubber and panel titles. */
 export const STAGE_LABELS: Record<AttentionStage, string> = {
   none: 'Not run yet',
+  embedding: 'Token + positional embeddings',
   scores: 'Raw scores  QKᵀ',
   scaled: 'Scaled  QKᵀ/√d_k',
   softmax: 'Softmax weights',

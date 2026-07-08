@@ -406,6 +406,17 @@ export interface RLConverged extends BaseTraceEvent {
 export type RLEvent = RLInit | RLEpisode | RLConverged;
 
 // ─── Self-Attention (toy multi-head scaled dot-product attention) ──────────
+export interface AttentionEmbed extends BaseTraceEvent {
+  type: 'attention:embed';
+  /** Raw (position-free) toy token embeddings, n × d_model. */
+  tokenEmbeddings: number[][];
+  /** Sinusoidal positional encoding matrix, n × d_model (Vaswani et al., 2017). */
+  positionalEncoding: number[][];
+  /** tokenEmbeddings + positionalEncoding — what Q/K/V are actually projected from. */
+  positionedEmbeddings: number[][];
+  /** Whether positional encoding was added (if false, positionedEmbeddings === tokenEmbeddings). */
+  usePosEnc: boolean;
+}
 export interface AttentionInit extends BaseTraceEvent {
   type: 'attention:init';
   tokens: string[];
@@ -436,7 +447,7 @@ export interface AttentionConverged extends BaseTraceEvent {
   output: number[][];
   reason: string;
 }
-export type AttentionEvent = AttentionInit | AttentionStep | AttentionConverged;
+export type AttentionEvent = AttentionEmbed | AttentionInit | AttentionStep | AttentionConverged;
 
 // ─── Universal lifecycle events ─────────────────────────────────────────────
 export interface ErrorEvent extends BaseTraceEvent {

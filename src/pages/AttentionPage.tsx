@@ -22,6 +22,7 @@ import { ensureWorker } from '@/workers/pyodide.client';
 import { tokenize, embedTokens } from '@/lib/toy-embeddings';
 import { attentionSnapshot, STAGE_LABELS, type HeadSelector } from '@/visualizations/attention-snapshot';
 import { AttentionViz } from '@/visualizations/AttentionViz';
+import { EmbeddingViz } from '@/visualizations/EmbeddingViz';
 import type { TraceEvent } from '@/types/trace';
 import attentionPy from '@/algorithms/python/attention.py?raw';
 
@@ -37,6 +38,7 @@ export function AttentionPage() {
   const [seed, setSeed] = useState(0);
   const [scale, setScale] = useState(true);
   const [causal, setCausal] = useState(false);
+  const [usePosEnc, setUsePosEnc] = useState(true);
   const [showCode, setShowCode] = useState(false);
 
   const [events, setEvents] = useState<TraceEvent[]>([]);
@@ -105,6 +107,7 @@ export function AttentionPage() {
       seed,
       scale: scale ? 1 : 0,
       causal: causal ? 1 : 0,
+      use_pos_enc: usePosEnc ? 1 : 0,
     };
 
     const collected: TraceEvent[] = [];
@@ -135,7 +138,7 @@ export function AttentionPage() {
       setStatus('error');
       setStatusMessage(err instanceof Error ? err.message : String(err));
     }
-  }, [sentence, code, dModel, dK, nHeads, seed, scale, causal]);
+  }, [sentence, code, dModel, dK, nHeads, seed, scale, causal, usePosEnc]);
 
   // Auto-run once on mount so the page never opens on an empty state.
   useEffect(() => {
@@ -245,6 +248,15 @@ export function AttentionPage() {
                   className="h-4 w-4 accent-accent-400"
                 />
               </label>
+              <label className="flex items-center justify-between gap-2">
+                <span>Positional encoding (sinusoidal)</span>
+                <input
+                  type="checkbox"
+                  checked={usePosEnc}
+                  onChange={(e) => setUsePosEnc(e.target.checked)}
+                  className="h-4 w-4 accent-accent-400"
+                />
+              </label>
             </div>
           </Panel>
 
@@ -276,7 +288,11 @@ export function AttentionPage() {
         <div className="flex flex-col gap-4">
           <Panel
             title={STAGE_LABELS[snapshot.stage]}
-            subtitle="Rows = queries, columns = keys. Hover a row to see what it attends to."
+            subtitle={
+              snapshot.stage === 'embedding'
+                ? 'Rows = tokens, columns = embedding dimensions.'
+                : 'Rows = queries, columns = keys. Hover a row to see what it attends to.'
+            }
             className="min-h-[340px]"
             right={
               snapshot.nHeads > 1 ? (
@@ -310,7 +326,17 @@ export function AttentionPage() {
               ) : undefined
             }
           >
-            <AttentionViz snapshot={snapshot} />
+            {snapshot.stage === 'embedding' ? (
+              <EmbeddingViz
+                tokens={tokens}
+                tokenEmbeddings={snapshot.tokenEmbeddings}
+                positionalEncoding={snapshot.positionalEncoding}
+                positionedEmbeddings={snapshot.positionedEmbeddings}
+                usePosEnc={snapshot.usePosEnc}
+              />
+            ) : (
+              <AttentionViz snapshot={snapshot} />
+            )}
           </Panel>
 
           <Panel title="Step" noBody>

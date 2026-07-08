@@ -123,8 +123,9 @@ export function Home() {
             </div>
             <p className="mt-1 text-xs leading-relaxed text-ink-400">
               Watch Q·Kᵀ, softmax, and the weighted sum of V compute a transformer's core mechanism on a
-              sentence you type — with multiple attention heads running in parallel. Switch heads to see
-              each one learn a different pattern, then hover a token to see what it attends to.
+              sentence you type — with multiple attention heads and sinusoidal positional encoding running
+              in parallel. Switch heads to see each one learn a different pattern, then hover a token to see
+              what it attends to.
             </p>
           </Link>
         </div>

@@ -2,9 +2,32 @@ import { describe, it, expect } from 'vitest';
 import { attentionSnapshot, STAGE_LABELS } from './attention-snapshot';
 import type { TraceEvent } from '@/types/trace';
 
+const embedEvent: TraceEvent = {
+  type: 'attention:embed',
+  step: 0,
+  tokenEmbeddings: [
+    [1, 0, 0, 0],
+    [0, 1, 0, 0],
+    [1, 0, 0, 0],
+  ],
+  positionalEncoding: [
+    [0, 1, 0, 1],
+    [0.84, 0.54, 0.01, 1],
+    [0.91, -0.42, 0.02, 1],
+  ],
+  positionedEmbeddings: [
+    [1, 1, 0, 1],
+    [0.84, 1.54, 0.01, 1],
+    [1.91, -0.42, 0.02, 1],
+  ],
+  usePosEnc: true,
+  explanation: 'embed explanation',
+  math: 'PE',
+};
+
 const initEvent: TraceEvent = {
   type: 'attention:init',
-  step: 0,
+  step: 1,
   tokens: ['the', 'cat', 'sat'],
   dModel: 4,
   dK: 2,
@@ -116,7 +139,7 @@ const convergedEvent: TraceEvent = {
   math: 'MultiHead',
 };
 
-const events: TraceEvent[] = [initEvent, scoresEvent, scaledEvent, softmaxEvent, convergedEvent];
+const events: TraceEvent[] = [embedEvent, initEvent, scoresEvent, scaledEvent, softmaxEvent, convergedEvent];
 
 describe('attentionSnapshot', () => {
   it('returns the empty snapshot before any events', () => {
@@ -126,8 +149,18 @@ describe('attentionSnapshot', () => {
     expect(snap.stage).toBe('none');
   });
 
-  it('picks up tokens/dModel/dK/nHeads from the init event alone', () => {
+  it('surfaces the embedding stage from the embed event alone', () => {
     const snap = attentionSnapshot(events, 0);
+    expect(snap.stage).toBe('embedding');
+    expect(snap.tokenEmbeddings).toEqual(embedEvent.tokenEmbeddings);
+    expect(snap.positionalEncoding).toEqual(embedEvent.positionalEncoding);
+    expect(snap.positionedEmbeddings).toEqual(embedEvent.positionedEmbeddings);
+    expect(snap.usePosEnc).toBe(true);
+    expect(snap.explanation).toBe('embed explanation');
+  });
+
+  it('picks up tokens/dModel/dK/nHeads from the init event alone', () => {
+    const snap = attentionSnapshot(events, 1);
     expect(snap.tokens).toEqual(['the', 'cat', 'sat']);
     expect(snap.dModel).toBe(4);
     expect(snap.dK).toBe(2);
@@ -136,24 +169,24 @@ describe('attentionSnapshot', () => {
   });
 
   it('surfaces head 0 by default at the scores step', () => {
-    const snap = attentionSnapshot(events, 1);
+    const snap = attentionSnapshot(events, 2);
     expect(snap.stage).toBe('scores');
     expect(snap.matrix).toEqual(headAScores);
     expect(snap.headMatrices).toEqual([headAScores, headBScores]);
   });
 
   it('surfaces a different head when selected', () => {
-    const snap = attentionSnapshot(events, 1, 1);
+    const snap = attentionSnapshot(events, 2, 1);
     expect(snap.matrix).toEqual(headBScores);
   });
 
   it('clamps an out-of-range head index to the last head', () => {
-    const snap = attentionSnapshot(events, 1, 99);
+    const snap = attentionSnapshot(events, 2, 99);
     expect(snap.matrix).toEqual(headBScores);
   });
 
   it('averages across heads when "mean" is selected', () => {
-    const snap = attentionSnapshot(events, 1, 'mean');
+    const snap = attentionSnapshot(events, 2, 'mean');
     expect(snap.matrix).toEqual([
       [0.5, 0.5, 0],
       [0.5, 0.5, 0],
@@ -162,19 +195,19 @@ describe('attentionSnapshot', () => {
   });
 
   it('surfaces the scaled matrix after the scaled step', () => {
-    const snap = attentionSnapshot(events, 2);
+    const snap = attentionSnapshot(events, 3);
     expect(snap.stage).toBe('scaled');
     expect(snap.matrix).toEqual(scaledEvent.headMatrices[0]);
   });
 
   it('surfaces softmax weights after the softmax step', () => {
-    const snap = attentionSnapshot(events, 3);
+    const snap = attentionSnapshot(events, 4);
     expect(snap.stage).toBe('softmax');
     expect(snap.matrix).toEqual(headASoftmax);
   });
 
   it('surfaces final weights + block output once converged', () => {
-    const snap = attentionSnapshot(events, 4);
+    const snap = attentionSnapshot(events, 5);
     expect(snap.stage).toBe('output');
     expect(snap.matrix).toEqual(headASoftmax);
     expect(snap.headOutput).toEqual(convergedEvent.headOutputs[0]);
