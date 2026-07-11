@@ -86,6 +86,15 @@ and this project aims to follow [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **Real 404 page instead of silent redirects (fixes soft-404s).** Unknown URLs
+  used to be silently redirected to the home page, and an unknown algorithm id in
+  `/workspace/:id` fell through to the first algorithm. Both served real content
+  at the wrong URL — a "soft 404" that wastes crawler budget and can index junk
+  URLs as duplicates of the homepage. Both now render a proper not-found page at
+  the requested URL with links back to Home and the learning paths. Because a
+  static/SPA host cannot emit a real 404 status, the page also flips the site's
+  `robots` meta to `noindex` while shown (restoring the prior value on navigation
+  away) so crawlers drop the dead URL.
 - **Recover from a failed Python start.** If the in-browser Python runtime
   (Pyodide/Web Worker) failed to boot — the worker throwing on creation or dying
   before it reported ready — the workspace was stuck on an infinite "loading
