@@ -63,6 +63,15 @@ and this project aims to follow [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Search-optimized page metadata + `/learn` indexing.** Every pre-rendered
+  algorithm page now leads its `<title>` and meta description with the search
+  terms people actually use — e.g. `K-Means Visualizer — Interactive ML in
+  Python` — and each carries `BreadcrumbList` structured data
+  (`scripts/seo-meta.mjs`, driven by the registry so titles can't drift). The
+  homepage title/description were retuned for the same intent. The Learning
+  Paths hub (`/learn`) is now pre-rendered as a crawlable page with `Course` /
+  `ItemList` structured data and added to `sitemap.xml`, so search engines can
+  discover the curriculum and its internal links to each workspace.
 - **README hero & screenshots.** The README now leads with a labelled screenshot
   of the live workspace (editable Python next to a converged K-Means
   visualization) plus a collapsible home-page gallery shot, both linking to the

@@ -26,6 +26,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { loadRegistry } from './load-registry.mjs';
 import { ogImageUrl, ogImageAlt } from './og-card.mjs';
+import { seoTitle, seoDescription, breadcrumbList } from './seo-meta.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
@@ -88,6 +89,11 @@ function jsonLd(meta) {
     about: { '@type': 'Thing', name: meta.name },
     isPartOf: { '@type': 'WebSite', name: 'AlgoVisualizer', url: `${ORIGIN}/` },
   };
+  return jsonLdScript(data);
+}
+
+/** Serialize a structured-data object into a safe <script> block. */
+function jsonLdScript(data) {
   // Escape `<` to keep the JSON from prematurely closing the script element.
   const json = JSON.stringify(data).replace(/</g, '\\u003c');
   return `<script type="application/ld+json">${json}</script>`;
@@ -95,8 +101,8 @@ function jsonLd(meta) {
 
 function renderPage(template, meta, categoryLabel) {
   const url = `${ORIGIN}/workspace/${meta.id}`;
-  const title = `${meta.name} — AlgoVisualizer`;
-  const description = meta.shortDescription;
+  const title = seoTitle(meta);
+  const description = seoDescription(meta);
   let html = template;
 
   html = replaceOnce(html, /<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(title)}</title>`, 'title');
@@ -164,7 +170,8 @@ function renderPage(template, meta, categoryLabel) {
     'twitter:image',
   );
 
-  html = replaceOnce(html, /<\/head>/, `${jsonLd(meta)}</head>`, 'head close');
+  const breadcrumb = jsonLdScript(breadcrumbList(meta, categoryLabel, ORIGIN));
+  html = replaceOnce(html, /<\/head>/, `${jsonLd(meta)}${breadcrumb}</head>`, 'head close');
   html = replaceOnce(
     html,
     /<div id="root">\s*<\/div>/,
@@ -175,13 +182,141 @@ function renderPage(template, meta, categoryLabel) {
   return html;
 }
 
+const LEARN_URL = `${ORIGIN}/learn`;
+const LEARN_TITLE = 'Learn Machine Learning — Interactive Lessons in Python';
+const LEARN_DESCRIPTION =
+  'Free guided ML lessons that run real Python in your browser. Work through linear ' +
+  'regression, logistic regression, decision trees, k-NN, k-means and PCA step by step.';
+
+function learnCrawlableContent(paths) {
+  const sections = paths
+    .map((path) => {
+      const lessons = path.lessons
+        .map(
+          (l) =>
+            `<li><a href="/workspace/${escapeHtml(l.algorithmId)}">${escapeHtml(l.title)}</a> — ${escapeHtml(l.blurb)}</li>`,
+        )
+        .join('');
+      return [
+        '<section>',
+        `<h2>${escapeHtml(path.title)}</h2>`,
+        `<p>${escapeHtml(path.summary)}</p>`,
+        `<p>${escapeHtml(path.estimate)} · ${path.lessons.length} lessons</p>`,
+        `<ol>${lessons}</ol>`,
+        '</section>',
+      ].join('');
+    })
+    .join('');
+  return [
+    '<main>',
+    '<nav><a href="/">AlgoVisualizer</a> › Learn</nav>',
+    '<h1>Learn Machine Learning — Interactive Lessons</h1>',
+    `<p>${escapeHtml(LEARN_DESCRIPTION)}</p>`,
+    '<p>Every lesson runs real Python in your browser and is complete when you beat its challenge — no install, no setup.</p>',
+    sections,
+    '<p><a href="/learn">Start learning</a></p>',
+    '</main>',
+  ].join('');
+}
+
+function learnStructuredData(paths) {
+  const itemList = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'AlgoVisualizer learning paths',
+    url: LEARN_URL,
+    itemListElement: paths.map((path, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'Course',
+        name: path.title,
+        description: path.summary,
+        url: LEARN_URL,
+        inLanguage: 'en',
+        isAccessibleForFree: true,
+        provider: { '@type': 'Organization', name: 'AlgoVisualizer', url: `${ORIGIN}/` },
+        hasCourseInstance: {
+          '@type': 'CourseInstance',
+          courseMode: 'online',
+          courseWorkload: path.estimate,
+        },
+      },
+    })),
+  };
+  const breadcrumb = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'AlgoVisualizer', item: `${ORIGIN}/` },
+      { '@type': 'ListItem', position: 2, name: 'Learn', item: LEARN_URL },
+    ],
+  };
+  return `${jsonLdScript(itemList)}${jsonLdScript(breadcrumb)}`;
+}
+
+function renderLearnPage(template, paths) {
+  let html = template;
+  html = replaceOnce(html, /<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(LEARN_TITLE)}</title>`, 'title');
+  html = replaceOnce(
+    html,
+    /<meta name="description" content="[^"]*"\s*\/?>/,
+    `<meta name="description" content="${escapeHtml(LEARN_DESCRIPTION)}" />`,
+    'description meta',
+  );
+  html = replaceOnce(
+    html,
+    /<link rel="canonical" href="[^"]*"\s*\/?>/,
+    `<link rel="canonical" href="${escapeHtml(LEARN_URL)}" />`,
+    'canonical link',
+  );
+  html = replaceOnce(
+    html,
+    /<meta property="og:url" content="[^"]*"\s*\/?>/,
+    `<meta property="og:url" content="${escapeHtml(LEARN_URL)}" />`,
+    'og:url',
+  );
+  html = replaceOnce(
+    html,
+    /<meta property="og:title" content="[^"]*"\s*\/?>/,
+    `<meta property="og:title" content="${escapeHtml(LEARN_TITLE)}" />`,
+    'og:title',
+  );
+  html = replaceOnce(
+    html,
+    /<meta property="og:description" content="[^"]*"\s*\/?>/,
+    `<meta property="og:description" content="${escapeHtml(LEARN_DESCRIPTION)}" />`,
+    'og:description',
+  );
+  html = replaceOnce(
+    html,
+    /<meta name="twitter:title" content="[^"]*"\s*\/?>/,
+    `<meta name="twitter:title" content="${escapeHtml(LEARN_TITLE)}" />`,
+    'twitter:title',
+  );
+  html = replaceOnce(
+    html,
+    /<meta name="twitter:description" content="[^"]*"\s*\/?>/,
+    `<meta name="twitter:description" content="${escapeHtml(LEARN_DESCRIPTION)}" />`,
+    'twitter:description',
+  );
+  html = replaceOnce(html, /<\/head>/, `${learnStructuredData(paths)}</head>`, 'head close');
+  html = replaceOnce(
+    html,
+    /<div id="root">\s*<\/div>/,
+    `<div id="root">${learnCrawlableContent(paths)}</div>`,
+    'root node',
+  );
+  return html;
+}
+
 async function main() {
   const templatePath = resolve(distDir, 'index.html');
   if (!existsSync(templatePath)) {
     throw new Error('prerender: dist/index.html not found — run `vite build` first.');
   }
   const template = readFileSync(templatePath, 'utf8');
-  const { listAlgorithms, CATEGORY_LABELS } = await loadRegistry();
+  const { listAlgorithms, CATEGORY_LABELS, listLearningPaths } = await loadRegistry();
   const algorithms = listAlgorithms();
 
   let count = 0;
@@ -194,7 +329,14 @@ async function main() {
     count += 1;
   }
 
-  console.log(`Prerendered ${count} algorithm page(s) into dist/workspace/<id>/index.html`);
+  const learnHtml = renderLearnPage(template, listLearningPaths());
+  const learnDir = resolve(distDir, 'learn');
+  mkdirSync(learnDir, { recursive: true });
+  writeFileSync(resolve(learnDir, 'index.html'), learnHtml, 'utf8');
+
+  console.log(
+    `Prerendered ${count} algorithm page(s) into dist/workspace/<id>/index.html + dist/learn/index.html`,
+  );
 }
 
 main().catch((err) => {
