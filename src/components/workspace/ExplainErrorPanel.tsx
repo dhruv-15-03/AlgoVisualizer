@@ -13,7 +13,7 @@ export function ExplainErrorPanel({ traceback }: { traceback: string }) {
   const explained = useMemo(() => explainError(traceback), [traceback]);
 
   return (
-    <div className="mt-3 rounded-md border border-rose-500/30 bg-rose-500/5 text-left">
+    <div className="mt-3 min-w-0 rounded-md border border-rose-500/30 bg-rose-500/5 text-left">
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
@@ -25,7 +25,7 @@ export function ExplainErrorPanel({ traceback }: { traceback: string }) {
       </button>
 
       {open && (
-        <div className="flex flex-col gap-2 px-3 pb-3">
+        <div className="flex min-w-0 flex-col gap-2 px-3 pb-3">
           <div className="text-sm font-semibold text-rose-100">{explained.title}</div>
           <p className="text-xs leading-relaxed text-ink-200">{explained.plainEnglish}</p>
 
@@ -52,7 +52,7 @@ export function ExplainErrorPanel({ traceback }: { traceback: string }) {
               {rawOpen ? 'Hide' : 'Show'} raw traceback
             </button>
             {rawOpen && (
-              <pre className="mt-1 max-h-40 overflow-auto rounded-md bg-ink-900/80 p-2 text-[11px] text-rose-200">
+              <pre className="mt-1 max-h-40 w-full overflow-auto whitespace-pre-wrap break-words rounded-md bg-ink-900/80 p-2 text-[11px] text-rose-200">
                 {explained.raw || 'No traceback available.'}
               </pre>
             )}
