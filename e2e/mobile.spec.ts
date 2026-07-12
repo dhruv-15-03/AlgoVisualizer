@@ -114,5 +114,46 @@ for (const viewport of VIEWPORTS) {
       expect(svgWidth as number).toBeLessThanOrEqual(containerWidth + 1);
       expect(svgWidth as number).toBeGreaterThan(containerWidth * 0.5);
     });
+
+    test('workspace nav/algorithm-switcher is reachable and transport controls are tap-friendly', async ({
+      page,
+    }) => {
+      await page.goto('/workspace/kmeans');
+      await expect(page.getByText(/step\s+\d+\/\d+/).first()).toBeVisible({ timeout: 60_000 });
+      await assertNoHorizontalOverflow(page);
+
+      // The algorithm switcher must be visible and reachable without
+      // horizontal scrolling — no offscreen/clipped nav on narrow screens.
+      const algorithmSwitcher = page.getByRole('combobox', { name: 'Algorithm' });
+      await expect(algorithmSwitcher).toBeVisible();
+      const switcherBox = await algorithmSwitcher.boundingBox();
+      expect(switcherBox?.x ?? -1).toBeGreaterThanOrEqual(0);
+      expect((switcherBox?.x ?? 0) + (switcherBox?.width ?? 0)).toBeLessThanOrEqual(viewport.width + 1);
+
+      // Playback/transport controls (step back/forward, play, reset, re-run)
+      // must meet the ~44px minimum touch-target size established by the
+      // `.touch-target` utility class.
+      const controlNames = ['Step back', 'Step forward', 'Play', 'Reset'];
+      for (const name of controlNames) {
+        const control = page.getByRole('button', { name, exact: false }).first();
+        const box = await control.boundingBox();
+        expect(box?.height ?? 0, `${name} height`).toBeGreaterThanOrEqual(44);
+        expect(box?.width ?? 0, `${name} width`).toBeGreaterThanOrEqual(44);
+      }
+
+      // The Tune tab's per-parameter "Sweep" icon buttons must also meet the
+      // touch-target floor (previously 24x24px, fixed to reuse `.touch-target`).
+      await page.getByRole('tab', { name: 'Tune' }).click();
+      await expect(page.getByText('Hyperparameters')).toBeVisible();
+      const sweepButtons = page.getByRole('button', { name: /^Sweep /i });
+      const sweepCount = await sweepButtons.count();
+      expect(sweepCount).toBeGreaterThan(0);
+      for (let i = 0; i < sweepCount; i++) {
+        const box = await sweepButtons.nth(i).boundingBox();
+        expect(box?.height ?? 0, `sweep button ${i} height`).toBeGreaterThanOrEqual(44);
+        expect(box?.width ?? 0, `sweep button ${i} width`).toBeGreaterThanOrEqual(44);
+      }
+      await assertNoHorizontalOverflow(page);
+    });
   });
 }

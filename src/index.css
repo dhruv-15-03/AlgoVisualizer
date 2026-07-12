@@ -130,9 +130,21 @@
   border-left: 2px solid theme('colors.accent.400');
 }
 
-/* Touch-friendly slider thumbs and minimum tap targets on coarse pointers.
-   WCAG 2.5.5 recommends 44×44px; we bump native range thumbs and add a
-   utility class for icon buttons in mobile bars. */
+/* Minimum tap target for icon buttons in mobile bars. WCAG 2.5.5 recommends
+   44x44px. Applied unconditionally (not gated on `pointer: coarse`) because
+   pointer-type media-feature detection is unreliable in practice: headless
+   test browsers, hybrid/2-in-1 devices, and resized desktop windows at
+   mobile widths often report `fine`/`none` even though a human may be
+   tapping the screen. The acceptance bar is "tap-friendly at mobile
+   viewports", not "tap-friendly only when the UA claims a coarse pointer". */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Touch-friendly slider thumbs on coarse pointers (nice-to-have enhancement;
+   native range thumbs already have generous OS-level touch slop even at
+   their default small visual size, so this stays pointer-gated). */
 @media (pointer: coarse) {
   input[type='range']::-webkit-slider-thumb {
     width: 1.25rem !important;
@@ -142,10 +154,6 @@
     width: 1.25rem !important;
     height: 1.25rem !important;
     border: 0;
-  }
-  .touch-target {
-    min-height: 44px;
-    min-width: 44px;
   }
 }
 

@@ -286,7 +286,7 @@ export function TopNav() {
           <Button
             size="sm"
             variant="secondary"
-            className="whitespace-nowrap"
+            className="touch-target whitespace-nowrap"
             onClick={() => runNow()}
             disabled={runStatus === 'running'}
           >
