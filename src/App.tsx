@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { Home } from '@/pages/Home';
+import { NotFound } from '@/pages/NotFound';
 import { attachController } from '@/controllers/training-controller';
 import { ConsentBanner } from '@/components/ConsentBanner';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
@@ -62,7 +63,7 @@ export default function App() {
           <Route path="/workspace/:algoId" element={<WorkspacePage />} />
           <Route path="/race" element={<RacePage />} />
           <Route path="/attention" element={<AttentionPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
       <ConsentBanner />

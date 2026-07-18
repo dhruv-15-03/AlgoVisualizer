@@ -137,7 +137,7 @@ function Hyperparams() {
                     title={`Sweep ${p.label} across a range`}
                     aria-label={`Sweep ${p.label}`}
                     onClick={() => setSweepingId(p.id)}
-                    className="inline-flex h-6 w-6 items-center justify-center rounded-md border border-ink-600 text-ink-400 transition-colors hover:border-accent-400 hover:text-accent-200"
+                    className="touch-target inline-flex items-center justify-center rounded-md border border-ink-600 text-ink-400 transition-colors hover:border-accent-400 hover:text-accent-200"
                   >
                     <Icon name="query_stats" size={14} />
                   </button>

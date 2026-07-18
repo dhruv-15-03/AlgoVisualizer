@@ -22,7 +22,8 @@ export async function loadRegistry() {
     stdin: {
       contents:
         "export { listAlgorithms } from '@/algorithms/registry';\n" +
-        "export { CATEGORY_LABELS } from '@/types/algorithm';\n",
+        "export { CATEGORY_LABELS } from '@/types/algorithm';\n" +
+        "export { listLearningPaths } from '@/lib/curriculum';\n",
       resolveDir: root,
       loader: 'ts',
     },
