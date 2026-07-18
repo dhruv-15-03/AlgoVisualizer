@@ -155,5 +155,78 @@ for (const viewport of VIEWPORTS) {
       }
       await assertNoHorizontalOverflow(page);
     });
+
+    test('workspace: CNN sample strip + feature maps stack without overflow', async ({ page }) => {
+      // CNN's viz has extra chrome (sample thumbnail strip, per-filter feature
+      // maps) that classification/clustering workspaces don't — a good stress
+      // test for the generic VizPanel/tab layout.
+      await page.goto('/workspace/cnn');
+      await expect(page.getByText(/step\s+\d+\/\d+/).first()).toBeVisible({ timeout: 60_000 });
+      await assertNoHorizontalOverflow(page);
+
+      const tabs = page.getByRole('tab');
+      if (viewport.width < 1280) {
+        await expect(tabs.filter({ hasText: 'Visualize' })).toBeVisible();
+      }
+      // Let training run a step or two so the sample strip + feature maps
+      // mount. The step-forward control is briefly disabled while the first
+      // async pyodide/training step resolves, so wait for it to be enabled
+      // before clicking rather than racing it (avoids a CI flake).
+      const stepForward = page.getByRole('button', { name: /step forward/i }).first();
+      await expect(stepForward).toBeEnabled({ timeout: 30_000 });
+      await stepForward.click();
+      await assertNoHorizontalOverflow(page);
+    });
+
+    test('workspace: MLP network diagram stacks without overflow', async ({ page }) => {
+      await page.goto('/workspace/mlp');
+      await expect(page.getByText(/step\s+\d+\/\d+/).first()).toBeVisible({ timeout: 60_000 });
+      await assertNoHorizontalOverflow(page);
+    });
+
+    test('ByoDataModal fits within viewport and closes via touch-friendly control', async ({ page }) => {
+      await page.goto('/workspace/kmeans');
+      await expect(page.getByText(/step\s+\d+\/\d+/).first()).toBeVisible({ timeout: 60_000 });
+
+      await page.getByRole('button', { name: /use your own data/i }).click();
+      const dialog = page.getByRole('dialog', { name: /use your own data/i });
+      await expect(dialog).toBeVisible();
+      await assertNoHorizontalOverflow(page);
+
+      const box = await dialog.boundingBox();
+      expect(box?.width ?? Infinity).toBeLessThanOrEqual(viewport.width);
+
+      const closeBtn = page.getByRole('button', { name: 'Close' });
+      const closeBox = await closeBtn.boundingBox();
+      expect(closeBox?.height ?? 0).toBeGreaterThanOrEqual(44);
+      expect(closeBox?.width ?? 0).toBeGreaterThanOrEqual(44);
+
+      await closeBtn.click();
+      await expect(dialog).toBeHidden();
+    });
+
+    test('SweepDialog fits within viewport with sticky, tap-friendly footer', async ({ page }) => {
+      await page.goto('/workspace/kmeans');
+      await expect(page.getByText(/step\s+\d+\/\d+/).first()).toBeVisible({ timeout: 60_000 });
+
+      await page.getByRole('tab', { name: 'Tune' }).click();
+      await expect(page.getByText('Hyperparameters')).toBeVisible();
+      await page.getByRole('button', { name: /^Sweep /i }).first().click();
+
+      const dialog = page.getByRole('dialog', { name: /^Sweep/ });
+      await expect(dialog).toBeVisible();
+      await assertNoHorizontalOverflow(page);
+
+      const box = await dialog.boundingBox();
+      expect(box?.width ?? Infinity).toBeLessThanOrEqual(viewport.width);
+
+      const closeBtn = page.getByRole('button', { name: 'Close sweep dialog' });
+      const closeBox = await closeBtn.boundingBox();
+      expect(closeBox?.height ?? 0).toBeGreaterThanOrEqual(44);
+      expect(closeBox?.width ?? 0).toBeGreaterThanOrEqual(44);
+
+      await closeBtn.click();
+      await expect(dialog).toBeHidden();
+    });
   });
 }
