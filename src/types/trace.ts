@@ -405,6 +405,50 @@ export interface RLConverged extends BaseTraceEvent {
 }
 export type RLEvent = RLInit | RLEpisode | RLConverged;
 
+// ─── Self-Attention (toy multi-head scaled dot-product attention) ──────────
+export interface AttentionEmbed extends BaseTraceEvent {
+  type: 'attention:embed';
+  /** Raw (position-free) toy token embeddings, n × d_model. */
+  tokenEmbeddings: number[][];
+  /** Sinusoidal positional encoding matrix, n × d_model (Vaswani et al., 2017). */
+  positionalEncoding: number[][];
+  /** tokenEmbeddings + positionalEncoding — what Q/K/V are actually projected from. */
+  positionedEmbeddings: number[][];
+  /** Whether positional encoding was added (if false, positionedEmbeddings === tokenEmbeddings). */
+  usePosEnc: boolean;
+}
+export interface AttentionInit extends BaseTraceEvent {
+  type: 'attention:init';
+  tokens: string[];
+  dModel: number;
+  dK: number;
+  /** Number of attention heads, each with its own Wq/Wk/Wv. */
+  nHeads: number;
+  /** Per-head Query/Key/Value matrices, each shaped [nHeads][n][dK]. */
+  headsQ: number[][][];
+  headsK: number[][][];
+  headsV: number[][][];
+}
+export interface AttentionStep extends BaseTraceEvent {
+  type: 'attention:step';
+  stage: 'scores' | 'scaled' | 'softmax';
+  /** Per-head n × n matrices for this stage, shaped [nHeads][n][n]. */
+  headMatrices: number[][][];
+}
+export interface AttentionConverged extends BaseTraceEvent {
+  type: 'attention:converged';
+  /** Final per-head softmax attention-weight matrices, [nHeads][n][n]. */
+  headWeights: number[][][];
+  /** Per-head weighted sum of Value vectors, [nHeads][n][dK]. */
+  headOutputs: number[][][];
+  /** All heads concatenated along the last axis, n × (nHeads * dK). */
+  concatOutput: number[][];
+  /** Concat projected through Wo back to d_model — the contextualized block output. */
+  output: number[][];
+  reason: string;
+}
+export type AttentionEvent = AttentionEmbed | AttentionInit | AttentionStep | AttentionConverged;
+
 // ─── Universal lifecycle events ─────────────────────────────────────────────
 export interface ErrorEvent extends BaseTraceEvent {
   type: 'error';
@@ -430,6 +474,7 @@ export type TraceEvent =
   | MLPEvent
   | CNNEvent
   | RLEvent
+  | AttentionEvent
   | ErrorEvent
   | FinishedEvent;
 
@@ -445,7 +490,8 @@ export type AlgorithmFamily =
   | 'forest'
   | 'mlp'
   | 'cnn'
-  | 'rl';
+  | 'rl'
+  | 'attention';
 
 const FAMILY_PREFIXES = new Set<string>([
   'kmeans',
@@ -460,6 +506,7 @@ const FAMILY_PREFIXES = new Set<string>([
   'mlp',
   'cnn',
   'rl',
+  'attention',
 ]);
 
 export function familyOf(type: TraceEvent['type']): AlgorithmFamily | 'system' {

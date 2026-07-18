@@ -20,6 +20,9 @@ const RacePage = lazy(() =>
 const LearnPage = lazy(() =>
   import('@/pages/LearnPage').then((m) => ({ default: m.LearnPage })),
 );
+const AttentionPage = lazy(() =>
+  import('@/pages/AttentionPage').then((m) => ({ default: m.AttentionPage })),
+);
 
 function RouteSplash() {
   return (
@@ -59,6 +62,7 @@ export default function App() {
           <Route path="/workspace" element={<WorkspacePage />} />
           <Route path="/workspace/:algoId" element={<WorkspacePage />} />
           <Route path="/race" element={<RacePage />} />
+          <Route path="/attention" element={<AttentionPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

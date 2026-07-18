@@ -33,6 +33,7 @@ export function Home() {
       // prewarm helpers (errors surface on the real run instead).
       void import('@/pages/WorkspacePage');
       void import('@/pages/RacePage');
+      void import('@/pages/AttentionPage');
       prewarmPyodide();
     });
     return () => cic(handle);
@@ -99,6 +100,36 @@ export function Home() {
           </span>
         </div>
       </header>
+
+      <section className="mt-8 sm:mt-12">
+        <div className="flex items-baseline justify-between border-b border-ink-700 pb-2">
+          <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-ink-300">
+            LLM / Modern AI Lab
+            <span className="rounded-full bg-accent-500/15 px-2 py-0.5 text-[10px] font-medium normal-case tracking-normal text-accent-300">
+              New
+            </span>
+          </h2>
+        </div>
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <Link
+            to="/attention"
+            className="group relative rounded-xl border border-accent-500/30 bg-gradient-to-br from-ink-800 to-ink-800/60 p-4 transition-colors hover:border-accent-500/60"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <h3 className="text-sm font-semibold text-ink-100 group-hover:text-accent-300">
+                Self-Attention
+              </h3>
+              <Icon name="science" size={16} className="text-accent-300" />
+            </div>
+            <p className="mt-1 text-xs leading-relaxed text-ink-400">
+              Watch Q·Kᵀ, softmax, and the weighted sum of V compute a transformer's core mechanism on a
+              sentence you type — with multiple attention heads and sinusoidal positional encoding running
+              in parallel. Switch heads to see each one learn a different pattern, then hover a token to see
+              what it attends to.
+            </p>
+          </Link>
+        </div>
+      </section>
 
       <section className="mt-8 space-y-8 sm:mt-12">
         {groups.map(({ category, algorithms }) => (
