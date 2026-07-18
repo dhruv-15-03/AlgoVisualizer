@@ -34,8 +34,14 @@ test('Race mode is reachable from the home page', async ({ page }) => {
   await expect(page).toHaveURL(/\/race$/);
 });
 
-test('an unknown route redirects home', async ({ page }) => {
+test('an unknown route renders a 404 page without redirecting', async ({ page }) => {
   await page.goto('/this-route-does-not-exist');
-  await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  // The bad URL must NOT be silently redirected to home — doing so is a
+  // soft-404 (200 + home content at the wrong URL). It stays put and renders a
+  // real not-found page.
+  await expect(page).toHaveURL(/\/this-route-does-not-exist$/);
+  await expect(page.getByRole('heading', { name: /page not found/i })).toBeVisible();
+  // A static/SPA host can't emit a real 404 status, so the page signals crawlers
+  // by flipping the robots meta to noindex.
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
 });
