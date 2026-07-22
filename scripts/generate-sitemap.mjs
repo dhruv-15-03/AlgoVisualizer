@@ -56,6 +56,7 @@ function urls() {
   const list = [
     { loc: `${SITE_ORIGIN}/`, changefreq: 'weekly', priority: 1.0 },
     { loc: `${SITE_ORIGIN}/race`, changefreq: 'monthly', priority: 0.7 },
+    { loc: `${SITE_ORIGIN}/learn`, changefreq: 'weekly', priority: 0.9 },
   ];
   for (const id of ALGORITHM_IDS) {
     list.push({ loc: `${SITE_ORIGIN}/workspace/${id}`, changefreq: 'monthly', priority: 0.8 });

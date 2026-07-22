@@ -191,18 +191,29 @@ export function TopNav() {
             <span className="hidden md:inline">Race</span>
           </Link>
           <KeyboardHelp />
-          <StatusPill tone={pyTone} pulse={pyodideStatus === 'loading'}>
-            <span className="hidden md:inline">{pyLabel}</span>
-            <span aria-label={pyLabel} className="md:hidden">
-              <Icon name="terminal" size={14} />
-            </span>
-          </StatusPill>
-          <StatusPill tone={runTone} pulse={runStatus === 'running'}>
-            <span className="hidden md:inline">{runLongLabel}</span>
-            <span aria-label={runLongLabel} className="md:hidden">
-              {runShortLabel}
-            </span>
-          </StatusPill>
+          {/* Status pills are actionable-only: they take up header space at
+              every width (worst on the cramped side-panel layout), so they
+              stay hidden in nominal states ('ready'/'idle' for Python,
+              'success'/'idle' for the run) where they convey no signal a
+              viewer needs — the visualization itself is the feedback on
+              success. They reappear only while something is in flight or
+              needs attention (loading/error/cancelled). */}
+          {(pyodideStatus === 'loading' || pyodideStatus === 'error') && (
+            <StatusPill tone={pyTone} pulse={pyodideStatus === 'loading'}>
+              <span className="hidden md:inline">{pyLabel}</span>
+              <span aria-label={pyLabel} className="md:hidden">
+                <Icon name="terminal" size={14} />
+              </span>
+            </StatusPill>
+          )}
+          {(runStatus === 'running' || runStatus === 'error' || runStatus === 'cancelled') && (
+            <StatusPill tone={runTone} pulse={runStatus === 'running'}>
+              <span className="hidden md:inline">{runLongLabel}</span>
+              <span aria-label={runLongLabel} className="md:hidden">
+                {runShortLabel}
+              </span>
+            </StatusPill>
+          )}
         </div>
 
         {/* Selectors. `order-last w-full` on small screens forces them onto their
@@ -286,7 +297,7 @@ export function TopNav() {
           <Button
             size="sm"
             variant="secondary"
-            className="whitespace-nowrap"
+            className="touch-target whitespace-nowrap"
             onClick={() => runNow()}
             disabled={runStatus === 'running'}
           >

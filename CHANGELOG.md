@@ -63,6 +63,15 @@ and this project aims to follow [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Search-optimized page metadata + `/learn` indexing.** Every pre-rendered
+  algorithm page now leads its `<title>` and meta description with the search
+  terms people actually use — e.g. `K-Means Visualizer — Interactive ML in
+  Python` — and each carries `BreadcrumbList` structured data
+  (`scripts/seo-meta.mjs`, driven by the registry so titles can't drift). The
+  homepage title/description were retuned for the same intent. The Learning
+  Paths hub (`/learn`) is now pre-rendered as a crawlable page with `Course` /
+  `ItemList` structured data and added to `sitemap.xml`, so search engines can
+  discover the curriculum and its internal links to each workspace.
 - **README hero & screenshots.** The README now leads with a labelled screenshot
   of the live workspace (editable Python next to a converged K-Means
   visualization) plus a collapsible home-page gallery shot, both linking to the
@@ -77,6 +86,15 @@ and this project aims to follow [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **Real 404 page instead of silent redirects (fixes soft-404s).** Unknown URLs
+  used to be silently redirected to the home page, and an unknown algorithm id in
+  `/workspace/:id` fell through to the first algorithm. Both served real content
+  at the wrong URL — a "soft 404" that wastes crawler budget and can index junk
+  URLs as duplicates of the homepage. Both now render a proper not-found page at
+  the requested URL with links back to Home and the learning paths. Because a
+  static/SPA host cannot emit a real 404 status, the page also flips the site's
+  `robots` meta to `noindex` while shown (restoring the prior value on navigation
+  away) so crawlers drop the dead URL.
 - **Recover from a failed Python start.** If the in-browser Python runtime
   (Pyodide/Web Worker) failed to boot — the worker throwing on creation or dying
   before it reported ready — the workspace was stuck on an infinite "loading

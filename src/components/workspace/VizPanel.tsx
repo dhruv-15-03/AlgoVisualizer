@@ -166,18 +166,18 @@ export function VizPanel() {
     body = <LoadingState stage={pyodideStage} message={pyodideProgress} />;
   } else if (pyodideStatus === 'error') {
     body = (
-      <div className="grid h-full place-items-center p-4">
-        <div className="max-w-md text-center">
+      <div className="grid h-full min-w-0 place-items-center p-4">
+        <div className="w-full min-w-0 max-w-md text-center">
           <div className="inline-flex items-center gap-1.5 text-sm font-semibold text-rose-300">
             <Icon name="error_outline" size={16} />
             Python failed to load
           </div>
-          <pre className="mt-2 max-h-40 overflow-auto rounded-md bg-rose-500/10 p-3 text-left text-[11px] text-rose-200">
+          <pre className="mt-2 max-h-40 w-full overflow-auto whitespace-pre-wrap break-words rounded-md bg-rose-500/10 p-3 text-left text-[11px] text-rose-200">
             {pyodideProgress}
           </pre>
           <button
             onClick={() => retryPyodide()}
-            className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-rose-400/40 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-100 transition-colors hover:bg-rose-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+            className="mt-3 inline-flex min-h-[44px] items-center gap-1.5 rounded-md border border-rose-400/40 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-100 transition-colors hover:bg-rose-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
           >
             <Icon name="refresh" size={14} />
             Retry
@@ -187,8 +187,8 @@ export function VizPanel() {
     );
   } else if (runStatus === 'error') {
     body = (
-      <div className="grid h-full place-items-center p-4">
-        <div className="w-full max-w-lg text-center">
+      <div className="grid h-full min-w-0 place-items-center p-4">
+        <div className="w-full min-w-0 max-w-lg text-center">
           <div className="inline-flex items-center gap-1.5 text-sm font-semibold text-rose-300">
             <Icon name="error_outline" size={16} />
             Run failed
@@ -196,7 +196,7 @@ export function VizPanel() {
           <ExplainErrorPanel traceback={runError || 'Unknown error'} />
           <button
             onClick={() => runNow()}
-            className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-accent-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-500"
+            className="mt-3 inline-flex min-h-[44px] items-center gap-1.5 rounded-md bg-accent-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-500"
           >
             <Icon name="refresh" size={14} />
             Try again
@@ -232,7 +232,7 @@ export function VizPanel() {
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-3">
+    <div className="flex h-full min-h-0 flex-col gap-3 overflow-y-auto">
       <Panel
         title="Visualization"
         subtitle={headerSubtitle}
@@ -246,10 +246,15 @@ export function VizPanel() {
             </span>
           </div>
         }
-        className="flex-1 min-h-0"
+        className="flex-1 min-h-fit xl:min-h-0"
         bodyClassName="p-2 flex flex-col gap-2"
       >
-        <div ref={vizContainerRef} className="relative min-h-0 flex-1 overflow-hidden rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
+        {/* `min-h-[…]` is a hard floor: on short mobile viewports the sibling
+            rows below (goal banner, scrubber) are `shrink-0` and would
+            otherwise squeeze this flex-1 box to near 0px. The floor keeps the
+            D3/canvas visualization usably sized; the outer `overflow-y-auto`
+            column scrolls instead of clipping when content exceeds the pane. */}
+        <div ref={vizContainerRef} className="relative min-h-[240px] flex-1 overflow-hidden rounded-lg border border-ink-700/50 bg-ink-900/50 p-2 sm:min-h-[320px]">
           {body}
           <ConvergenceCelebration />
         </div>
@@ -305,7 +310,7 @@ function ExplanationPanel({ event }: { event: ReturnType<typeof useCurrentEvent>
   }, [currentStep]);
 
   const content = (
-    <div className="flex flex-col gap-3">
+    <div className="flex min-w-0 flex-col gap-3">
       <p className="text-sm leading-relaxed text-ink-200">
         {event?.explanation ?? 'No events yet.'}
       </p>
@@ -315,7 +320,7 @@ function ExplanationPanel({ event }: { event: ReturnType<typeof useCurrentEvent>
         </div>
       )}
       {familyOf(event?.type ?? 'finished') === 'system' && event?.type === 'error' && (
-        <pre className="overflow-x-auto rounded-md bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+        <pre className="w-full overflow-auto whitespace-pre-wrap break-words rounded-md bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
           {(event as { message?: string }).message}
         </pre>
       )}

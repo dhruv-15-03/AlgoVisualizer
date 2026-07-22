@@ -17,6 +17,7 @@ import { getAlgorithmSource } from '@/algorithms/algorithm-sources';
 import { getDataset } from '@/datasets/registry';
 import { DEFAULT_DATASET_BY_ALGO } from '@/algorithms/default-datasets';
 import { decodeShareState, readTokenFromHash } from '@/lib/share-link';
+import { NotFound } from '@/pages/NotFound';
 import type { AlgorithmId } from '@/types/algorithm';
 
 export function WorkspacePage() {
@@ -59,7 +60,10 @@ export function WorkspacePage() {
     if (!algoId) return;
     const meta = getAlgorithm(algoId);
     if (!meta) {
-      navigate('/workspace', { replace: true });
+      // Unknown algorithm id — fall through so the component renders the 404
+      // page at this URL instead of silently redirecting to the first
+      // algorithm, which would be a soft-404 for crawlers and confusing for
+      // users following a dead link.
       return;
     }
     // Read live state too: during the same mount commit as hydration the
@@ -116,6 +120,12 @@ export function WorkspacePage() {
   usePlaybackKeyboard();
 
   const familyTheme = useFamilyTheme();
+
+  // Unknown algorithm id in the route → render a real 404 at this URL rather
+  // than redirecting. Placed after all hooks so hook order stays stable.
+  if (algoId && !getAlgorithm(algoId)) {
+    return <NotFound />;
+  }
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-ink-900" style={familyTheme.style}>

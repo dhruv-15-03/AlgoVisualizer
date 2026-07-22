@@ -59,6 +59,7 @@ export function sitemapUrls(
   const urls: SitemapUrl[] = [
     { loc: `${origin}/`, changefreq: 'weekly', priority: 1.0 },
     { loc: `${origin}/race`, changefreq: 'monthly', priority: 0.7 },
+    { loc: `${origin}/learn`, changefreq: 'weekly', priority: 0.9 },
   ];
   for (const id of ids) {
     urls.push({ loc: `${origin}/workspace/${id}`, changefreq: 'monthly', priority: 0.8 });
