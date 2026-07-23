@@ -29,6 +29,8 @@ interface MLPSnapshot {
   lossHistory: Array<{ iteration: number; loss: number }>;
   points: number[][] | null;
   pointAxisLabels: [string, string] | null;
+  sampleActivations: number[][] | null;
+  probeIndex: number | null;
 }
 
 function snapshot(events: TraceEvent[], upTo: number): MLPSnapshot {
@@ -43,6 +45,8 @@ function snapshot(events: TraceEvent[], upTo: number): MLPSnapshot {
   const lossHistory: Array<{ iteration: number; loss: number }> = [];
   let points: number[][] | null = null;
   let pointAxisLabels: [string, string] | null = null;
+  let sampleActivations: number[][] | null = null;
+  let probeIndex: number | null = null;
   for (let i = 0; i <= upTo && i < events.length; i += 1) {
     const e = events[i];
     if (e.type === 'mlp:init') {
@@ -52,6 +56,8 @@ function snapshot(events: TraceEvent[], upTo: number): MLPSnapshot {
       accuracy = e.accuracy;
       points = e.points ?? points;
       pointAxisLabels = e.pointAxisLabels ?? pointAxisLabels;
+      sampleActivations = e.sampleActivations ?? sampleActivations;
+      probeIndex = e.probeIndex ?? probeIndex;
       lossHistory.push({ iteration: -1, loss: e.loss });
     } else if (e.type === 'mlp:step') {
       layers = e.layers;
@@ -62,6 +68,8 @@ function snapshot(events: TraceEvent[], upTo: number): MLPSnapshot {
       loss = e.loss;
       accuracy = e.accuracy;
       iteration = e.iteration ?? lossHistory.length;
+      sampleActivations = e.sampleActivations ?? sampleActivations;
+      probeIndex = e.probeIndex ?? probeIndex;
       lossHistory.push({ iteration, loss: e.loss });
     } else if (e.type === 'mlp:converged') {
       layers = e.layers;
@@ -70,7 +78,7 @@ function snapshot(events: TraceEvent[], upTo: number): MLPSnapshot {
       accuracy = e.finalAccuracy;
     }
   }
-  return { layers, weights, grid, gridSize, bbox, loss, accuracy, iteration, lossHistory, points, pointAxisLabels };
+  return { layers, weights, grid, gridSize, bbox, loss, accuracy, iteration, lossHistory, points, pointAxisLabels, sampleActivations, probeIndex };
 }
 
 function BoundaryTop({
@@ -80,6 +88,7 @@ function BoundaryTop({
   gridSize,
   bbox,
   featureNames,
+  probeIndex,
 }: {
   X: number[][];
   y: number[] | null;
@@ -87,6 +96,7 @@ function BoundaryTop({
   gridSize: number | null;
   bbox: [number, number, number, number] | null;
   featureNames?: string[];
+  probeIndex?: number | null;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
@@ -170,11 +180,11 @@ function BoundaryTop({
                 key={i}
                 cx={xScale(row[0])}
                 cy={yScale(row[1])}
-                r={3.2}
+                r={i === probeIndex ? 5.5 : 3.2}
                 fill={colorFor(y?.[i] ?? 0)}
                 fillOpacity={0.9}
-                stroke="#0f172a"
-                strokeWidth={0.5}
+                stroke={i === probeIndex ? '#fbbf24' : '#0f172a'}
+                strokeWidth={i === probeIndex ? 2 : 0.5}
               />
             ))}
             {featureNames?.[0] && (
@@ -197,9 +207,11 @@ function BoundaryTop({
 function NetworkDiagram({
   layers,
   weights,
+  sampleActivations,
 }: {
   layers: number[];
   weights: number[][][] | null;
+  sampleActivations?: number[][] | null;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
@@ -269,28 +281,53 @@ function NetworkDiagram({
               </g>
             );
           })}
-          {layerPositions.map((pos, li) => (
-            <g key={`layer-${li}`}>
-              {pos.ys.map((cy, i) => (
-                <circle
-                  key={i}
-                  cx={pos.cx}
-                  cy={cy}
-                  r={li === 0 || li === layerPositions.length - 1 ? 8 : 6}
-                  fill={li === layerPositions.length - 1 ? '#fbbf24' : li === 0 ? '#60a5fa' : '#a78bfa'}
-                  fillOpacity={0.9}
-                  stroke="#0f172a"
-                  strokeWidth={1}
-                />
-              ))}
-              <text x={pos.cx} y={padding.top - 6} textAnchor="middle" fill="#94a3b8" fontSize={10}>
-                {li === 0 ? 'Input' : li === layers.length - 1 ? 'Output' : `Hidden ${li}`}
-              </text>
-              <text x={pos.cx} y={padding.top + innerH + 12} textAnchor="middle" fill="#64748b" fontSize={9} fontFamily="JetBrains Mono">
-                {layers[li]} units
-              </text>
-            </g>
-          ))}
+          {layerPositions.map((pos, li) => {
+            const layerActs = sampleActivations?.[li];
+            const maxAct = layerActs ? Math.max(0.001, ...layerActs.map((v) => Math.abs(v))) : 1;
+            const baseR = li === 0 || li === layerPositions.length - 1 ? 8 : 6;
+            return (
+              <g key={`layer-${li}`}>
+                {pos.ys.map((cy, i) => {
+                  const act = layerActs?.[i];
+                  const activePulse = act !== undefined ? Math.abs(act) / maxAct : null;
+                  return (
+                    <g key={i}>
+                      {activePulse !== null && (
+                        <circle
+                          cx={pos.cx}
+                          cy={cy}
+                          r={baseR + 3 + 4 * activePulse}
+                          fill="none"
+                          stroke="#fbbf24"
+                          strokeOpacity={0.15 + 0.45 * activePulse}
+                          strokeWidth={1.5}
+                        >
+                          <title>{`activation ${act!.toFixed(3)}`}</title>
+                        </circle>
+                      )}
+                      <circle
+                        cx={pos.cx}
+                        cy={cy}
+                        r={baseR}
+                        fill={li === layerPositions.length - 1 ? '#fbbf24' : li === 0 ? '#60a5fa' : '#a78bfa'}
+                        fillOpacity={activePulse !== null ? 0.55 + 0.45 * activePulse : 0.9}
+                        stroke="#0f172a"
+                        strokeWidth={1}
+                      >
+                        {act !== undefined && <title>{`activation ${act.toFixed(3)}`}</title>}
+                      </circle>
+                    </g>
+                  );
+                })}
+                <text x={pos.cx} y={padding.top - 6} textAnchor="middle" fill="#94a3b8" fontSize={10}>
+                  {li === 0 ? 'Input' : li === layers.length - 1 ? 'Output' : `Hidden ${li}`}
+                </text>
+                <text x={pos.cx} y={padding.top + innerH + 12} textAnchor="middle" fill="#64748b" fontSize={9} fontFamily="JetBrains Mono">
+                  {layers[li]} units
+                </text>
+              </g>
+            );
+          })}
         </svg>
       )}
     </div>
@@ -309,6 +346,7 @@ export function MLPViz({ dataset, events, currentStep }: MLPVizProps) {
           gridSize={snap.gridSize}
           bbox={snap.bbox}
           featureNames={snap.pointAxisLabels ?? dataset.featureNames}
+          probeIndex={snap.probeIndex}
         />
         <div className="absolute right-3 top-2 flex gap-2 text-[10px] font-mono">
           {snap.loss !== null && (
@@ -319,9 +357,16 @@ export function MLPViz({ dataset, events, currentStep }: MLPVizProps) {
           )}
         </div>
       </div>
-      <div className="min-h-0 rounded-lg border border-ink-700/50 bg-ink-900/50 p-2">
+      <div className="min-h-0 rounded-lg border border-ink-700/50 bg-ink-900/50 p-2 relative">
         {snap.layers && snap.weights ? (
-          <NetworkDiagram layers={snap.layers} weights={snap.weights} />
+          <>
+            <NetworkDiagram layers={snap.layers} weights={snap.weights} sampleActivations={snap.sampleActivations} />
+            {snap.sampleActivations && (
+              <div className="absolute left-3 top-2 text-[10px] font-mono text-ink-400">
+                Forward pass — glow ring shows activation strength for the <span className="text-amber-300">highlighted point</span> above.
+              </div>
+            )}
+          </>
         ) : (
           <div className="grid h-full place-items-center text-xs text-ink-400">Run to see the network.</div>
         )}

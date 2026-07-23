@@ -62,6 +62,13 @@ def _forward(X, weights, biases, activation):
     return activations
 
 
+def _probe_activations(X, weights, biases, activation, probe_idx=0):
+    # Forward pass for a single sample, returned per-layer as a flat list of
+    # scalars so the UI can light up each neuron in the network diagram.
+    acts = _forward(X[probe_idx:probe_idx + 1], weights, biases, activation)
+    return [a[0].tolist() for a in acts]
+
+
 def _loss_acc(X, y, weights, biases, activation):
     acts = _forward(X, weights, biases, activation)
     probs = acts[-1]
@@ -122,6 +129,7 @@ def run(X, y, hidden=8, lr=0.1, epochs=80, activation="tanh", seed=0):
 
     step = 0
     loss, acc, acts = _loss_acc(X, y, weights, biases, activation)
+    probe_idx = 0
     init_event = {
         "type": "mlp:init",
         "step": step,
@@ -129,6 +137,8 @@ def run(X, y, hidden=8, lr=0.1, epochs=80, activation="tanh", seed=0):
         "weights": [W.tolist() for W in weights],
         "loss": loss,
         "accuracy": acc,
+        "sampleActivations": _probe_activations(X, weights, biases, activation, probe_idx),
+        "probeIndex": probe_idx,
         "explanation": note + (
             f"Initialized MLP layers {layers}, activation={activation}, softmax output, "
             f"cross-entropy loss. Initial loss={loss:.4f}, acc={acc:.3f}."
@@ -161,6 +171,8 @@ def run(X, y, hidden=8, lr=0.1, epochs=80, activation="tanh", seed=0):
             "loss": loss,
             "accuracy": acc,
             "learningRate": lr,
+            "sampleActivations": _probe_activations(X, weights, biases, activation, probe_idx),
+            "probeIndex": probe_idx,
             "explanation": f"Epoch {it}: loss={loss:.4f}, acc={acc:.3f}. Backprop with {activation} activations.",
             "math": r"W \leftarrow W - \eta \, \nabla_W \mathcal{L}",
             **extras,
