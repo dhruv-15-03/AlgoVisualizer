@@ -30,7 +30,7 @@
     "react-katex": "^3.0.1",
     "react-router-dom": "^7.18.2",
     "tailwind-merge": "^3.6.0",
-    "zustand": "^5.0.14"
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",
